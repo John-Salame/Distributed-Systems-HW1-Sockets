@@ -1,26 +1,56 @@
+/**
+ * Class Item
+ * Author: John Salame
+ * CSCI 5673 Distributed Systems
+ * Assignment 1 - Sockets
+ * Description: Item class common to client and server
+ */
+
 package common;
 
 public class Item {
 	private String name; // up to 32 characters
-	private int category; // integer 0-9
-	private int id; // unique provided by server
+	private ItemId id; // unique provided by server; the data type might change. I need to ask about it.
 	private String[] keywords;
 	private int numKeywords;
 	private static final int MAX_KEYWORDS = 5;
 	private String condition; // New or Used
 	private float price;
+	private int sellerId; // the seller is intrinsically tied to the item since he can change the price
 
-	// default constructor
+	// CONSTRUCTORS
 	public Item() {
+		initializeDefaults();
+	}
+	public Item(int sellerId) {
+		initializeDefaults();
+		this.sellerId = sellerId;
+	}
+
+	private void initializeDefaults() {
 		this.name = "";
-		this.category = 0;
-		this.id = 0;
+		this.id = new ItemId();
 		this.keywords = new String[MAX_KEYWORDS];
 		this.numKeywords = 0;
 		this.condition = "Used";
 		this.price = (float) 0.00;
+		this.sellerId = 0; // impossible seller ID
 	}
 
+	/**
+	 * Call this method after adding the item to the database.
+	 */
+	/*
+	public void createId(int serial) {
+		assert this.id == null;
+		this.id = new ItemId(this.category, serial);
+	}
+	*/
+
+	/**
+	 * Method listKeywords()
+	 * Represent the list of keywords as a string.
+	 */
 	public String listKeywords() {
 		String result = "";
 		for(int i = 0; i < numKeywords; i++) {
@@ -39,14 +69,15 @@ public class Item {
 		}
 		this.name = name;
 	}
-	public void setCategory(int cat) {
-		if(cat < 0 || cat > 9) {
-			throw new IllegalArgumentException("Category must be in range 0-9");
-		}
-		this.category = cat;
+	public void setCategory(int category) {
+		this.id.setCategory(category);
 	}
-	public void setId(int id) {
-		this.id = id;
+	public void setSerial(int serial) {
+		this.id.setSerial(serial);
+	}
+	public void setId(int category, int serial) {
+		this.id.setCategory(category);
+		this.id.setSerial(serial);
 	}
 	public void addKeyword(String keyword) {
 		// if we can add no more keywords, do nothing; if we want to alert the seller, then change this logic
@@ -70,25 +101,39 @@ public class Item {
 	public void setPrice(float price) {
 		this.price = price;
 	}
+	public void setSellerId(int sellerId) {
+		this.sellerId = sellerId;
+	}
 
 	// GETTERS
 	public String getName() {
 		return this.name;
 	}
 	public int getCategory() {
-		return this.category;
+		return this.id.getCategory();
 	}
-	public int getId() {
+	public int getSerial() {
+		return this.id.getSerial();
+	}
+	public ItemId getId() {
 		return this.id;
 	}
+	// return a copy of the keywords array without any blank keywords
 	public String[] getKeywords() {
-		return this.keywords;
+		String keywordsCopy[] = new String[this.numKeywords];
+		for(int i = 0; i < numKeywords; i++) {
+			keywordsCopy[i] = this.keywords[i];
+		}
+		return keywordsCopy;
 	}
 	public String getCondition() {
 		return this.condition;
 	}
 	public float getPrice() {
 		return this.price;
+	}
+	public int getSellerId() {
+		return this.sellerId;
 	}
 
 	// TO-DO: Make a byte array
@@ -101,11 +146,10 @@ public class Item {
 
 	@Override
 	public String toString() {
-		return "Name: " + this.name + "\n" +
-			"Item ID: " + this.id + "\n" + 
-			"Category: " + this.category + "\n" +
+		return "Name: " + this.getName() + "\n" +
+			"Item ID: " + this.getId() + "\n" + 
 			"Keywords: " + listKeywords() + "\n" + 
-			"Condition: " + this.condition + "\n" +
-			"Price: " + this.price + "\n";
+			"Condition: " + this.getCondition() + "\n" +
+			"Price: " + this.getPrice() + "\n";
 	}
 }

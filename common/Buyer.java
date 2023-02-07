@@ -1,15 +1,37 @@
+/**
+ * Class Buyer
+ * Author: John Salame
+ * CSCI 5673 Distributed Systems
+ * Assignment 1 - Sockets
+ * Description: Buyer class common to client and server
+ */
+
 package common;
 
 public class Buyer {
-	private String name; // provided by seller during account creation
+	private String name; // provided by buyer during account creation
+	private String password; // provided by buyer during account creation
 	private int id; // provided by server during account creation
 	private int numPurchases; // maintained by server
 
 	// CONSTRUCTOR
 	public Buyer() {
 		this.name = "";
+		this.password = "";
 		this.id = 0;
 		this.numPurchases = 0;
+	}
+
+	public Buyer(String name, String password, int id, int numPurchases) {
+		this.setName(name);
+		this.setPassword(password);
+		this.setId(id);
+		this.setNumPurchases(numPurchases);
+	}
+
+	// Check if the login credentials match this user
+	public boolean isMyLoginCredentials(String username, String password) {
+		return (this.name.equals(username) && this.password.equals(password));
 	}
 
 	// SETTERS
@@ -18,6 +40,9 @@ public class Buyer {
 			throw new IllegalArgumentException("Buyer name is too long");
 		}
 		this.name = name;
+	}
+	public void setPassword(String password) {
+		this.password = password;
 	}
 	public void setId(int id) {
 		this.id = id;
@@ -35,7 +60,7 @@ public class Buyer {
 		return this.id;
 	}
 	public int getNumPurchases() {
-		return numPurchases; // temporary implementation
+		return numPurchases;
 	}
 
 	// TO-DO: Make a byte array
@@ -48,8 +73,8 @@ public class Buyer {
 
 	@Override
 	public String toString() {
-		return "Name: " + this.name + "\n" +
-			"Buyer ID: " + this.id + "\n" + 
-			"Items purchased: " + this.numPurchases + "\n";
+		return "Name: " + this.getName() + "\n" +
+			"Buyer ID: " + this.getId() + "\n" + 
+			"Items purchased: " + this.getNumPurchases() + "\n";
 	}
 }

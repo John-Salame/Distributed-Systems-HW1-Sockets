@@ -1,7 +1,16 @@
+/**
+ * Class Seller
+ * Author: John Salame
+ * CSCI 5673 Distributed Systems
+ * Assignment 1 - Sockets
+ * Description: Seller class common to client and server
+ */
+
 package common;
 
 public class Seller {
 	private String name;
+	private String password;
 	private int id;
 	private int[] feedback;
 	private int numSold;
@@ -9,11 +18,23 @@ public class Seller {
 	// default constructor
 	public Seller() {
 		this.name = "";
+		this.password = "";
 		this.id = 0;
 		feedback = new int[2];
 		this.feedback[0] = 0;
 		this.feedback[1] = 0;
 		this.numSold = 0;
+	}
+
+	// Check if the login credentials match this user
+	public boolean isMyLoginCredentials(String username, String password) {
+		return (this.name.equals(username) && this.password.equals(password));
+	}
+
+	public String displayFeedback() {
+		return "Feedback:\n" + 
+			"  Positive: " + this.feedback[0] + "\n" +
+			"  Negative: " + this.feedback[1] + "\n";
 	}
 
 	// SETTERS
@@ -22,6 +43,9 @@ public class Seller {
 			throw new IllegalArgumentException("Seller name is too long");
 		}
 		this.name = name;
+	}
+	public void setPassword(String password) {
+		this.password = password;
 	}
 	public void setId(int id) {
 		this.id = id;
@@ -61,11 +85,9 @@ public class Seller {
 
 	@Override
 	public String toString() {
-		return "Name: " + this.name + "\n" +
-			"Seller ID: " + this.id + "\n" + 
-			"Feedback:\n" + 
-			"  Positive: " + this.feedback[0] + "\n" +
-			"  Negative: " + this.feedback[1] + "\n" +
-			"Items sold: " + this.numSold + "\n";
+		return "Name: " + this.getName() + "\n" +
+			"Seller ID: " + this.getId() + "\n" + 
+			this.displayFeedback() +
+			"Items sold: " + this.getNumSold() + "\n";
 	}
 }

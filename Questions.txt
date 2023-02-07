@@ -1,0 +1,39 @@
+Questions:
+
+1. Item ID: Do we have an int or do we have to have <category, int> as the write-up says?
+2. Are we allowed to send JSON over the network?
+    Use same data representation over all homework.
+3. Can the database be on the same IP address as the server? Or what does it mean by in-memory database?
+    Databases need to be on separate IP address.
+4. Is it okay to use Maven or something like that to pull in packages?
+5. Can we have some stuff on the server such as Sessions?
+6. Would purchases be more suited to customer database or product database?
+7. What would be the easiest way to do a bunch of API calls from each client, and do we need to use multiple machines?
+8. Do the users databases need to contain passwords and allow only correct logins?
+    Add whatever you need to the classes.
+
+**Logout closes the connection.
+No other thing can close the TCP connection.
+
+Other project ideas:
+* L2 application discovery service to limit communication to only the LAN.
+* Function as a Service (FaaS)
+* Kubernetes-like application without containers.
+    * Seems similar to SOAP based on the notes in class.
+* Restoring socket connection to a server after client changes IP address.
+    * Mobile applications
+        * Changing WiFi networks / new BSS.
+    * Identify the connection with something other than IP or session token, something unique to a device.
+    * For the case where an IP address changes or network reachability is broken without client or server crash/error.
+* Light-weight network communication to improve Mobile battery life.
+* Distributed video/audio rendering
+
+___________________________________________________________________
+
+Questions Tues 2/7/23 (the day before the due date)
+1. Are we allowed to track sessions on the server or does it need to be in the database?
+2. Are we allowed to cache database responses on the server?
+3. Do we have only one server running with one thread? Otherwise counting sales / purchases is more difficult.
+4. What would happen if we apply a database lock / begin a transaction and then the server communicating with the DB crashes?
+5. How can we view a buyer's purchase history if he are not impleminting "Make purchase?"
+6. Are buyers allowed to purchase less than the quantity? Or do they purchase the full quantity the seller lists?
