@@ -1,14 +1,13 @@
 /**
- * Class ServerRunnerInMemory
+ * Class BuyerRunnerClient
  * Author: John Salame
  * CSCI 5673 Distributed Systems
  * Assignment 1 - Sockets
- * Description: Test the business logic using in-memory databases. Skip the client-server interaction.
+ * Description: The buyer client which will make API calls and measure average response time
  */
 
-package server;
-import dao.*;
-import server.v1.*;
+package client;
+import client.v1.*;
 import common.Buyer;
 import common.BuyerInterface;
 import common.Seller;
@@ -18,25 +17,20 @@ import common.ItemId;
 import common.SaleListing;
 import common.SaleListingId;
 
- public class ServerRunnerInMemory {
+ public class BuyerRunnerClient {
 	public static void main(String[] args) {
-		BuyerDAO buyerDao = new BuyerDAOInMemory();
-		SellerDAO sellerDao = new SellerDAOInMemory();
-		SessionDAO sessionDao = new SessionDAOInMemory();
-		ItemDAO itemDao = null;
-		BuyerInterface buyerInterface = new BuyerInterfaceServerV1(buyerDao, sellerDao, sessionDao, itemDao);
-		SellerInterface sellerInterface = new SellerInterfaceServerV1(sellerDao, sessionDao, itemDao);
+		BuyerInterface transport = new BuyerSocketClientV1("localhost", 8100);
+		BuyerInterface buyerInterface = new BuyerInterfaceClientV1(transport);
 
 		// Basic buyer API calls
 		String buyer1Username = "Joe";
 		String buyer1Password = "password123";
 		int buyer1Id = buyerInterface.createUser(buyer1Username, buyer1Password);
-		assert buyer1Id == buyerDao.getUserId(buyer1Username, buyer1Password);
+		System.out.println("Buyer 1 id: " + buyer1Id);
 		String buyer1SessionToken = buyerInterface.login(buyer1Username, buyer1Password);
-		Buyer buyer1 = buyerDao.getBuyerById(buyer1Id);
-		System.out.println("Printing buyer 1");
-		System.out.println(buyer1);
+		System.out.println("Buyer 1 session token = " + buyer1SessionToken);
 
+		/*
 		// Basic seller API calls
 		String seller1Username = "John";
 		String seller1Password = "password321";
@@ -85,5 +79,6 @@ import common.SaleListingId;
 		System.out.println("Seller 1 logging out");
 		sellerInterface.logout(seller1SessionToken);
 		System.out.println(sessionDao.listSessions());
+		*/
 	}
  }

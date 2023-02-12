@@ -1,19 +1,20 @@
 /**
- * Class BuyerInterfaceServer
+ * Class BuyerInterfaceServerV1
  * Author: John Salame
  * CSCI 5673 Distributed Systems
  * Assignment 1 - Sockets
+ * API version 1
  * Description: Server-side implementation of the buyer API
  */
 
-package server;
+package server.v1;
 import dao.*;
 import common.BuyerInterface;
 import common.Item;
 import common.ItemId;
 import util.EditDistance;
 
-public class BuyerInterfaceServer implements BuyerInterface {
+public class BuyerInterfaceServerV1 implements BuyerInterface {
 
 	private BuyerDAO buyerDao;
 	private SellerDAO sellerDao;
@@ -21,8 +22,8 @@ public class BuyerInterfaceServer implements BuyerInterface {
 	private ItemDAO itemDao;
 	
 	// CONSTRUCTORS
-	public BuyerInterfaceServer() {}
-	public BuyerInterfaceServer(BuyerDAO buyerDao, SellerDAO sellerDao, SessionDAO sessionDao, ItemDAO itemDao) {
+	public BuyerInterfaceServerV1() {}
+	public BuyerInterfaceServerV1(BuyerDAO buyerDao, SellerDAO sellerDao, SessionDAO sessionDao, ItemDAO itemDao) {
 		this.buyerDao = buyerDao;
 		this.sellerDao = sellerDao;
 		this.sessionDao = sessionDao;
@@ -41,7 +42,6 @@ public class BuyerInterfaceServer implements BuyerInterface {
 		sessionDao.expireSession(sessionToken);
 	}
 	public int[] getSellerRating(int sellerId) {
-		// throw new NotImplementedException("BuyerInterfaceServer: getSellerRating()");
 		return sellerDao.getSellerById(sellerId).getFeedback();
 	}
 	/**

@@ -1,27 +1,28 @@
 /**
- * Class SellerInterfaceServer
+ * Class SellerInterfaceServerV1
  * Author: John Salame
  * CSCI 5673 Distributed Systems
  * Assignment 1 - Sockets
+ * API version 1
  * Description: Server-side implementation of the seller API
  */
 
-package server;
+package server.v1;
 import dao.*;
 import common.SellerInterface;
 import common.Item;
 import common.ItemId;
 import util.EditDistance;
 
-public class SellerInterfaceServer implements SellerInterface {
+public class SellerInterfaceServerV1 implements SellerInterface {
 
 	private SellerDAO sellerDao;
 	private SessionDAO sessionDao;
 	private ItemDAO itemDao;
 	
 	// CONSTRUCTORS
-	public SellerInterfaceServer() {}
-	public SellerInterfaceServer(SellerDAO sellerDao, SessionDAO sessionDao, ItemDAO itemDao) {
+	public SellerInterfaceServerV1() {}
+	public SellerInterfaceServerV1(SellerDAO sellerDao, SessionDAO sessionDao, ItemDAO itemDao) {
 		this.sellerDao = sellerDao;
 		this.sessionDao = sessionDao;
 		this.itemDao = itemDao;
@@ -39,10 +40,9 @@ public class SellerInterfaceServer implements SellerInterface {
 		sessionDao.expireSession(sessionToken);
 	}
 	public int[] getSellerRating(int sellerId) {
-		// throw new NotImplementedException("BuyerInterfaceServer: getSellerRating()");
 		return sellerDao.getSellerById(sellerId).getFeedback();
 	}
 	public void putOnSale(String sessionToken, Item item, int quantity) {
-		throw new RuntimeException("SellerInterfaceServer: putOnSale() Not implemented");
+		throw new RuntimeException("SellerInterfaceServerV1: putOnSale() Not implemented");
 	}
 }
