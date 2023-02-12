@@ -1,17 +1,17 @@
 /**
- * Class BuyerSocketServerThreadV1
+ * Class SellerSocketServerThreadV1
  * Author: John Salame
  * CSCI 5673 Distributed Systems
  * Assignment 1 - Sockets
  * API version 1
- * Description: Socket implementation of buyer client-server IPC on server side
+ * Description: Socket implementation of seller client-server IPC on server side
  * Socket programming reference: https://www.geeksforgeeks.org/socket-programming-in-java/
  */
 
 package server.v1;
-import common.BuyerInterface;
+import common.SellerInterface;
 import common.transport.serialize.*;
-import common.transport.socket.BuyerEnumV1;
+import common.transport.socket.SellerEnumV1;
 import common.transport.socket.PacketPrefix;
 import common.transport.socket.SocketMessage;
 import common.Item;
@@ -22,9 +22,9 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.EOFException; // happens when writing to a closed socket
 
-public class BuyerSocketServerThreadV1 implements BuyerInterface, Runnable {
-	private BuyerInterface buyerInterfaceV1;
-	private BuyerEnumV1[] buyerEnumV1Values; // for translating function ID to enum value
+public class SellerSocketServerThreadV1 implements SellerInterface, Runnable {
+	private SellerInterface sellerInterfaceV1;
+	private SellerEnumV1[] sellerEnumV1Values; // for translating function ID to enum value
 	private Socket socket = null;
 	private boolean stop; // set to true upon logout to stop the loop of reading and responding to messages
 	private DataOutputStream out; // use this to write to the socket
@@ -32,9 +32,9 @@ public class BuyerSocketServerThreadV1 implements BuyerInterface, Runnable {
 
 	// CONSTRUCTORS
 	// Use this Constructor for threads that have an active connection
-	public BuyerSocketServerThreadV1(BuyerInterface buyerInterfaceV1, Socket socket) {
-		this.buyerInterfaceV1 = buyerInterfaceV1;
-		this.buyerEnumV1Values = BuyerEnumV1.values();
+	public SellerSocketServerThreadV1(SellerInterface sellerInterfaceV1, Socket socket) {
+		this.sellerInterfaceV1 = sellerInterfaceV1;
+		this.sellerEnumV1Values = SellerEnumV1.values();
 		this.socket = socket;
 		this.stop = false;
 	}
@@ -69,7 +69,7 @@ public class BuyerSocketServerThreadV1 implements BuyerInterface, Runnable {
 				}
 			}
 			catch (EOFException e) {
-				System.out.println("BuyerSocketServerThreadV1 receive loop: " + e);
+				System.out.println("SellerSocketServerThreadV1 receive loop: " + e);
 				this.stop = true;
 			}
 			// return immediately if the socket experiences a connectoin error such as "Connection reset"
@@ -92,7 +92,7 @@ public class BuyerSocketServerThreadV1 implements BuyerInterface, Runnable {
 			byte[] msg = new PacketPrefix(apiVer).prependPrefix(b, funcId); // prepare the message
 			this.out.write(msg); // send the message over the socket
 		} catch (EOFException e) {
-			System.out.println("BuyerSocketServerThreadV1 sendResponse(): " + e);
+			System.out.println("SellerSocketServerThreadV1 sendResponse(): " + e);
 		} catch (IOException i) {
 			System.out.println(i);
 		} catch (Exception e) {
@@ -107,7 +107,7 @@ public class BuyerSocketServerThreadV1 implements BuyerInterface, Runnable {
 			this.socket.close();
 			this.socket = null;
 		} catch (IOException i) {
-			System.out.println("BuyerSocketServerThreadV1 cleanup(): " + i);
+			System.out.println("SellerSocketServerThreadV1 cleanup(): " + i);
 		}
 	}
 
@@ -116,12 +116,12 @@ public class BuyerSocketServerThreadV1 implements BuyerInterface, Runnable {
 			case 1:
 				return this.demuxV1(funcId, msg);
 			default:
-				throw new RuntimeException("Err BuyerSocketServerThreadV1: Received message with invalid API version.");
+				throw new RuntimeException("Err SellerSocketServerThreadV1: Received message with invalid API version.");
 		}
 	}
 	private byte[] demuxV1(int funcId, byte[] msg) throws IOException {
 		// TO-DO: Error handling if funcId is an invalid index
-		BuyerEnumV1 functionName = this.buyerEnumV1Values[funcId];
+		SellerEnumV1 functionName = this.sellerEnumV1Values[funcId];
 		switch (functionName) {
 			case CREATE_USER:
 				return this.bytesCreateUser(msg);
@@ -131,14 +131,16 @@ public class BuyerSocketServerThreadV1 implements BuyerInterface, Runnable {
 				return this.bytesLogout(msg);
 			case GET_SELLER_RATING:
 				return this.bytesGetSellerRating(msg);
+			case PUT_ON_SALE:
+				return this.bytesPutOnSale(msg);
 			default:
-				throw new RuntimeException("Err BuyerSocketServerThreadV1: Unsupported method triggered by enum.");
+				throw new RuntimeException("Err SellerSocketServerThreadV1: Unsupported method triggered by enum.");
 		}
 	}
 
-	// Buyer interface methods and their new counterparts
+	// Seller interface methods and their new counterparts
 	public int createUser(String username, String password) {
-		return this.buyerInterfaceV1.createUser(username, password);
+		return this.sellerInterfaceV1.createUser(username, password);
 	}
 	private byte[] bytesCreateUser(byte[] msg) throws IOException {
 		SerializeLogin serLog = SerializeLogin.deserialize(msg);
@@ -147,7 +149,7 @@ public class BuyerSocketServerThreadV1 implements BuyerInterface, Runnable {
 	}
 
 	public String login(String username, String password) {
-		return this.buyerInterfaceV1.login(username, password);
+		return this.sellerInterfaceV1.login(username, password);
 	}
 	private byte[] bytesLogin(byte[] msg) throws IOException {
 		SerializeLogin serLog = SerializeLogin.deserialize(msg);
@@ -155,7 +157,7 @@ public class BuyerSocketServerThreadV1 implements BuyerInterface, Runnable {
 		return SerializeString.serialize(sessionToken);
 	}
 	public void logout(String sessionToken) {
-		this.buyerInterfaceV1.logout(sessionToken);
+		this.sellerInterfaceV1.logout(sessionToken);
 		this.stop = true;
 		System.out.println("Logging out");
 	}
@@ -166,27 +168,22 @@ public class BuyerSocketServerThreadV1 implements BuyerInterface, Runnable {
 		return output;
 	}
 	public int[] getSellerRating(int sellerId) {
-		return this.buyerInterfaceV1.getSellerRating(sellerId);
+		return this.sellerInterfaceV1.getSellerRating(sellerId);
 	}
 	private byte[] bytesGetSellerRating(byte[] msg) throws IOException {
 		int sellerId = SerializeInt.deserialize(msg);
 		int[] rating = this.getSellerRating(sellerId);
 		return SerializeIntArray.serialize(rating);
 	}
-	public Item[] searchItem(String sessionToken, int category, String[] keywords) {
-		int funcId = BuyerEnumV1.SEARCH_ITEM.ordinal();
-		System.out.println(funcId);
-		throw new RuntimeException("Method not implemented BuyerSocketServerV1: searchItem()");
+	public void putOnSale(String sessionToken, Item item, int quantity) {
+		this.sellerInterfaceV1.putOnSale(sessionToken, item, quantity);
 	}
-	// public abstract void addToCart(String sessionToken, ItemId itemId, int quantity);
-	// public abstract void removeFromCart(String sessionToken, ItemId itemId, int quantity);
-	// public abstract void clearCart(String sessionToken);
-	// public abstract String displayCart(String sessionToken); // return a string that you can display later
-	/**
-	 * For feedback, rating=1 is thumbs up and rating=-1 is thumbs down.
-	 * A user should only be able to provide feedback for an item once.
-	 * Maybe return a String so I can give a proper message if the user attempts to provide feedback more than once.
-	 */
-	// public abstract void provideFeedback(String sessionToken, ItemId itemId, int rating); // TO-DO: Figure out how to limit to one vote
-	// public abstract Purchase[] getPurchaseHistory(String sessionToken);
+	private byte[] bytesPutOnSale(byte[] msg) throws IOException {
+		throw new RuntimeException("SellerSocketServerThreadV1: putOnSale() Not implemented");
+	}
+	/*
+	public void changePriceOfItem(String sessionToken, ItemId itemId, float newPrice);
+	public void removeItemFromSale(String sessionToken, ItemId itemId, int quantity);
+	public String displayItemsOnSale(String sessionToken);
+	*/
 }

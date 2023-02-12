@@ -12,10 +12,18 @@ RM = rm
 CLASSES = \
 	client/v1/BuyerInterfaceClientV1.java \
 	client/v1/BuyerSocketClientV1.java \
+	client/v1/SellerInterfaceClientV1.java \
+	client/v1/SellerSocketClientV1.java \
 	client/BuyerRunnerClient.java \
+	client/SellerRunnerClient.java \
+	common/transport/serialize/SerializeInt.java \
+	common/transport/serialize/SerializeIntArray.java \
 	common/transport/serialize/SerializeLogin.java \
+	common/transport/serialize/SerializeString.java \
 	common/transport/socket/BuyerEnumV1.java \
 	common/transport/socket/PacketPrefix.java \
+	common/transport/socket/SellerEnumV1.java \
+	common/transport/socket/SocketMessage.java \
 	common/Buyer.java \
 	common/BuyerInterface.java \
 	common/CartItem.java \
@@ -39,8 +47,11 @@ CLASSES = \
 	server/v1/BuyerSocketServerListenerV1.java \
 	server/v1/BuyerSocketServerThreadV1.java \
 	server/v1/SellerInterfaceServerV1.java \
+	server/v1/SellerSocketServerListenerV1.java \
+	server/v1/SellerSocketServerThreadV1.java \
 	server/ServerRunnerInMemory.java \
 	server/BuyerRunnerServer.java \
+	server/SellerRunnerServer.java \
 	util/EditDistance.java
 
 all: classes
@@ -59,3 +70,9 @@ run_buyer_client:
 
 run_buyer_server:
 	$(JR) server/BuyerRunnerServer.java
+
+run_seller_client:
+	$(JR) client/SellerRunnerClient.Java
+
+run_seller_server:
+	$(JR) server/SellerRunnerServer.java

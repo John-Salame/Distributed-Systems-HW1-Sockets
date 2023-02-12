@@ -20,7 +20,6 @@ public class SerializeString {
 		DataOutputStream writer = new DataOutputStream(buf);
 		writer.writeUTF(str);
 		byte ret[] = buf.toByteArray();
-		System.out.println(ret.length);
 		writer.close();
 		buf.close();
 		return ret;

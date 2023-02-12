@@ -1,5 +1,5 @@
 /**
- * Class BuyerInterfaceClient
+ * Class BuyerInterfaceClientV1
  * Author: John Salame
  * CSCI 5673 Distributed Systems
  * Assignment 1 - Sockets

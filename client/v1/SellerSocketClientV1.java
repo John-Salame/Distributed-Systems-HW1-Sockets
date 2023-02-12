@@ -1,17 +1,17 @@
 /**
- * Class BuyerSocketClientV1
+ * Class SellerSocketClientV1
  * Author: John Salame
  * CSCI 5673 Distributed Systems
  * Assignment 1 - Sockets
  * API version 1
- * Description: Socket implementation of buyer client-server IPC on client side
+ * Description: Socket implementation of seller client-server IPC on client side
  * Socket programming reference: https://www.geeksforgeeks.org/socket-programming-in-java/
  */
 
 package client.v1;
-import common.BuyerInterface;
+import common.SellerInterface;
 import common.transport.serialize.*;
-import common.transport.socket.BuyerEnumV1;
+import common.transport.socket.SellerEnumV1;
 import common.transport.socket.PacketPrefix;
 import common.transport.socket.SocketMessage;
 import common.Item;
@@ -21,7 +21,7 @@ import java.io.DataOutputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-public class BuyerSocketClientV1 implements BuyerInterface {
+public class SellerSocketClientV1 implements SellerInterface {
 	private final short apiVer = 1;
 	private PacketPrefix packetPrefix; // use this to add important metadata to messages over the socket
 	private Socket socket = null;
@@ -32,7 +32,7 @@ public class BuyerSocketClientV1 implements BuyerInterface {
 
 	// CONSTRUCTORS
 	// recommend serverIp = localhost
-	public BuyerSocketClientV1(String serverIp, int serverPort) {
+	public SellerSocketClientV1(String serverIp, int serverPort) {
 		this.packetPrefix = new PacketPrefix(this.apiVer);
 		this.setup(serverIp, serverPort);
 	}
@@ -99,7 +99,7 @@ public class BuyerSocketClientV1 implements BuyerInterface {
 				return;
 			}
 		}
-		throw new RuntimeException("Buyer client failed to connect.");
+		throw new RuntimeException("Seller client failed to connect.");
 	}
 	// send the message and return the response
 	public byte[] sendAndReceive(byte[] msg, int funcId) throws IOException {
@@ -111,7 +111,7 @@ public class BuyerSocketClientV1 implements BuyerInterface {
 
 	// Inherited Methods
 	public int createUser(String username, String password) {
-		int funcId = BuyerEnumV1.CREATE_USER.ordinal();
+		int funcId = SellerEnumV1.CREATE_USER.ordinal();
 		int userId = 0;
 		try {
 			byte[] msg = SerializeLogin.serialize(username, password);
@@ -125,7 +125,7 @@ public class BuyerSocketClientV1 implements BuyerInterface {
 		return userId;
 	}
 	public String login(String username, String password) {
-		int funcId = BuyerEnumV1.LOGIN.ordinal();
+		int funcId = SellerEnumV1.LOGIN.ordinal();
 		String sessionToken = null;
 		try {
 			byte[] msg = SerializeLogin.serialize(username, password);
@@ -139,7 +139,7 @@ public class BuyerSocketClientV1 implements BuyerInterface {
 	}
 	// clean up (close buffers and close the connection) when finished
 	public void logout(String sessionToken) {
-		int funcId = BuyerEnumV1.LOGOUT.ordinal();
+		int funcId = SellerEnumV1.LOGOUT.ordinal();
 		try {
 			byte[] msg = SerializeString.serialize(sessionToken);
 			byte[] buf = this.sendAndReceive(msg, funcId);
@@ -151,7 +151,7 @@ public class BuyerSocketClientV1 implements BuyerInterface {
 		this.cleanup();
 	}
 	public int[] getSellerRating(int sellerId) {
-		int funcId = BuyerEnumV1.GET_SELLER_RATING.ordinal();
+		int funcId = SellerEnumV1.GET_SELLER_RATING.ordinal();
 		int[] rating = null;
 		try {
 			byte[] msg = SerializeInt.serialize(sellerId);
@@ -163,19 +163,12 @@ public class BuyerSocketClientV1 implements BuyerInterface {
 		}
 		return rating;
 	}
-	public Item[] searchItem(String sessionToken, int category, String[] keywords) {
-		int funcId = BuyerEnumV1.SEARCH_ITEM.ordinal();
-		throw new RuntimeException("Method not implemented BuyerSocketClientV1: searchItem()");
+	public void putOnSale(String sessionToken, Item item, int quantity) {
+		throw new RuntimeException("SellerSocketClientV1: putOnSale() Not implemented");
 	}
-	// public abstract void addToCart(String sessionToken, ItemId itemId, int quantity);
-	// public abstract void removeFromCart(String sessionToken, ItemId itemId, int quantity);
-	// public abstract void clearCart(String sessionToken);
-	// public abstract String displayCart(String sessionToken); // return a string that you can display later
-	/**
-	 * For feedback, rating=1 is thumbs up and rating=-1 is thumbs down.
-	 * A user should only be able to provide feedback for an item once.
-	 * Maybe return a String so I can give a proper message if the user attempts to provide feedback more than once.
-	 */
-	// public abstract void provideFeedback(String sessionToken, ItemId itemId, int rating); // TO-DO: Figure out how to limit to one vote
-	// public abstract Purchase[] getPurchaseHistory(String sessionToken);
+	/*
+	public void changePriceOfItem(String sessionToken, ItemId itemId, float newPrice);
+	public void removeItemFromSale(String sessionToken, ItemId itemId, int quantity);
+	public String displayItemsOnSale(String sessionToken);
+	*/
 }

@@ -45,4 +45,9 @@ public class SellerInterfaceServerV1 implements SellerInterface {
 	public void putOnSale(String sessionToken, Item item, int quantity) {
 		throw new RuntimeException("SellerInterfaceServerV1: putOnSale() Not implemented");
 	}
+	/*
+	public void changePriceOfItem(String sessionToken, ItemId itemId, float newPrice);
+	public void removeItemFromSale(String sessionToken, ItemId itemId, int quantity);
+	public String displayItemsOnSale(String sessionToken);
+	*/
 }
