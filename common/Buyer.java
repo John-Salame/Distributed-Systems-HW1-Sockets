@@ -21,7 +21,6 @@ public class Buyer {
 		this.id = 0;
 		this.numPurchases = 0;
 	}
-
 	public Buyer(String name, String password, int id, int numPurchases) {
 		this.setName(name);
 		this.setPassword(password);

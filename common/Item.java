@@ -26,7 +26,17 @@ public class Item {
 		initializeDefaults();
 		this.sellerId = sellerId;
 	}
-
+	public Item(String name, ItemId id, String[] keywords, String condition, float price, int sellerId) {
+		this.setName(name);
+		this.id = id; // assume that the constraints in the creation of itemId have provided our validation for us
+		this.keywords = new String[MAX_KEYWORDS];
+		for(String keyword : keywords) {
+			this.addKeyword(keyword);
+		}
+		this.setCondition(condition);
+		this.setPrice(price);
+		this.setSellerId(sellerId);
+	}
 	private void initializeDefaults() {
 		this.name = "";
 		this.id = new ItemId();
@@ -150,6 +160,7 @@ public class Item {
 			"Item ID: " + this.getId() + "\n" + 
 			"Keywords: " + listKeywords() + "\n" + 
 			"Condition: " + this.getCondition() + "\n" +
-			"Price: " + this.getPrice() + "\n";
+			"Price: " + this.getPrice() + "\n" + 
+			"Seller ID: " + this.getSellerId() + "\n";
 	}
 }

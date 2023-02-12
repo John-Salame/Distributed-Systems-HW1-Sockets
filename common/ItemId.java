@@ -74,4 +74,9 @@ public class ItemId {
 	public String toString() {
 		return "<" + this.category + ", " + this.serial + ">";
 	}
+	@Override
+	public boolean equals(Object other) {
+		ItemId otherItemId = (ItemId) other;
+		return (this.category == otherItemId.category && this.serial == otherItemId.serial);
+	}
  }

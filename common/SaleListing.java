@@ -18,23 +18,44 @@
 package common;
 
 public class SaleListing {
-	private ItemId itemId; // acts as a foreign key
-	private int originalQuantity; // how many the seller put up for sale
+	private SaleListingId id;
 	private int quantityRemaining; // how many have not yet sold
 	boolean isRemoved;
 
 	// CONSTRUCTORS
 	public SaleListing() {
+		this.id = new SaleListingId();
 		this.isRemoved = false;
 	}
 	public SaleListing(ItemId itemId, int quantity) {
-		this.itemId = itemId;
+		this.id = new SaleListingId(itemId, quantity);
 		this.initializeQuantity(quantity);
+		this.isRemoved = false;
+	}
+	public SaleListing(SaleListingId id) {
+		this.id = id;
+		this.initializeQuantity(id.getQuantity());
+		this.isRemoved = false;
 	}
 
+	// SETTERS
+	public void setItemId(ItemId itemId) {
+		this.id.setItemId(itemId);
+	}
+	public void initializeQuantity(int q) {
+		assert q >= 0;
+		this.setOriginalQuantity(q);
+		this.quantityRemaining = q;
+	}
+	private void setOriginalQuantity(int q) {
+		this.id.setQuantity(q);
+	}
 	// used this function when selling the item; you can only sell up to <quantityRemaining> items
 	// return the number of items sold
 	public int decrementQuantity(int q) {
+		if(isRemoved) {
+			throw new IllegalStateException("Error: Cannot buy an item which has been removed from sale.");
+		}
 		int qSold = Math.min(q, this.quantityRemaining);
 		this.quantityRemaining -= qSold;
 		return qSold;
@@ -44,27 +65,18 @@ public class SaleListing {
 		this.isRemoved = true;
 	}
 
-	// SETTERS
-	public void setItemId(ItemId itemId) {
-		this.itemId = itemId;
-	}
-	public void initializeQuantity(int q) {
-		this.originalQuantity = q;
-		this.quantityRemaining = q;
-	}
-
 	// GETTERS
 	public ItemId getItemId() {
-		return this.itemId;
+		return this.id.getItemId();
 	}
 	public int getOriginalQuantity() {
-		return this.originalQuantity;
+		return this.id.getQuantity();
 	}
 	public int getQuantityRemaining() {
 		return this.quantityRemaining;
 	}
 	public int getQuantitySold() {
-		return this.originalQuantity - this.quantityRemaining;
+		return this.getOriginalQuantity() - this.quantityRemaining;
 	}
 	public boolean isSoldOut() {
 		return this.quantityRemaining <= 0; // really it should only work for = 0, but who knows if something weird might happen?
@@ -81,7 +93,7 @@ public class SaleListing {
 			ret += " (Sold out)";
 		}
 		else if(this.isRemoved()) {
-			ret += " (No longer available)";
+			ret += " (No longer available for purchase)";
 		}
 		ret += "\n";
 		return ret;

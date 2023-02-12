@@ -27,6 +27,7 @@ CLASSES = \
 	dao/SessionDAO.java \
 	dao/SessionDAOInMemory.java \
 	server/BuyerInterfaceServer.java \
+	server/SellerInterfaceServer.java \
 	server/ServerRunnerInMemory.java \
 	util/EditDistance.java
 

@@ -33,7 +33,10 @@ ___________________________________________________________________
 Questions Tues 2/7/23 (the day before the due date)
 1. Are we allowed to track sessions on the server or does it need to be in the database?
 2. Are we allowed to cache database responses on the server?
+    Session token must be in database but I can cache it
 3. Do we have only one server running with one thread? Otherwise counting sales / purchases is more difficult.
+    We need to write it in a way that it can work across multiple servers.
 4. What would happen if we apply a database lock / begin a transaction and then the server communicating with the DB crashes?
 5. How can we view a buyer's purchase history if he are not impleminting "Make purchase?"
 6. Are buyers allowed to purchase less than the quantity? Or do they purchase the full quantity the seller lists?
+    Yes, they can buy less.

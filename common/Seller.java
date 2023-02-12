@@ -30,11 +30,13 @@ public class Seller {
 	public boolean isMyLoginCredentials(String username, String password) {
 		return (this.name.equals(username) && this.password.equals(password));
 	}
-
-	public String displayFeedback() {
+	public String displayFeedbackSelf() {
+		return displayFeedback(this.feedback);
+	}
+	public static String displayFeedback(int[] feedback) {
 		return "Feedback:\n" + 
-			"  Positive: " + this.feedback[0] + "\n" +
-			"  Negative: " + this.feedback[1] + "\n";
+			"  Positive: " + feedback[0] + "\n" +
+			"  Negative: " + feedback[1] + "\n";
 	}
 
 	// SETTERS
@@ -87,7 +89,7 @@ public class Seller {
 	public String toString() {
 		return "Name: " + this.getName() + "\n" +
 			"Seller ID: " + this.getId() + "\n" + 
-			this.displayFeedback() +
+			this.displayFeedbackSelf() +
 			"Items sold: " + this.getNumSold() + "\n";
 	}
 }

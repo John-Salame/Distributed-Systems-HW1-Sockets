@@ -3,7 +3,7 @@
  * Author: John Salame
  * CSCI 5673 Distributed Systems
  * Assignment 1 - Sockets
- * Description: Server-side implementation of the buyer interface
+ * Description: Server-side implementation of the buyer API
  */
 
 package server;
@@ -21,9 +21,7 @@ public class BuyerInterfaceServer implements BuyerInterface {
 	private ItemDAO itemDao;
 	
 	// CONSTRUCTORS
-	public BuyerInterfaceServer() {
-
-	}
+	public BuyerInterfaceServer() {}
 	public BuyerInterfaceServer(BuyerDAO buyerDao, SellerDAO sellerDao, SessionDAO sessionDao, ItemDAO itemDao) {
 		this.buyerDao = buyerDao;
 		this.sellerDao = sellerDao;

@@ -13,7 +13,9 @@ public interface SellerInterface extends CommonUserInterface {
 	//   Implement methods from CommonUserInterface
 	// New Methods
 	public abstract void putOnSale(String sessionToken, Item item, int quantity);
-	public abstract void changePriceOfItem(String sessionToken, int itemId, float newPrice);
-	public abstract void removeItemFromSale(String sessionToken, int itemId, int quantity);
+	/*
+	public abstract void changePriceOfItem(String sessionToken, ItemId itemId, float newPrice);
+	public abstract void removeItemFromSale(String sessionToken, ItemId itemId, int quantity);
 	public abstract String displayItemsOnSale(String sessionToken);
+	*/
 }
