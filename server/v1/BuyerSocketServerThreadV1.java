@@ -20,11 +20,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.io.EOFException; // happens when writing to a closed socket
 
 public class BuyerSocketServerThreadV1 implements BuyerInterface, Runnable {
 	private BuyerInterface buyerInterfaceV1;
 	private BuyerEnumV1[] buyerEnumV1Values; // for translating function ID to enum value
 	private Socket socket = null;
+	private boolean stop; // set to true upon logout to stop the loop of reading and responding to messages
 	private DataOutputStream out; // use this to write to the socket
 	private DataInputStream in; // use this to read from the socket
 
@@ -34,6 +36,7 @@ public class BuyerSocketServerThreadV1 implements BuyerInterface, Runnable {
 		this.buyerInterfaceV1 = buyerInterfaceV1;
 		this.buyerEnumV1Values = BuyerEnumV1.values();
 		this.socket = socket;
+		this.stop = false;
 	}
 
 
@@ -50,51 +53,36 @@ public class BuyerSocketServerThreadV1 implements BuyerInterface, Runnable {
 		catch (IOException i) {
 			System.out.println(i);
 		}
-		/*
-		// Pull out the message metadata (packet prefix)
-		PacketPrefix prefix = null;
-		try {
-			prefix = PacketPrefix.getPrefixFromMessage(in);
-			System.out.println(prefix);
-		} catch (IOException i) {
-			System.out.println(i);
-			this.cleanup();
-			return;
-		}
-		short msgSize = prefix.getMsgSize();
-		short apiVer = prefix.getApiVer();
-		int funcId = prefix.getFuncId();
-		// read the actual message
-		short bytesLeft = msgSize;
-		byte[] buf = new byte[msgSize];
-		boolean msgOk = true;
-		while(bytesLeft > 0) {
-			try {
-				short bytesRead = (short) in.read(buf, 0, bytesLeft);
-				bytesLeft -= bytesRead;
-			} catch (IOException i) {
-				System.out.println(i);
-				msgOk = false;
-			}
-		}
-		*/
+		// repeatedly read and respond to messages until the client closes the connection
 		// I have many functions that can result in IOException but I do not do any retries
-		try {
-			SocketMessage inMsg = SocketMessage.readAndSplit(this.in);
-			// now, pass the message to the functions that will figure out who the handler is
-			if (inMsg != null) {
-				byte[] buf = inMsg.getMsg();
-				short apiVer = inMsg.getPrefix().getApiVer();
-				int funcId = inMsg.getPrefix().getFuncId();
-				// call the demux function
-				byte[] response = this.demux(apiVer, funcId, buf);
-				this.sendResponse(response, funcId, apiVer);
+		while(!this.stop) {
+			try {
+				SocketMessage inMsg = SocketMessage.readAndSplit(this.in);
+				// now, pass the message to the functions that will figure out who the handler is
+				if (inMsg != null) {
+					byte[] buf = inMsg.getMsg();
+					short apiVer = inMsg.getPrefix().getApiVer();
+					int funcId = inMsg.getPrefix().getFuncId();
+					// call the demux function
+					byte[] response = this.demux(apiVer, funcId, buf);
+					this.sendResponse(response, funcId, apiVer);
+				}
 			}
-		}
-		catch (IOException i) {
-			System.out.println(i);
+			catch (EOFException e) {
+				System.out.println("BuyerSocketServerThreadV1 receive loop: " + e);
+				this.stop = true;
+			}
+			// return immediately if the socket experiences a connectoin error such as "Connection reset"
+			catch (SocketException s) {
+				System.out.println(s);
+				this.stop = true;
+			}
+			catch (IOException i) {
+				System.out.println(i);
+			}
 		}
 		this.cleanup(); // if we fail to read a message correctly, then clean up (close the connection) and end the thread
+		System.out.println("Exiting thread");
 	}
 
 	// b is the response we want to send, which does not yet have the packet prefix
@@ -103,6 +91,8 @@ public class BuyerSocketServerThreadV1 implements BuyerInterface, Runnable {
 		try {
 			byte[] msg = new PacketPrefix(apiVer).prependPrefix(b, funcId); // prepare the message
 			this.out.write(msg); // send the message over the socket
+		} catch (EOFException e) {
+			System.out.println("BuyerSocketServerThreadV1 sendResponse(): " + e);
 		} catch (IOException i) {
 			System.out.println(i);
 		} catch (Exception e) {
@@ -110,14 +100,15 @@ public class BuyerSocketServerThreadV1 implements BuyerInterface, Runnable {
 		}
 	}
 	private void cleanup() {
+		System.out.println("Cleaning up");
 		try {
 			this.in.close();
 			this.out.close();
 			this.socket.close();
+			this.socket = null;
 		} catch (IOException i) {
-			System.out.println(i);
+			System.out.println("BuyerSocketServerThreadV1 cleanup(): " + i);
 		}
-		this.socket = null;
 	}
 
 	private byte[] demux(short apiVer, int funcId, byte[] msg) throws IOException {
@@ -136,6 +127,8 @@ public class BuyerSocketServerThreadV1 implements BuyerInterface, Runnable {
 				return this.bytesCreateUser(msg);
 			case LOGIN:
 				return this.bytesLogin(msg);
+			case LOGOUT:
+				return this.bytesLogout(msg);
 			default:
 				throw new RuntimeException("Err BuyerSocketServerThreadV1: Unsupported method triggered by enum.");
 		}
@@ -143,7 +136,7 @@ public class BuyerSocketServerThreadV1 implements BuyerInterface, Runnable {
 
 	// Buyer interface methods and their new counterparts
 	public int createUser(String username, String password) {
-		return buyerInterfaceV1.createUser(username, password);
+		return this.buyerInterfaceV1.createUser(username, password);
 	}
 	private byte[] bytesCreateUser(byte[] msg) throws IOException {
 		SerializeLogin serLog = SerializeLogin.deserialize(msg);
@@ -152,9 +145,7 @@ public class BuyerSocketServerThreadV1 implements BuyerInterface, Runnable {
 	}
 
 	public String login(String username, String password) {
-		int funcId = BuyerEnumV1.LOGIN.ordinal();
-		System.out.println(funcId);
-		throw new RuntimeException("Method not implemented BuyerSocketServerV1: login()");
+		return this.buyerInterfaceV1.login(username, password);
 	}
 	private byte[] bytesLogin(byte[] msg) throws IOException {
 		SerializeLogin serLog = SerializeLogin.deserialize(msg);
@@ -164,10 +155,13 @@ public class BuyerSocketServerThreadV1 implements BuyerInterface, Runnable {
 	}
 	// TO-DO: Determine if I need to clean up here or if the socket will close fine on its own
 	public void logout(String sessionToken) {
-		int funcId = BuyerEnumV1.LOGOUT.ordinal();
-		System.out.println(funcId);
-		this.cleanup();
-		throw new RuntimeException("Method not implemented BuyerSocketServerV1: logout()");
+		this.buyerInterfaceV1.logout(sessionToken);
+		this.stop = true;
+	}
+	private byte[] bytesLogout(byte[] msg) throws IOException {
+		String messageToken = SerializeString.deserialize(msg);
+		byte[] output = new byte[0];
+		return output;
 	}
 	public int[] getSellerRating(int sellerId) {
 		int funcId = BuyerEnumV1.GET_SELLER_RATING.ordinal();

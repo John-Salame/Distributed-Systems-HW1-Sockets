@@ -101,6 +101,13 @@ public class BuyerSocketClientV1 implements BuyerInterface {
 		}
 		throw new RuntimeException("Buyer client failed to connect.");
 	}
+	// send the message and return the response
+	public byte[] sendAndReceive(byte[] msg, int funcId) throws IOException {
+		this.send(msg, funcId);
+		// wait for response and parse response
+		SocketMessage inMsg = SocketMessage.readAndSplit(this.in);
+		return inMsg.getMsg();
+	}
 
 	// Inherited Methods
 	public int createUser(String username, String password) {
@@ -108,10 +115,7 @@ public class BuyerSocketClientV1 implements BuyerInterface {
 		int userId = 0;
 		try {
 			byte[] msg = SerializeLogin.serialize(username, password);
-			this.send(msg, funcId);
-			// wait for response and parse response
-			SocketMessage inMsg = SocketMessage.readAndSplit(this.in);
-			byte[] buf = inMsg.getMsg();
+			byte[] buf = this.sendAndReceive(msg, funcId);
 			userId = SerializeInt.deserialize(buf);
 		}
 		catch (IOException i) {
@@ -125,10 +129,7 @@ public class BuyerSocketClientV1 implements BuyerInterface {
 		String sessionToken = null;
 		try {
 			byte[] msg = SerializeLogin.serialize(username, password);
-			this.send(msg, funcId);
-			//wait for resposne and parse response
-			SocketMessage inMsg = SocketMessage.readAndSplit(this.in);
-			byte[] buf = inMsg.getMsg();
+			byte[] buf = this.sendAndReceive(msg, funcId);
 			sessionToken = SerializeString.deserialize(buf);
 		}
 		catch (IOException i) {
@@ -136,12 +137,19 @@ public class BuyerSocketClientV1 implements BuyerInterface {
 		}
 		return sessionToken;
 	}
-	// in addition to 
+	// clean up (close buffers and close the connection) when finished
 	public void logout(String sessionToken) {
 		int funcId = BuyerEnumV1.LOGOUT.ordinal();
 		System.out.println(funcId);
+		try {
+			byte[] msg = SerializeString.serialize(sessionToken);
+			byte[] buf = this.sendAndReceive(msg, funcId);
+			assert buf.length == 0; // server sending empty response after packet prefix
+		}
+		catch (IOException i) {
+			System.out.println(i);
+		}
 		this.cleanup();
-		throw new RuntimeException("Method not implemented BuyerSocketClientV1: logout()");
 	}
 	public int[] getSellerRating(int sellerId) {
 		int funcId = BuyerEnumV1.GET_SELLER_RATING.ordinal();

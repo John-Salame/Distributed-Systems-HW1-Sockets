@@ -29,6 +29,8 @@ import common.SaleListingId;
 		System.out.println("Buyer 1 id: " + buyer1Id);
 		String buyer1SessionToken = buyerInterface.login(buyer1Username, buyer1Password);
 		System.out.println("Buyer 1 session token = " + buyer1SessionToken);
+		System.out.println("Buyer 1 logging out");
+		buyerInterface.logout(buyer1SessionToken);
 
 		/*
 		// Basic seller API calls
