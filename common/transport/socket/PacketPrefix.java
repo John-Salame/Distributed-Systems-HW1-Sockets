@@ -15,21 +15,24 @@ import java.io.DataInputStream;
 import java.io.IOException;
 
 public class PacketPrefix {
-	public static final int PREFIX_SIZE = 2*Short.BYTES + Integer.BYTES; // how many bytes the prefix takes up
+	public static final int PREFIX_SIZE = 2*Short.BYTES + 2*Integer.BYTES; // how many bytes the prefix takes up
 	private short msgSize; // total length of the message (the message which follows the prefix, not including the prefix)
 	private short apiVer; // API version associated with the message
+	private int api; // which API this is for (buyer, seller, various DAOs, etc.)
 	private int funcId; // identifier of the function
 
 	// CONSTRUCTORS
 
 	// this constructor is useful for client sockets who always use the same API version
-	public PacketPrefix(short apiVer) {
+	public PacketPrefix(short apiVer, int api) {
 		this.apiVer = apiVer;
+		this.api = api;
 	}
 	// this constructor is good for generating a prefix from a message you receive
-	public PacketPrefix(short msgSize, short apiVer, int funcId) {
+	public PacketPrefix(short msgSize, short apiVer, int api, int funcId) {
 		this.msgSize = msgSize;
 		this.apiVer = apiVer;
+		this.api = api;
 		this.funcId = funcId;
 	}
 
@@ -41,6 +44,7 @@ public class PacketPrefix {
 		DataOutputStream writer = new DataOutputStream(prefix); // write to underlying OutputStream "prefix"
 		writer.writeShort(msgSize);
 		writer.writeShort(this.apiVer);
+		writer.writeInt(this.api);
 		writer.writeInt(funcId);
 		// writer.flush();
 		byte[] ret = prefix.toByteArray();
@@ -66,8 +70,9 @@ public class PacketPrefix {
 	public static PacketPrefix getPrefixFromMessage(DataInputStream stream) throws IOException {
 		short msgSize = stream.readShort();
 		short apiVer = stream.readShort();
+		int api =  stream.readInt();
 		int funcId = stream.readInt();
-		return new PacketPrefix(msgSize, apiVer, funcId);
+		return new PacketPrefix(msgSize, apiVer, api, funcId);
 	}
 
 	// GETTERS
@@ -80,6 +85,12 @@ public class PacketPrefix {
 	public short getApiVersion() {
 		return this.apiVer;
 	}
+	public int getApi() {
+		return this.api;
+	}
+	public int getApiNum() {
+		return this.api;
+	}
 	public int getFuncId() {
 		return this.funcId;
 	}
@@ -89,7 +100,7 @@ public class PacketPrefix {
 
 	@Override
 	public String toString() {
-		return "Message size " + this.msgSize + ", API Version " + 
-			this.apiVer + ", " + "Function Identifier " + this.funcId;
+		return "Message size " + this.msgSize + ", API Version " + this.apiVer + ", " + 
+			"API " + this.api +  ", Function Identifier " + this.funcId;
 	}
 }

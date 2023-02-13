@@ -11,6 +11,7 @@
 package server.v1;
 import common.BuyerInterface;
 import common.transport.serialize.*;
+import common.transport.socket.APIEnumV1;
 import common.transport.socket.BuyerEnumV1;
 import common.transport.socket.PacketPrefix;
 import common.transport.socket.SocketMessage;
@@ -25,6 +26,7 @@ import java.io.EOFException; // happens when writing to a closed socket
 public class BuyerSocketServerThreadV1 implements BuyerInterface, Runnable {
 	private BuyerInterface buyerInterfaceV1;
 	private BuyerEnumV1[] buyerEnumV1Values; // for translating function ID to enum value
+	private APIEnumV1[] apiEnumV1Values;
 	private Socket socket = null;
 	private boolean stop; // set to true upon logout to stop the loop of reading and responding to messages
 	private DataOutputStream out; // use this to write to the socket
@@ -35,6 +37,7 @@ public class BuyerSocketServerThreadV1 implements BuyerInterface, Runnable {
 	public BuyerSocketServerThreadV1(BuyerInterface buyerInterfaceV1, Socket socket) {
 		this.buyerInterfaceV1 = buyerInterfaceV1;
 		this.buyerEnumV1Values = BuyerEnumV1.values();
+		this.apiEnumV1Values = APIEnumV1.values();
 		this.socket = socket;
 		this.stop = false;
 	}
@@ -61,11 +64,13 @@ public class BuyerSocketServerThreadV1 implements BuyerInterface, Runnable {
 				// now, pass the message to the functions that will figure out who the handler is
 				if (inMsg != null) {
 					byte[] buf = inMsg.getMsg();
-					short apiVer = inMsg.getPrefix().getApiVer();
-					int funcId = inMsg.getPrefix().getFuncId();
+					PacketPrefix prefix = inMsg.getPrefix();
+					short apiVer = prefix.getApiVer();
+					int api = prefix.getApi();
+					int funcId = prefix.getFuncId();
 					// call the demux function
-					byte[] response = this.demux(apiVer, funcId, buf);
-					this.sendResponse(response, funcId, apiVer);
+					byte[] response = this.demux(apiVer, api, funcId, buf);
+					this.sendResponse(apiVer, api, funcId, response);
 				}
 			}
 			catch (EOFException e) {
@@ -86,10 +91,10 @@ public class BuyerSocketServerThreadV1 implements BuyerInterface, Runnable {
 	}
 
 	// b is the response we want to send, which does not yet have the packet prefix
-	private void sendResponse(byte[] b, int funcId, short apiVer) {
+	private void sendResponse(short apiVer, int api, int funcId, byte[] b) {
 		// currently no resiliency for sending message once socket connection has been created
 		try {
-			byte[] msg = new PacketPrefix(apiVer).prependPrefix(b, funcId); // prepare the message
+			byte[] msg = new PacketPrefix(apiVer, api).prependPrefix(b, funcId); // prepare the message
 			this.out.write(msg); // send the message over the socket
 		} catch (EOFException e) {
 			System.out.println("BuyerSocketServerThreadV1 sendResponse(): " + e);
@@ -111,16 +116,24 @@ public class BuyerSocketServerThreadV1 implements BuyerInterface, Runnable {
 		}
 	}
 
-	private byte[] demux(short apiVer, int funcId, byte[] msg) throws IOException {
+	private byte[] demux(short apiVer, int api, int funcId, byte[] msg) throws IOException {
 		switch (apiVer) {
 			case 1:
-				return this.demuxV1(funcId, msg);
+				return this.demuxV1(api, funcId, msg);
 			default:
 				throw new RuntimeException("Err BuyerSocketServerThreadV1: Received message with invalid API version.");
 		}
 	}
-	private byte[] demuxV1(int funcId, byte[] msg) throws IOException {
-		// TO-DO: Error handling if funcId is an invalid index
+	private byte[] demuxV1(int api, int funcId, byte[] msg) throws IOException {
+		APIEnumV1 apiName = this.apiEnumV1Values[api];
+		switch (apiName) {
+			case BUYER:
+				return this.demuxV1Buyer(funcId, msg);
+			default:
+				throw new RuntimeException("Err BuyerSocketServerThreadV1: Received message with invalid API identifier.");
+		}
+	}
+	private byte[] demuxV1Buyer(int funcId, byte[] msg) throws IOException {
 		BuyerEnumV1 functionName = this.buyerEnumV1Values[funcId];
 		switch (functionName) {
 			case CREATE_USER:

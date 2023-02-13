@@ -11,6 +11,7 @@
 package client.v1;
 import common.SellerInterface;
 import common.transport.serialize.*;
+import common.transport.socket.APIEnumV1;
 import common.transport.socket.SellerEnumV1;
 import common.transport.socket.PacketPrefix;
 import common.transport.socket.SocketMessage;
@@ -23,6 +24,7 @@ import java.io.IOException;
 
 public class SellerSocketClientV1 implements SellerInterface {
 	private final short apiVer = 1;
+	private final int api = APIEnumV1.SELLER.ordinal();
 	private PacketPrefix packetPrefix; // use this to add important metadata to messages over the socket
 	private Socket socket = null;
 	private String serverIp;
@@ -33,7 +35,7 @@ public class SellerSocketClientV1 implements SellerInterface {
 	// CONSTRUCTORS
 	// recommend serverIp = localhost
 	public SellerSocketClientV1(String serverIp, int serverPort) {
-		this.packetPrefix = new PacketPrefix(this.apiVer);
+		this.packetPrefix = new PacketPrefix(this.apiVer, this.api);
 		this.setup(serverIp, serverPort);
 	}
 
@@ -46,7 +48,7 @@ public class SellerSocketClientV1 implements SellerInterface {
 		// currently no resiliency for sending message once socket connection has been created
 		try {
 			byte[] msg = packetPrefix.prependPrefix(b, funcId); // prepare the message
-			System.out.println("Sending " + new PacketPrefix((short) b.length, this.apiVer, funcId));
+			System.out.println("Sending " + new PacketPrefix((short) b.length, this.apiVer, this.api, funcId));
 			this.out.write(msg); // send the message over the socket
 		} catch (IOException i) {
 			System.out.println(i);
