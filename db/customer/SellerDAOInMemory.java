@@ -6,7 +6,8 @@
  * Description: Provides access to a server-local database of sellers.
  */
 
-package dao;
+package db.customer;
+import dao.SellerDAO;
 import common.Seller;
 import java.util.List;
 import java.util.ArrayList;
@@ -61,5 +62,19 @@ public class SellerDAOInMemory implements SellerDAO {
 			}
 		}
 		return null;
+	}
+
+	// not thread-safe / safe with multiple simultaneous operations
+	public void commitSeller(Seller seller) {
+		int id = seller.getId();
+		// update if the seller exists
+		for(int i = 0; i < sellers.size(); i++) {
+			if(sellers.get(i).getId() == id) {
+				sellers.set(i, seller);
+				return;
+			}
+		}
+		// add if seller not exists
+		sellers.add(seller);
 	}
 }

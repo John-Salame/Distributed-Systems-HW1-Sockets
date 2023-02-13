@@ -20,7 +20,11 @@ CLASSES = \
 	common/transport/serialize/SerializeIntArray.java \
 	common/transport/serialize/SerializeLogin.java \
 	common/transport/serialize/SerializeString.java \
+	common/transport/socket/APIEnumV1.java \
+	common/transport/socket/BaseSocketClient.java \
+	common/transport/socket/BaseSocketServerThread.java \
 	common/transport/socket/BuyerEnumV1.java \
+	common/transport/socket/DBSellerEnumV1.java \
 	common/transport/socket/PacketPrefix.java \
 	common/transport/socket/SellerEnumV1.java \
 	common/transport/socket/SocketMessage.java \
@@ -39,13 +43,16 @@ CLASSES = \
 	dao/ItemDAO.java \
 	dao/SaleListingDAO.java \
 	dao/SellerDAO.java \
-	dao/SellerDAOInMemory.java \
 	dao/SessionDAO.java \
 	dao/SessionDAOInMemory.java \
 	dao/ShoppingCartDAO.java \
+	db/customer/v1/DBCustomerSocketServerListenerV1.java \
+	db/customer/v1/DBCustomerSocketServerThreadV1.java \
+	db/customer/SellerDAOInMemory.java \
 	server/v1/BuyerInterfaceServerV1.java \
 	server/v1/BuyerSocketServerListenerV1.java \
 	server/v1/BuyerSocketServerThreadV1.java \
+	server/v1/DBCustomerSocketClientV1.java \
 	server/v1/SellerInterfaceServerV1.java \
 	server/v1/SellerSocketServerListenerV1.java \
 	server/v1/SellerSocketServerThreadV1.java \
@@ -76,3 +83,6 @@ run_seller_client:
 
 run_seller_server:
 	$(JR) server/SellerRunnerServer.java
+
+run_db_customer:
+	$(JR) db/customer/CustomerRunner.java

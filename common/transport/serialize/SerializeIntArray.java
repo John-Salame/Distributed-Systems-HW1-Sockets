@@ -34,13 +34,18 @@ public class SerializeIntArray {
 	public static int[] deserialize(byte[] b) throws IOException {
 		ByteArrayInputStream buf = new ByteArrayInputStream(b);
 		DataInputStream reader = new DataInputStream(buf);
+		int[] ret = deserializeFromStream(reader);
+		reader.close();
+		buf.close();
+		return ret;
+	}
+
+	public static int[] deserializeFromStream(DataInputStream reader) throws IOException {
 		short numElements = reader.readShort();
 		int[] ret = new int[numElements];
 		for(short i = 0; i < numElements; i++) {
 			ret[i] = reader.readInt();
 		}
-		reader.close();
-		buf.close();
 		return ret;
 	}
 }

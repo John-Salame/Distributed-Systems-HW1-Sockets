@@ -7,6 +7,12 @@
  */
 
 package common;
+import common.transport.serialize.SerializeIntArray;
+import java.io.ByteArrayOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.DataOutputStream;
+import java.io.DataInputStream;
+import java.io.IOException;
 
 public class Seller {
 	private String name;
@@ -78,11 +84,29 @@ public class Seller {
 	}
 
 	// TO-DO: Make a byte array
-	public String serialize() {
-		return "";
+	public static byte[] serialize(Seller seller) throws IOException {
+		// name, id, feedback, numSold
+		ByteArrayOutputStream buf = new ByteArrayOutputStream(); // grow dynamically
+		DataOutputStream writer = new DataOutputStream(buf); // write to underlying OutputStream "prefix"
+		writer.writeUTF(seller.getName());
+		writer.writeInt(seller.getId());
+		byte[] feedback = SerializeIntArray.serialize(seller.getFeedback());
+		writer.write(feedback);
+		writer.writeInt(seller.getNumSold());
+		byte ret[] = buf.toByteArray();
+		writer.close();
+		buf.close();
+		return ret;
 	}
-	public static Seller deserialize(String rawData) {
-		return new Seller();
+	public static Seller deserialize(byte[] b) throws IOException {
+		ByteArrayInputStream buf = new ByteArrayInputStream(b);
+		DataInputStream reader = new DataInputStream(buf);
+		Seller seller = new Seller();
+		seller.setName(reader.readUTF());
+		seller.setId(reader.readInt());
+		seller.feedback = SerializeIntArray.deserializeFromStream(reader);
+		seller.setNumSold(reader.readInt());
+		return seller;
 	}
 
 	@Override

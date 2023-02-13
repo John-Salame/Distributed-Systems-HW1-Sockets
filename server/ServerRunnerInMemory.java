@@ -17,6 +17,7 @@ import common.Item;
 import common.ItemId;
 import common.SaleListing;
 import common.SaleListingId;
+import db.customer.SellerDAOInMemory;
 
  public class ServerRunnerInMemory {
 	public static void main(String[] args) {

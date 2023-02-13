@@ -10,11 +10,14 @@ package server;
 import server.v1.*;
 import dao.*;
 import common.BuyerInterface;
+import db.customer.SellerDAOInMemory;
 
 public class BuyerRunnerServer {
 	public static void main(String[] args) {
+		String customerDBHost = "localhost";
+		int customerDBIp = 8300;
 		BuyerDAO buyerDao = new BuyerDAOInMemory();
-		SellerDAO sellerDao = new SellerDAOInMemory();
+		SellerDAO sellerDao = new DBCustomerSocketClientV1(customerDBHost, customerDBIp);
 		SessionDAO sessionDao = new SessionDAOInMemory();
 		ItemDAO itemDao = null;
 		BuyerInterface buyerInterface = new BuyerInterfaceServerV1(buyerDao, sellerDao, sessionDao, itemDao);

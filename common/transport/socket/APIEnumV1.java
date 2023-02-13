@@ -10,6 +10,8 @@
 package common.transport.socket;
 
 public enum APIEnumV1 {
+	ERROR,
 	BUYER,
-	SELLER
+	SELLER,
+	DB_SELLER
 }

@@ -40,7 +40,7 @@ public class SellerInterfaceServerV1 implements SellerInterface {
 		sessionDao.expireSession(sessionToken);
 	}
 	public int[] getSellerRating(int sellerId) {
-		return sellerDao.getSellerById(sellerId).getFeedback();
+		return sellerDao.getSellerById(sellerId).getFeedback(); // not sure if this counts as stateless
 	}
 	public void putOnSale(String sessionToken, Item item, int quantity) {
 		throw new RuntimeException("SellerInterfaceServerV1: putOnSale() Not implemented");
