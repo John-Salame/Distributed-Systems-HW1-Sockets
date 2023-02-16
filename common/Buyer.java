@@ -7,6 +7,11 @@
  */
 
 package common;
+import java.io.ByteArrayOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.DataOutputStream;
+import java.io.DataInputStream;
+import java.io.IOException;
 
 public class Buyer {
 	private String name; // provided by buyer during account creation
@@ -63,11 +68,28 @@ public class Buyer {
 	}
 
 	// TO-DO: Make a byte array
-	public String serialize() {
-		return "";
+	public static byte[] serialize(Buyer buyer) throws IOException {
+		// name, id, numPurchases
+		ByteArrayOutputStream buf = new ByteArrayOutputStream(); // grow dynamically
+		DataOutputStream writer = new DataOutputStream(buf); // write to underlying OutputStream "prefix"
+		writer.writeUTF(buyer.getName());
+		writer.writeInt(buyer.getId());
+		writer.writeInt(buyer.getNumPurchases());
+		byte ret[] = buf.toByteArray();
+		writer.close();
+		buf.close();
+		return ret;
 	}
-	public static Buyer deserialize(String rawData) {
-		return new Buyer();
+	public static Buyer deserialize(byte[] b) throws IOException {
+	ByteArrayInputStream buf = new ByteArrayInputStream(b);
+		DataInputStream reader = new DataInputStream(buf);
+		Buyer buyer = new Buyer();
+		buyer.setName(reader.readUTF());
+		buyer.setId(reader.readInt());
+		buyer.setNumPurchases(reader.readInt());
+		reader.close();
+		buf.close();
+		return buyer;
 	}
 
 	@Override

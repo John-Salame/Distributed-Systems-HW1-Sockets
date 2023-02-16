@@ -16,7 +16,7 @@ public class SellerRunnerServer {
 	public static void main(String[] args) {
 		String customerDBHost = "localhost";
 		int customerDBIp = 8300;
-		SellerDAO sellerDao = new DBCustomerSocketClientV1(customerDBHost, customerDBIp);
+		SellerDAO sellerDao = new DBCustomerSellerSocketClientV1(customerDBHost, customerDBIp);
 		SessionDAO sessionDao = new SessionDAOInMemory();
 		ItemDAO itemDao = null;
 		SellerInterface sellerInterface = new SellerInterfaceServerV1(sellerDao, sessionDao, itemDao);

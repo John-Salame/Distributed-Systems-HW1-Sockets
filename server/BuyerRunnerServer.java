@@ -14,11 +14,13 @@ import db.customer.SellerDAOInMemory;
 
 public class BuyerRunnerServer {
 	public static void main(String[] args) {
+		// connnections to the customer database
 		String customerDBHost = "localhost";
 		int customerDBIp = 8300;
-		BuyerDAO buyerDao = new BuyerDAOInMemory();
-		SellerDAO sellerDao = new DBCustomerSocketClientV1(customerDBHost, customerDBIp);
+		BuyerDAO buyerDao = new DBCustomerBuyerSocketClientV1(customerDBHost, customerDBIp);
+		SellerDAO sellerDao = new DBCustomerSellerSocketClientV1(customerDBHost, customerDBIp);
 		SessionDAO sessionDao = new SessionDAOInMemory();
+		// other database connections
 		ItemDAO itemDao = null;
 		BuyerInterface buyerInterface = new BuyerInterfaceServerV1(buyerDao, sellerDao, sessionDao, itemDao);
 		BuyerSocketServerListenerV1 server = new BuyerSocketServerListenerV1(buyerInterface);

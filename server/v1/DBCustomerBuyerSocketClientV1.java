@@ -1,33 +1,33 @@
 /**
- * Class DBCustomerSocketClientV1
+ * Class DBCustomerBuyerSocketClientV1
  * Author: John Salame
  * CSCI 5673 Distributed Systems
  * Assignment 1 - Sockets
  * API version 1
- * Description: Socket implementation of seller server-database IPC on server side
+ * Description: Socket implementation of buyer server-database IPC on server side
  * Socket programming reference: https://www.geeksforgeeks.org/socket-programming-in-java/
  */
 
 package server.v1;
-import dao.SellerDAO;
+import dao.BuyerDAO;
 import common.transport.serialize.*;
 import common.transport.socket.APIEnumV1;
 import common.transport.socket.BaseSocketClient;
-import common.transport.socket.DBSellerEnumV1;
-import common.Seller;
+import common.transport.socket.DBBuyerEnumV1;
+import common.Buyer;
 import java.io.IOException;
 
-public class DBCustomerSocketClientV1 extends BaseSocketClient implements SellerDAO {
+public class DBCustomerBuyerSocketClientV1 extends BaseSocketClient implements BuyerDAO {
 
 	// CONSTRUCTORS
 	// recommend serverIp = localhost
-	public DBCustomerSocketClientV1(String serverIp, int serverPort) {
-		super(serverIp, serverPort, (short) 1, APIEnumV1.DB_SELLER.ordinal());
+	public DBCustomerBuyerSocketClientV1(String serverIp, int serverPort) {
+		super(serverIp, serverPort, (short) 1, APIEnumV1.DB_BUYER.ordinal());
 	}
 
-	// Inherited Methods
+	// BuyerDAO Methods
 	public int createUser(String username, String password) {
-		int funcId = DBSellerEnumV1.CREATE_USER.ordinal();
+		int funcId = DBBuyerEnumV1.CREATE_USER.ordinal();
 		int userId = 0;
 		try {
 			byte[] msg = SerializeLogin.serialize(username, password);
@@ -41,7 +41,7 @@ public class DBCustomerSocketClientV1 extends BaseSocketClient implements Seller
 		return userId;
 	}
 	public int getUserId(String username, String password) {
-		int funcId = DBSellerEnumV1.GET_USER_ID.ordinal();
+		int funcId = DBBuyerEnumV1.GET_USER_ID.ordinal();
 		int userId = 0;
 		try {
 			byte[] msg = SerializeLogin.serialize(username, password);
@@ -53,28 +53,17 @@ public class DBCustomerSocketClientV1 extends BaseSocketClient implements Seller
 		}
 		return userId;
 	}
-	public Seller getSellerById(int sellerId) {
-		int funcId = DBSellerEnumV1.GET_SELLER_BY_ID.ordinal();
-		Seller seller = null;
+	public Buyer getBuyerById(int buyerId) {
+		int funcId = DBBuyerEnumV1.GET_BUYER_BY_ID.ordinal();
+		Buyer buyer = null;
 		try {
-			byte[] msg = SerializeInt.serialize(sellerId);
+			byte[] msg = SerializeInt.serialize(buyerId);
 			byte[] buf = this.sendAndReceive(msg, funcId);
-			seller = Seller.deserialize(buf);
+			buyer = Buyer.deserialize(buf);
 		}
 		catch (IOException i) {
 			System.out.println(i);
 		}
-		return seller;
-	}
-	public void commitSeller(Seller seller) {
-		int funcId = DBSellerEnumV1.COMMIT_SELLER.ordinal();
-		try {
-			byte[] msg = Seller.serialize(seller);
-			byte[] buf = this.sendAndReceive(msg, funcId);
-			assert buf.length == 0;
-		}
-		catch (IOException i) {
-			System.out.println(i);
-		}
+		return buyer;
 	}
 }

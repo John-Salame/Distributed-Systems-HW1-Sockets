@@ -24,6 +24,7 @@ CLASSES = \
 	common/transport/socket/BaseSocketClient.java \
 	common/transport/socket/BaseSocketServerThread.java \
 	common/transport/socket/BuyerEnumV1.java \
+	common/transport/socket/DBBuyerEnumV1.java \
 	common/transport/socket/DBSellerEnumV1.java \
 	common/transport/socket/PacketPrefix.java \
 	common/transport/socket/SellerEnumV1.java \
@@ -39,7 +40,6 @@ CLASSES = \
 	common/Seller.java \
 	common/SellerInterface.java \
 	dao/BuyerDAO.java \
-	dao/BuyerDAOInMemory.java \
 	dao/ItemDAO.java \
 	dao/SaleListingDAO.java \
 	dao/SellerDAO.java \
@@ -48,11 +48,13 @@ CLASSES = \
 	dao/ShoppingCartDAO.java \
 	db/customer/v1/DBCustomerSocketServerListenerV1.java \
 	db/customer/v1/DBCustomerSocketServerThreadV1.java \
+	db/customer/BuyerDAOInMemory.java \
 	db/customer/SellerDAOInMemory.java \
 	server/v1/BuyerInterfaceServerV1.java \
 	server/v1/BuyerSocketServerListenerV1.java \
 	server/v1/BuyerSocketServerThreadV1.java \
-	server/v1/DBCustomerSocketClientV1.java \
+	server/v1/DBCustomerBuyerSocketClientV1.java \
+	server/v1/DBCustomerSellerSocketClientV1.java \
 	server/v1/SellerInterfaceServerV1.java \
 	server/v1/SellerSocketServerListenerV1.java \
 	server/v1/SellerSocketServerThreadV1.java \

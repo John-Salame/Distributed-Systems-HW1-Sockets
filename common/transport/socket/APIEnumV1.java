@@ -13,5 +13,6 @@ public enum APIEnumV1 {
 	ERROR,
 	BUYER,
 	SELLER,
-	DB_SELLER
+	DB_SELLER,
+	DB_BUYER
 }

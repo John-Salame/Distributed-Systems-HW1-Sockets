@@ -7,8 +7,8 @@
  */
 
 package db.customer;
-import dao.SellerDAO;
 import common.Seller;
+import dao.SellerDAO;
 import java.util.List;
 import java.util.ArrayList;
 

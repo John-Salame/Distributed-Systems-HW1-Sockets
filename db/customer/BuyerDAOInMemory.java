@@ -6,8 +6,9 @@
  * Description: Provides access to a server-local database of buyers.
  */
 
-package dao;
+package db.customer;
 import common.Buyer;
+import dao.BuyerDAO;
 import java.util.List;
 import java.util.ArrayList;
 

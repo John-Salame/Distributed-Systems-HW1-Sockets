@@ -106,6 +106,8 @@ public class Seller {
 		seller.setId(reader.readInt());
 		seller.feedback = SerializeIntArray.deserializeFromStream(reader);
 		seller.setNumSold(reader.readInt());
+		reader.close();
+		buf.close();
 		return seller;
 	}
 
