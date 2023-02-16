@@ -17,7 +17,7 @@ public class SellerRunnerServer {
 		String customerDBHost = "localhost";
 		int customerDBIp = 8300;
 		SellerDAO sellerDao = new DBCustomerSellerSocketClientV1(customerDBHost, customerDBIp);
-		SessionDAO sessionDao = new SessionDAOInMemory();
+		SessionDAO sessionDao = new DBCustomerSessionSocketClientV1(customerDBHost, customerDBIp);
 		ItemDAO itemDao = null;
 		SellerInterface sellerInterface = new SellerInterfaceServerV1(sellerDao, sessionDao, itemDao);
 		// make a sample user

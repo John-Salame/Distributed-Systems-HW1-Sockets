@@ -6,7 +6,8 @@
  * Description: Keep a mapping of sessions to user IDs.
  */
 
-package dao;
+package db.customer;
+import dao.SessionDAO;
 import java.util.Map;
 import java.util.HashMap;
 

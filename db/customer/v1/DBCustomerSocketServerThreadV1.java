@@ -11,11 +11,13 @@
 package db.customer.v1;
 import dao.BuyerDAO;
 import dao.SellerDAO;
+import dao.SessionDAO;
 import common.transport.serialize.*;
 import common.transport.socket.APIEnumV1;
 import common.transport.socket.BaseSocketServerThread;
 import common.transport.socket.DBBuyerEnumV1;
 import common.transport.socket.DBSellerEnumV1;
+import common.transport.socket.DBSessionEnumV1;
 import common.Buyer;
 import common.Item;
 import common.Seller;
@@ -25,18 +27,22 @@ import java.io.IOException;
 public class DBCustomerSocketServerThreadV1 extends BaseSocketServerThread implements BuyerDAO, SellerDAO {
 	private BuyerDAO buyerDaoV1;
 	private SellerDAO sellerDaoV1;
+	private SessionDAO sessionDaoV1;
 	private DBBuyerEnumV1[] dbBuyerEnumV1Values; // for translating function ID to enum value
 	private DBSellerEnumV1[] dbSellerEnumV1Values; // for translating function ID to enum value
+	private DBSessionEnumV1[] dbSessionEnumV1Values;
 	private APIEnumV1[] apiEnumV1Values;
 
 	// CONSTRUCTORS
 	// Use this Constructor for threads that have an active connection
-	public DBCustomerSocketServerThreadV1(BuyerDAO buyerDaoV1, SellerDAO sellerDaoV1, Socket socket) {
+	public DBCustomerSocketServerThreadV1(BuyerDAO buyerDaoV1, SellerDAO sellerDaoV1, SessionDAO sessionDaoV1, Socket socket) {
 		super(socket);
 		this.buyerDaoV1 = buyerDaoV1;
 		this.sellerDaoV1 = sellerDaoV1;
+		this.sessionDaoV1 = sessionDaoV1;
 		this.dbBuyerEnumV1Values = DBBuyerEnumV1.values();
 		this.dbSellerEnumV1Values = DBSellerEnumV1.values();
+		this.dbSessionEnumV1Values = DBSessionEnumV1.values();
 		this.apiEnumV1Values = APIEnumV1.values();
 	}
 
@@ -56,6 +62,8 @@ public class DBCustomerSocketServerThreadV1 extends BaseSocketServerThread imple
 				return this.demuxV1DBBuyer(funcId, msg);
 			case DB_SELLER:
 				return this.demuxV1DBSeller(funcId, msg);
+			case DB_SESSION:
+				return this.demuxV1DBSession(funcId, msg);
 			default:
 				throw new RuntimeException("Err SellerSocketServerThreadV1: Received message with invalid API identifier.");
 		}
@@ -74,7 +82,6 @@ public class DBCustomerSocketServerThreadV1 extends BaseSocketServerThread imple
 		}
 	}
 	private byte[] demuxV1DBSeller(int funcId, byte[] msg) throws IOException {
-		// TO-DO: Error handling if funcId is an invalid index
 		DBSellerEnumV1 functionName = this.dbSellerEnumV1Values[funcId];
 		switch (functionName) {
 			case CREATE_USER:
@@ -85,6 +92,21 @@ public class DBCustomerSocketServerThreadV1 extends BaseSocketServerThread imple
 				return this.bytesGetSellerById(msg);
 			case COMMIT_SELLER:
 				return this.bytesCommitSeller(msg);
+			default:
+				throw new RuntimeException("Err SellerSocketServerThreadV1: Unsupported method triggered by enum.");
+		}
+	}
+	private byte[] demuxV1DBSession(int funcId, byte[] msg) throws IOException {
+		DBSessionEnumV1 functionName = this.dbSessionEnumV1Values[funcId];
+		switch (functionName) {
+			case CREATE_SESSION:
+				return this.bytesCreateSession(msg);
+			case EXPIRE_SESSION:
+				return this.bytesExpireSession(msg);
+			case GET_USER_ID_FROM_SESSION:
+				return this.bytesGetUserIdFromSession(msg);
+			case LIST_SESSIONS:
+				return this.bytesListSessions(msg);
 			default:
 				throw new RuntimeException("Err SellerSocketServerThreadV1: Unsupported method triggered by enum.");
 		}
@@ -157,5 +179,42 @@ public class DBCustomerSocketServerThreadV1 extends BaseSocketServerThread imple
 		Seller seller = Seller.deserialize(msg);
 		this.commitSeller(seller);
 		return new byte[0]; // empty response for void functions
+	}
+
+	// Session functions
+	// return the session key generated for the user
+	public String createSession(int userId) {
+		return this.sessionDaoV1.createSession(userId);
+	}
+	private byte[] bytesCreateSession(byte[] msg) throws IOException {
+		int userId = SerializeInt.deserialize(msg);
+		String sessionToken = this.createSession(userId);
+		return SerializeString.serialize(sessionToken);
+	}
+	// Called by logout() on server
+	public void expireSession(String sessionKey) {
+		this.sessionDaoV1.expireSession(sessionKey);
+	}
+	private byte[] bytesExpireSession(byte[] msg) throws IOException {
+		String sessionKey = SerializeString.deserialize(msg);
+		this.expireSession(sessionKey);
+		return new byte[0];
+	}
+	// might throw an error if the session does not exist
+	public int getUserIdFromSession(String sessionKey) {
+		return this.sessionDaoV1.getUserIdFromSession(sessionKey);
+	}
+	private byte[] bytesGetUserIdFromSession(byte[] msg) throws IOException {
+		String sessionKey = SerializeString.deserialize(msg);
+		int userId = this.getUserIdFromSession(sessionKey);
+		return SerializeInt.serialize(userId);
+	}
+	// just for debugging purposes
+	public String listSessions() {
+		return this.sessionDaoV1.listSessions();
+	}
+	private byte[] bytesListSessions(byte[] msg) throws IOException {
+		assert msg.length == 0;
+		return SerializeString.serialize(this.listSessions());
 	}
 }

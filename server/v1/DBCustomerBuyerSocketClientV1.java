@@ -28,7 +28,7 @@ public class DBCustomerBuyerSocketClientV1 extends BaseSocketClient implements B
 	// BuyerDAO Methods
 	public int createUser(String username, String password) {
 		int funcId = DBBuyerEnumV1.CREATE_USER.ordinal();
-		int userId = 0;
+		int userId = 0; // user id 0 indicates error
 		try {
 			byte[] msg = SerializeLogin.serialize(username, password);
 			byte[] buf = this.sendAndReceive(msg, funcId);
@@ -36,13 +36,12 @@ public class DBCustomerBuyerSocketClientV1 extends BaseSocketClient implements B
 		}
 		catch (IOException i) {
 			System.out.println(i);
-			return 0; // user id 0 indicates error
 		}
 		return userId;
 	}
 	public int getUserId(String username, String password) {
 		int funcId = DBBuyerEnumV1.GET_USER_ID.ordinal();
-		int userId = 0;
+		int userId = 0; // user id 0 indicates error
 		try {
 			byte[] msg = SerializeLogin.serialize(username, password);
 			byte[] buf = this.sendAndReceive(msg, funcId);

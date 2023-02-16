@@ -12,19 +12,22 @@ package db.customer.v1;
 import common.SellerInterface;
 import dao.BuyerDAO;
 import dao.SellerDAO;
+import dao.SessionDAO;
 import java.net.*;
 import java.io.IOException;
 
 public class DBCustomerSocketServerListenerV1 {
 	private BuyerDAO buyerDaoV1;
 	private SellerDAO sellerDaoV1;
+	private SessionDAO sessionDaoV1;
 	private ServerSocket server = null;
 
 	// CONSTRUCTORS
 	// starting the server - use this constructor and then call startServer()
-	public DBCustomerSocketServerListenerV1(BuyerDAO buyerDaoV1, SellerDAO sellerDaoV1) {
+	public DBCustomerSocketServerListenerV1(BuyerDAO buyerDaoV1, SellerDAO sellerDaoV1, SessionDAO sessionDaoV1) {
 		this.buyerDaoV1 = buyerDaoV1;
 		this.sellerDaoV1 = sellerDaoV1;
+		this.sessionDaoV1 = sessionDaoV1;
 	}
 
 	// create the listener and enter the server loop
@@ -43,7 +46,7 @@ public class DBCustomerSocketServerListenerV1 {
 		while(true) {
 			try {
 				Socket socket = server.accept();
-				Thread t = new Thread((Runnable) new DBCustomerSocketServerThreadV1(this.buyerDaoV1, this.sellerDaoV1, socket));
+				Thread t = new Thread((Runnable) new DBCustomerSocketServerThreadV1(this.buyerDaoV1, this.sellerDaoV1, this.sessionDaoV1, socket));
 				t.start(); // run the run() function on a new thread
 				// TO-DO: Figure out how to join threads and maybe do something with the thread interrupts
 				// I could potentially check the socket.getRemoteSocketAddress() for each thread to check if it's ready to join

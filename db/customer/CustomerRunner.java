@@ -8,14 +8,16 @@
 
 package db.customer;
 import db.customer.v1.*;
-import dao.SellerDAO;
 import dao.BuyerDAO;
+import dao.SellerDAO;
+import dao.SessionDAO;
 
 public class CustomerRunner {
 	public static void main(String[] args) {
 		SellerDAO sellerDaoV1 = new SellerDAOInMemory();
 		BuyerDAO buyerDaoV1 = new BuyerDAOInMemory();
-		DBCustomerSocketServerListenerV1 server = new DBCustomerSocketServerListenerV1(buyerDaoV1, sellerDaoV1);
+		SessionDAO sessionDaoV1 = new SessionDAOInMemory();
+		DBCustomerSocketServerListenerV1 server = new DBCustomerSocketServerListenerV1(buyerDaoV1, sellerDaoV1, sessionDaoV1);
 		int port = 8300;
 		int maxConnections = 1;
 		server.startServer(port, maxConnections);

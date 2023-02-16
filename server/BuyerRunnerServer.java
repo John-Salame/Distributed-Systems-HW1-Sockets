@@ -19,7 +19,7 @@ public class BuyerRunnerServer {
 		int customerDBIp = 8300;
 		BuyerDAO buyerDao = new DBCustomerBuyerSocketClientV1(customerDBHost, customerDBIp);
 		SellerDAO sellerDao = new DBCustomerSellerSocketClientV1(customerDBHost, customerDBIp);
-		SessionDAO sessionDao = new SessionDAOInMemory();
+		SessionDAO sessionDao = new DBCustomerSessionSocketClientV1(customerDBHost, customerDBIp);
 		// other database connections
 		ItemDAO itemDao = null;
 		BuyerInterface buyerInterface = new BuyerInterfaceServerV1(buyerDao, sellerDao, sessionDao, itemDao);

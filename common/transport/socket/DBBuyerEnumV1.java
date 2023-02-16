@@ -4,7 +4,7 @@
  * CSCI 5673 Distributed Systems
  * Assignment 1 - Sockets
  * API version 1
- * Description: Used by sockets to contact the buyer database; alligns with DAO functions
+ * Description: Used by sockets to contact the buyer database (on customer database); alligns with DAO functions
  */
 
 package common.transport.socket;

@@ -27,3 +27,8 @@ My search used the Levenshtein distance against the keywords in each item.
 The Levenshtein distance is an edit distance for strings which includes character insertions, deletions, and substitution.  
 Each keyword in the search query calculates its distance to each keyword in the item and keeps its best distance. We do this for all keywords in the search query and sum up the results.  
 Then we normalize the edit distance a bit so it's more or less based on the percentage of the string that is correct, with some boosting for shorter strings.
+
+## Bugs
+* Attempting to log in while the database is unreachable will cause the server to crash without closing the socket and the client to hang because it tries to operate on a null string (the session token created by the sessionDao).
+* * Perhaps I should handle this more gracefully. I could maybe return an empty string and then validate on the client side that an empty string means an error.
+* * I could also just close the server socket upon triggering a NullPointerException, but this would also cause the client process to end.
