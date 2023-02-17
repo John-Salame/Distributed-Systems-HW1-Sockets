@@ -20,6 +20,7 @@ CLASSES = \
 	common/transport/serialize/SerializeIntArray.java \
 	common/transport/serialize/SerializeLogin.java \
 	common/transport/serialize/SerializeString.java \
+	common/transport/serialize/SerializeStringArray.java \
 	common/transport/socket/APIEnumV1.java \
 	common/transport/socket/BaseSocketClient.java \
 	common/transport/socket/BaseSocketServerThread.java \
@@ -51,11 +52,13 @@ CLASSES = \
 	db/customer/BuyerDAOInMemory.java \
 	db/customer/SellerDAOInMemory.java \
 	db/customer/SessionDAOInMemory.java \
+	db/product/ItemDAOInMemory.java \
 	server/v1/BuyerInterfaceServerV1.java \
 	server/v1/BuyerSocketServerListenerV1.java \
 	server/v1/BuyerSocketServerThreadV1.java \
 	server/v1/DBCustomerBuyerSocketClientV1.java \
 	server/v1/DBCustomerSellerSocketClientV1.java \
+	server/v1/DBProductItemSocketClientV1.java \
 	server/v1/SellerInterfaceServerV1.java \
 	server/v1/SellerSocketServerListenerV1.java \
 	server/v1/SellerSocketServerThreadV1.java \

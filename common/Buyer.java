@@ -67,11 +67,10 @@ public class Buyer {
 		return numPurchases;
 	}
 
-	// TO-DO: Make a byte array
 	public static byte[] serialize(Buyer buyer) throws IOException {
 		// name, id, numPurchases
 		ByteArrayOutputStream buf = new ByteArrayOutputStream(); // grow dynamically
-		DataOutputStream writer = new DataOutputStream(buf); // write to underlying OutputStream "prefix"
+		DataOutputStream writer = new DataOutputStream(buf);
 		writer.writeUTF(buyer.getName());
 		writer.writeInt(buyer.getId());
 		writer.writeInt(buyer.getNumPurchases());

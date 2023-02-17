@@ -7,16 +7,22 @@
  */
 
 package common;
+import common.transport.serialize.SerializeStringArray;
+import java.io.ByteArrayOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.DataOutputStream;
+import java.io.DataInputStream;
+import java.io.IOException;
 
 public class Item {
 	private String name; // up to 32 characters
-	private ItemId id; // unique provided by server; the data type might change. I need to ask about it.
+	private ItemId id; // unique provided by server
 	private String[] keywords;
 	private int numKeywords;
 	private static final int MAX_KEYWORDS = 5;
 	private String condition; // New or Used
 	private float price;
-	private int sellerId; // the seller is intrinsically tied to the item since he can change the price
+	private int sellerId; // the seller is intrinsically tied to the item since they can change the price
 
 	// CONSTRUCTORS
 	public Item() {
@@ -30,12 +36,20 @@ public class Item {
 		this.setName(name);
 		this.id = id; // assume that the constraints in the creation of itemId have provided our validation for us
 		this.keywords = new String[MAX_KEYWORDS];
-		for(String keyword : keywords) {
-			this.addKeyword(keyword);
-		}
+		this.addKeywords(keywords);
 		this.setCondition(condition);
 		this.setPrice(price);
 		this.setSellerId(sellerId);
+	}
+	// use this constructor for client-side request
+	public Item(String name, int category, String[] keywords, String condition, float price) {
+		this.initializeDefaults();
+		this.setName(name);
+		this.setCategory(category);
+		this.addKeywords(keywords);
+		this.setCondition(condition);
+		this.setPrice(price);
+		// note: sellerId is still 0 and itemId is incomplete
 	}
 	private void initializeDefaults() {
 		this.name = "";
@@ -46,16 +60,6 @@ public class Item {
 		this.price = (float) 0.00;
 		this.sellerId = 0; // impossible seller ID
 	}
-
-	/**
-	 * Call this method after adding the item to the database.
-	 */
-	/*
-	public void createId(int serial) {
-		assert this.id == null;
-		this.id = new ItemId(this.category, serial);
-	}
-	*/
 
 	/**
 	 * Method listKeywords()
@@ -98,6 +102,11 @@ public class Item {
 				throw new IllegalArgumentException("Item keywords must be 8 characters or less");
 			}
 			this.keywords[numKeywords++] = keyword;
+		}
+	}
+	public void addKeywords(String[] keywords) {
+		for(String keyword : keywords) {
+			this.addKeyword(keyword);
 		}
 	}
 	public void setCondition(String cond) {
@@ -146,12 +155,68 @@ public class Item {
 		return this.sellerId;
 	}
 
-	// TO-DO: Make a byte array
-	public String serialize() {
-		return "";
+	public static byte[] serialize(Item item) throws IOException {
+		// name, itemId, keywords, condition, price, sellerId
+		ByteArrayOutputStream buf = new ByteArrayOutputStream(); // grow dynamically
+		DataOutputStream writer = new DataOutputStream(buf);
+		writer.writeUTF(item.getName());
+		byte[] itemIdSer = ItemId.serialize(item.getId());
+		writer.write(itemIdSer);
+		byte[] keywordsSer = SerializeStringArray.serialize(item.getKeywords());
+		writer.write(keywordsSer);
+		writer.writeUTF(item.getCondition());
+		writer.writeFloat(item.getPrice());
+		writer.writeInt(item.getSellerId());
+		byte ret[] = buf.toByteArray();
+		writer.close();
+		buf.close();
+		return ret;
 	}
-	public static Item deserialize(String rawData) {
-		return new Item();
+	public static Item deserialize(byte[] b) throws IOException {
+		ByteArrayInputStream buf = new ByteArrayInputStream(b);
+		DataInputStream reader = new DataInputStream(buf);
+		Item item = deserializeFromStream(reader);
+		reader.close();
+		buf.close();
+		return item;
+	}
+	public static Item deserializeFromStream(DataInputStream reader) throws IOException {
+		String name = reader.readUTF();
+		ItemId itemId = ItemId.deserializeFromStream(reader);
+		String[] keywords = SerializeStringArray.deserializeFromStream(reader);
+		String condition = reader.readUTF();
+		float price = reader.readFloat();
+		int sellerId = reader.readInt();
+		Item item = new Item(name, itemId, keywords, condition, price, sellerId);
+		return item;
+	}
+
+	public static byte[] serializeArray(Item[] items) throws IOException {
+		ByteArrayOutputStream buf = new ByteArrayOutputStream(); // grow dynamically
+		DataOutputStream writer = new DataOutputStream(buf);
+		short numElements = (short) items.length;
+		writer.writeShort(numElements);
+		for(short i = 0; i < numElements; i++) {
+			byte[] itemSer = Item.serialize(items[i]);
+			writer.write(itemSer);
+		}
+		byte ret[] = buf.toByteArray();
+		writer.close();
+		buf.close();
+		return ret;
+	}
+
+	public static Item[] deserializeArray(byte[] b) throws IOException {
+		ByteArrayInputStream buf = new ByteArrayInputStream(b);
+		DataInputStream reader = new DataInputStream(buf);
+		short numElements = reader.readShort();
+		Item[] items = new Item[numElements];
+		for(short i = 0; i < numElements; i++) {
+			items[i] = Item.deserializeFromStream(reader);
+		}
+		reader.close();
+		buf.close();
+		return items;
 	}
 
 	@Override

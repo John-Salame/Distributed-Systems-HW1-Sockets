@@ -87,7 +87,7 @@ public class Seller {
 	public static byte[] serialize(Seller seller) throws IOException {
 		// name, id, feedback, numSold
 		ByteArrayOutputStream buf = new ByteArrayOutputStream(); // grow dynamically
-		DataOutputStream writer = new DataOutputStream(buf); // write to underlying OutputStream "prefix"
+		DataOutputStream writer = new DataOutputStream(buf);
 		writer.writeUTF(seller.getName());
 		writer.writeInt(seller.getId());
 		byte[] feedback = SerializeIntArray.serialize(seller.getFeedback());

@@ -3,7 +3,7 @@
  * Author: John Salame
  * CSCI 5673 Distributed Systems
  * Assignment 1 - Sockets
- * Description: Provides access to a server-local database of buyers.
+ * Description: Provides access to the buyers database.
  */
 
 package db.customer;

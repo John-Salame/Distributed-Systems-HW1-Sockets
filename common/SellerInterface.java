@@ -12,7 +12,7 @@ public interface SellerInterface extends CommonUserInterface {
 	// Inherited Methods
 	//   Implement methods from CommonUserInterface
 	// New Methods
-	public abstract void putOnSale(String sessionToken, Item item, int quantity);
+	public abstract SaleListingId putOnSale(String sessionToken, Item item, int quantity);
 	/*
 	public abstract void changePriceOfItem(String sessionToken, ItemId itemId, float newPrice);
 	public abstract void removeItemFromSale(String sessionToken, ItemId itemId, int quantity);

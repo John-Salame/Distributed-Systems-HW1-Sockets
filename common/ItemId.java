@@ -7,6 +7,11 @@
  */
 
 package common;
+import java.io.ByteArrayOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.DataOutputStream;
+import java.io.DataInputStream;
+import java.io.IOException;
 
 public class ItemId {
 	private int category;
@@ -68,6 +73,32 @@ public class ItemId {
 	}
 	public int getSerial() {
 		return this.serial;
+	}
+
+	public static byte[] serialize(ItemId itemId) throws IOException {
+		// category, serial
+		ByteArrayOutputStream buf = new ByteArrayOutputStream(2*Integer.BYTES);
+		DataOutputStream writer = new DataOutputStream(buf);
+		writer.writeInt(itemId.getCategory());
+		writer.writeInt(itemId.getSerial());
+		byte ret[] = buf.toByteArray();
+		writer.close();
+		buf.close();
+		return ret;
+	}
+	public static ItemId deserialize(byte[] b) throws IOException {
+		ByteArrayInputStream buf = new ByteArrayInputStream(b);
+		DataInputStream reader = new DataInputStream(buf);
+		ItemId itemId = deserializeFromStream(reader);
+		reader.close();
+		buf.close();
+		return itemId;
+	}
+	public static ItemId deserializeFromStream(DataInputStream reader) throws IOException {
+		int category = reader.readInt();
+		int serial = reader.readInt();
+		ItemId itemId = new ItemId(category, serial);
+		return itemId;
 	}
 
 	@Override

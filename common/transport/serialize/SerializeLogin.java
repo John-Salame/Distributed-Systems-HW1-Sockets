@@ -25,7 +25,7 @@ public class SerializeLogin {
 	// we are not enforcing username length at this point, though we could.
 	public static byte[] serialize(String username, String password) throws IOException {
 		ByteArrayOutputStream buf = new ByteArrayOutputStream(); // grow dynamically
-		DataOutputStream writer = new DataOutputStream(buf); // write to underlying OutputStream "prefix"
+		DataOutputStream writer = new DataOutputStream(buf);
 		writer.writeUTF(username);
 		writer.writeUTF(password);
 		byte ret[] = buf.toByteArray();

@@ -15,5 +15,6 @@ public enum APIEnumV1 {
 	SELLER,
 	DB_SELLER,
 	DB_BUYER,
-	DB_SESSION
+	DB_SESSION,
+	DB_ITEM
 }
