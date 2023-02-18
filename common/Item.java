@@ -94,12 +94,14 @@ public class Item {
 		this.id.setSerial(serial);
 	}
 	public void addKeyword(String keyword) {
+		String newKeyword = keyword;
 		// if we can add no more keywords, do nothing; if we want to alert the seller, then change this logic
 		if(numKeywords < MAX_KEYWORDS) {
-			// limit keywords to 8 characters
+			// limit keywords to 8 characters (truncate)
 			if(keyword.length() > 8) {
 				// alternative would be to truncate the keyword
-				throw new IllegalArgumentException("Item keywords must be 8 characters or less");
+				// throw new IllegalArgumentException("Item keywords must be 8 characters or less");
+				newKeyword = keyword.substring(0,8);
 			}
 			this.keywords[numKeywords++] = keyword;
 		}

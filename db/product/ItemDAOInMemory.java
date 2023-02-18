@@ -14,17 +14,21 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class ItemDAOInMemory implements ItemDAO {
-	private static int[] nextId;
+	private int[] nextId = null;
 	private static final int NUM_CATEGORIES = 10;
-	private List<Item> items;
+	private List<Item> items = null;
 
 	// CONSTRUCTORS
 	public ItemDAOInMemory() {
-		this.nextId = new int[NUM_CATEGORIES];
-		for(int i = 0; i < NUM_CATEGORIES;) {
-			this.nextId[i] = 1;
+		if(this.nextId == null) {
+			this.nextId = new int[NUM_CATEGORIES];
+			for(int i = 0; i < NUM_CATEGORIES; i++) {
+				this.nextId[i] = 1;
+			}
 		}
-		this.items = new ArrayList<Item>();
+		if (this.items == null) {
+			this.items = new ArrayList<Item>();
+		}
 	}
 
 	/**
@@ -76,22 +80,26 @@ public class ItemDAOInMemory implements ItemDAO {
 		}
 	}
 	public Item[] getItemsBySeller(int sellerId) {
-		List sellerItems = new ArrayList<Item>();
+		List<Item> sellerItems = new ArrayList<Item>();
 		for (Item item : this.items) {
 			if(item.getSellerId() == sellerId) {
 				sellerItems.add(item);
 			}
 		}
-		return (Item[]) sellerItems.toArray();
+		Item[] ret = new Item[0];
+		ret = sellerItems.toArray(ret);
+		return ret;
 	}
 	// TO-DO: Figure out if I want to include sold out / removed items in the output
 	public Item[] getItemsInCategory(int category) {
-		List catItems = new ArrayList<Item>();
+		List<Item> catItems = new ArrayList<Item>();
 		for (Item item : this.items) {
 			if(item.getCategory() == category) {
 				catItems.add(item);
 			}
 		}
-		return (Item[]) catItems.toArray();
+		Item[] ret = new Item[0];
+		ret = catItems.toArray(ret);
+		return ret;
 	}
 }

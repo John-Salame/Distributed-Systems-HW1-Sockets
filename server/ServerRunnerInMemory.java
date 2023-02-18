@@ -20,13 +20,17 @@ import common.SaleListingId;
 import db.customer.BuyerDAOInMemory;
 import db.customer.SellerDAOInMemory;
 import db.customer.SessionDAOInMemory;
+import db.product.ItemDAOInMemory;
+import java.util.Arrays;
 
  public class ServerRunnerInMemory {
 	public static void main(String[] args) {
+		System.out.println("Starting program");
 		BuyerDAO buyerDao = new BuyerDAOInMemory();
 		SellerDAO sellerDao = new SellerDAOInMemory();
 		SessionDAO sessionDao = new SessionDAOInMemory();
-		ItemDAO itemDao = null;
+		ItemDAO itemDao = new ItemDAOInMemory();
+		System.out.println("Done creating DAOs");
 		BuyerInterface buyerInterface = new BuyerInterfaceServerV1(buyerDao, sellerDao, sessionDao, itemDao);
 		SellerInterface sellerInterface = new SellerInterfaceServerV1(sellerDao, sessionDao, itemDao);
 
@@ -54,12 +58,33 @@ import db.customer.SessionDAOInMemory;
 		System.out.println(Seller.displayFeedback(feedback));
 
 		// Create an item
-		String[] keywords = {"Food", "Fruit"};
-		ItemId itemId = new ItemId(0, 1);
-		Item apple = new Item("apple", itemId, keywords, "New", (float) 0.79, seller1Id);
+		int seller2Id = seller1Id + 1;
+		String[] keywords = {"Food", "Fruit", "Crunchy"};
+		// ItemId itemId = new ItemId(0, 1);
+		// Item apple = new Item("apple", itemId, keywords, "New", (float) 0.79, seller1Id);
+		Item appleFirst = new Item("apple", 0, keywords, "New", (float) 0.79);
+		appleFirst.setSellerId(seller1Id);
+		ItemId itemId = itemDao.createItem(appleFirst);
+		Item apple = itemDao.getItemById(itemId);
 		System.out.println(apple);
+		System.out.println("\n\nChanging price of apple to 0.99\n");
+		itemDao.changePrice(itemId, seller1Id, (float) 0.99);
+		itemDao.changePrice(itemId, seller2Id, (float) 1.22); // this one should fail
+		System.out.println(apple);
+		// Test functions to get items by category and get items by seller
+		Item pear = new Item("pear", 0, new String[] {"Food", "Fruit", "Sour", "Sweet"}, "New", (float) 1.23);
+		pear.setSellerId(seller2Id);
+		itemDao.createItem(pear);
+		Item chair = new Item("chair", 1, new String[] {"Household", "Furniture"}, "Used", (float) 5.29);
+		chair.setSellerId(seller1Id);
+		itemDao.createItem(chair);
+		System.out.println("\n\nItems by seller1:");
+		System.out.println(Arrays.toString(itemDao.getItemsBySeller(seller1Id)));
+		System.out.println("\n\nItems in category 0 (food):");
+		System.out.println(Arrays.toString(itemDao.getItemsInCategory(0)));
 
 		// Sell the item
+		System.out.println("\n\n");
 		SaleListing sale = new SaleListing(new SaleListingId(itemId, 5));
 		System.out.println(sale);
 		System.out.println("Decreasing quantity by 2");

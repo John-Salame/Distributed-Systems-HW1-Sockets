@@ -1,7 +1,7 @@
 # Modified from https://www.cs.swarthmore.edu/~newhall/unixhelp/javamakefiles.html
 # use current directory as class path
 CLASSPATH = -cp "${PWD}"
-JFLAGS = -g -Xlint:deprecation $(CLASSPATH)
+JFLAGS = -g -Xlint:deprecation -Xlint:unchecked $(CLASSPATH)
 JC = "/c/Program Files/Common Files/Oracle/Java/javapath/javac"
 JR = "/c/Program Files/Common Files/Oracle/Java/javapath/java" $(CLASSPATH)
 RM = rm
