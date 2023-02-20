@@ -7,10 +7,11 @@
  */
 
 package common;
+import java.util.NoSuchElementException;
 
 public interface CommonUserInterface {
-	public abstract int createUser(String username, String password); // return the user ID
-	public abstract String login(String username, String password); // return the session token
-	public abstract void logout(String sessionToken);
-	public abstract int[] getSellerRating(int sellerId);
+	public abstract int createUser(String username, String password) throws IllegalArgumentException; // return the user ID
+	public abstract String login(String username, String password) throws NoSuchElementException; // return the session token
+	public abstract void logout(String sessionToken) throws NoSuchElementException;
+	public abstract int[] getSellerRating(int sellerId) throws NoSuchElementException;
 }

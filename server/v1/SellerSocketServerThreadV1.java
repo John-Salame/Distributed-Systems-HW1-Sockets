@@ -15,8 +15,11 @@ import common.transport.socket.APIEnumV1;
 import common.transport.socket.BaseSocketServerThread;
 import common.transport.socket.SellerEnumV1;
 import common.Item;
+import common.ItemId;
+import common.SaleListingId;
 import java.net.*;
 import java.io.IOException;
+import java.util.NoSuchElementException;
 
 public class SellerSocketServerThreadV1 extends BaseSocketServerThread implements SellerInterface {
 	private SellerInterface sellerInterfaceV1;
@@ -64,6 +67,8 @@ public class SellerSocketServerThreadV1 extends BaseSocketServerThread implement
 				return this.bytesGetSellerRating(msg);
 			case PUT_ON_SALE:
 				return this.bytesPutOnSale(msg);
+			case CHANGE_PRICE_OF_ITEM:
+				return this.bytesChangePriceOfItem(msg);
 			default:
 				throw new RuntimeException("Err SellerSocketServerThreadV1: Unsupported method triggered by enum.");
 		}
@@ -106,14 +111,21 @@ public class SellerSocketServerThreadV1 extends BaseSocketServerThread implement
 		int[] rating = this.getSellerRating(sellerId);
 		return SerializeIntArray.serialize(rating);
 	}
-	public void putOnSale(String sessionToken, Item item, int quantity) {
-		this.sellerInterfaceV1.putOnSale(sessionToken, item, quantity);
+	public SaleListingId putOnSale(String sessionToken, Item item, int quantity) {
+		return this.sellerInterfaceV1.putOnSale(sessionToken, item, quantity);
 	}
 	private byte[] bytesPutOnSale(byte[] msg) throws IOException {
 		throw new RuntimeException("SellerSocketServerThreadV1: putOnSale() Not implemented");
 	}
+	public void changePriceOfItem(String sessionToken, ItemId itemId, float newPrice) throws NoSuchElementException, IllegalArgumentException, UnsupportedOperationException {
+		this.sellerInterfaceV1.changePriceOfItem(sessionToken, itemId, newPrice);
+	}
+	private byte[] bytesChangePriceOfItem(byte[] msg) throws IOException {
+		SerializePriceArgClientServer priceArg = SerializePriceArgClientServer.deserialize(msg);
+		this.changePriceOfItem(priceArg.getSessionToken(), priceArg.getItemId(), priceArg.getPrice());
+		return new byte[0];
+	}
 	/*
-	public void changePriceOfItem(String sessionToken, ItemId itemId, float newPrice);
 	public void removeItemFromSale(String sessionToken, ItemId itemId, int quantity);
 	public String displayItemsOnSale(String sessionToken);
 	*/

@@ -45,17 +45,37 @@ public class Seller {
 			"  Negative: " + feedback[1] + "\n";
 	}
 
-	// SETTERS
-	public void setName(String name) {
-		if(name.length() > 32) {
+	// VALIDATION
+	public static void validateName(String name) throws IllegalArgumentException {
+		if (name == null || name.equals("")) {
+			throw new IllegalArgumentException("Seller name must not be null or empty string");
+		}
+		if (name.length() > 32) {
 			throw new IllegalArgumentException("Seller name is too long");
 		}
+	}
+	public static void validatePassword(String password) throws IllegalArgumentException {
+		if (password == null || password.equals("")) {
+			throw new IllegalArgumentException("Seller password must not be null or empty string");
+		}
+	}
+	public static void validateId(int id) throws IllegalArgumentException {
+		if (id < 1) {
+			throw new IllegalArgumentException("Seller ID must be positive");
+		}
+	}
+
+	// SETTERS
+	public void setName(String name) throws IllegalArgumentException {
+		validateName(name);
 		this.name = name;
 	}
-	public void setPassword(String password) {
+	public void setPassword(String password) throws IllegalArgumentException{
+		validatePassword(password);
 		this.password = password;
 	}
-	public void setId(int id) {
+	public void setId(int id) throws IllegalArgumentException {
+		validateId(id);
 		this.id = id;
 	}
 	public void addThumbsUp() {

@@ -1,5 +1,5 @@
 /**
- * Class SerializeLogin
+ * Class SerializePriceArgDB
  * Author: John Salame
  * CSCI 5673 Distributed Systems
  * Assignment 1 - Sockets
@@ -14,13 +14,13 @@ import java.io.DataOutputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-public class SerializePriceArg {
+public class SerializePriceArgDB {
 	private ItemId itemId;
 	private int sellerId;
 	private float price;
 
-	public SerializePriceArg() {}
-	public SerializePriceArg(ItemId itemId, int sellerId, float price) {
+	public SerializePriceArgDB() {}
+	public SerializePriceArgDB(ItemId itemId, int sellerId, float price) {
 		this.itemId = itemId;
 		this.sellerId = sellerId;
 		this.price = price;
@@ -40,7 +40,7 @@ public class SerializePriceArg {
 		return ret;
 	}
 
-	public static SerializePriceArg deserialize(byte[] b) throws IOException {
+	public static SerializePriceArgDB deserialize(byte[] b) throws IOException {
 		ByteArrayInputStream buf = new ByteArrayInputStream(b);
 		DataInputStream reader = new DataInputStream(buf);
 		ItemId itemId = ItemId.deserializeFromStream(reader);
@@ -48,7 +48,7 @@ public class SerializePriceArg {
 		float price = reader.readFloat();
 		reader.close();
 		buf.close();
-		return new SerializePriceArg(itemId, sellerId, price);
+		return new SerializePriceArgDB(itemId, sellerId, price);
 	}
 
 	// GETTERS

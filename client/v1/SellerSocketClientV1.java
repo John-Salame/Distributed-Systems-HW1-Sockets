@@ -15,7 +15,10 @@ import common.transport.socket.APIEnumV1;
 import common.transport.socket.BaseSocketClient;
 import common.transport.socket.SellerEnumV1;
 import common.Item;
+import common.ItemId;
+import common.SaleListingId;
 import java.io.IOException;
+import java.util.NoSuchElementException;
 
 public class SellerSocketClientV1 extends BaseSocketClient implements SellerInterface {
 	
@@ -79,11 +82,21 @@ public class SellerSocketClientV1 extends BaseSocketClient implements SellerInte
 		}
 		return rating;
 	}
-	public void putOnSale(String sessionToken, Item item, int quantity) {
+	public SaleListingId putOnSale(String sessionToken, Item item, int quantity) {
 		throw new RuntimeException("SellerSocketClientV1: putOnSale() Not implemented");
 	}
+	public void changePriceOfItem(String sessionToken, ItemId itemId, float newPrice) throws NoSuchElementException, IllegalArgumentException, UnsupportedOperationException {
+		int funcId = SellerEnumV1.CHANGE_PRICE_OF_ITEM.ordinal();
+		try {
+			byte[] msg = SerializePriceArgClientServer.serialize(sessionToken, itemId, newPrice);
+			byte[] buf = this.sendAndReceive(msg, funcId);
+			assert buf.length == 0;
+		}
+		catch (IOException i) {
+			System.out.println(i);
+		}
+	}
 	/*
-	public void changePriceOfItem(String sessionToken, ItemId itemId, float newPrice);
 	public void removeItemFromSale(String sessionToken, ItemId itemId, int quantity);
 	public String displayItemsOnSale(String sessionToken);
 	*/

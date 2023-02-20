@@ -19,6 +19,8 @@ CLASSES = \
 	common/transport/serialize/SerializeInt.java \
 	common/transport/serialize/SerializeIntArray.java \
 	common/transport/serialize/SerializeLogin.java \
+	common/transport/serialize/SerializePriceArgClientServer.java \
+	common/transport/serialize/SerializePriceArgDB.java \
 	common/transport/serialize/SerializeString.java \
 	common/transport/serialize/SerializeStringArray.java \
 	common/transport/socket/APIEnumV1.java \

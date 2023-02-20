@@ -10,6 +10,7 @@ package db.customer;
 import dao.SessionDAO;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.NoSuchElementException;
 
 public class SessionDAOInMemory implements SessionDAO {
 	// https://www.geeksforgeeks.org/map-interface-java-examples/
@@ -27,7 +28,7 @@ public class SessionDAOInMemory implements SessionDAO {
 	 * That way, logging out on one client does not disrupt any other client.
 	 * We can use information about the client, such as time of login or user-agent field, in order to generate a unique session token.
 	 * Private methods are allowed since Java 9 https://www.tutorialspoint.com/can-we-have-a-private-method-or-private-static-method-in-an-interface-in-java-9
-	 * However, I don't have Java 9, so I won't put this in the interface declaration.
+	 * However, I don't have Java 9, so I won't put this method in the interface declaration.
 	 */
 	private String generateUniqueSessionToken(int userId) {
 		String token = "";
@@ -54,18 +55,36 @@ public class SessionDAOInMemory implements SessionDAO {
 	// Called by login() on server
 	public String createSession(int userId) {
 		String sessionKey = this.generateUniqueSessionToken(userId);
-		sessions.put(sessionKey, Integer.valueOf(userId));
+		sessions.put(sessionKey, Integer.valueOf(userId)); // I don't know if this can cause an Exception
 		return sessionKey;
 	}
 
 	// Called by logout() on server
-	public void expireSession(String sessionKey) {
-		sessions.remove(sessionKey);
+	public void expireSession(String sessionKey) throws NoSuchElementException {
+		if (!sessions.containsKey(sessionKey)) {
+			throw new NoSuchElementException("Cannot log out session which does not exist");
+		}
+		// put this try/catch in case somebody logs out between the containsKey check and now. I don't think this is possible.
+		try {
+			sessions.remove(sessionKey); // may cause an Exception
+		} catch (Exception e) {
+			System.out.println(e);
+			throw new NoSuchElementException("Somebody already logged out from this session");
+		}
 	}
 
 	// might throw an error if the session does not exist
-	public int getUserIdFromSession(String sessionKey) {
-		return sessions.get(sessionKey).intValue();
+	public int getUserIdFromSession(String sessionKey) throws NoSuchElementException {
+		if (!sessions.containsKey(sessionKey)) {
+			throw new NoSuchElementException("Cannot get user associated with a session that does not exist");
+		}
+		// put this try/catch in case somebody logs out between the containsKey check and now. Replace with some locking mechanism later.
+		try {
+			return sessions.get(sessionKey).intValue();
+		} catch (Exception e) {
+			System.out.println(e);
+			throw new NoSuchElementException("Somebody already logged out from this session");
+		}
 	}
 
 	public String listSessions() {

@@ -13,6 +13,7 @@ import common.BuyerInterface;
 import common.Item;
 import common.ItemId;
 import util.EditDistance;
+import java.util.NoSuchElementException;
 
 public class BuyerInterfaceServerV1 implements BuyerInterface {
 
@@ -30,18 +31,18 @@ public class BuyerInterfaceServerV1 implements BuyerInterface {
 		this.itemDao = itemDao;
 	}
 
-	public int createUser(String username, String password) {
+	public int createUser(String username, String password) throws IllegalArgumentException {
 		return buyerDao.createUser(username, password);
 	}
-	public String login(String username, String password) {
-		int userId = buyerDao.getUserId(username, password);
+	public String login(String username, String password) throws NoSuchElementException {
+		int userId = buyerDao.getUserId(username, password); // may raise a NoSuchElementException
 		String sessionToken = sessionDao.createSession(userId);
 		return sessionToken;
 	}
-	public void logout(String sessionToken) {
+	public void logout(String sessionToken) throws NoSuchElementException {
 		sessionDao.expireSession(sessionToken);
 	}
-	public int[] getSellerRating(int sellerId) {
+	public int[] getSellerRating(int sellerId) throws NoSuchElementException {
 		return sellerDao.getSellerById(sellerId).getFeedback();
 	}
 	/**
@@ -56,27 +57,57 @@ public class BuyerInterfaceServerV1 implements BuyerInterface {
 	public Item[] searchItem(String sessionToken, int category, String[] keywords) {
 		final int LIMIT = 20; // how many search results to show
 		Item[] items = itemDao.getItemsInCategory(category);
-		double[] scores = new double[items.length];
+		int numItemsInCategory = items.length;
+		double[] scores = new double[numItemsInCategory];
 		int scoreIndex = 0;
-		int numKeywords = keywords.length; // number of search keywords
+		int numKeywords = 0; // number of search keywords
+		// truncate the keywords before comparing them to the item keywords
+		String[] keywordsTruncated = new String[keywords.length];
+		for(int i = 0; i < keywords.length; i++) {
+			try {
+				String keyword = keywords[i];
+				keyword = Item.validateKeyword(keyword); // truncate, or throw error if keyword is null or empty string
+				keywordsTruncated[numKeywords++] = keyword;
+			} catch (IllegalArgumentException e) {
+				// do nothing; prevents the keyword from being added
+			}
+		}
+		// numKeywords is the number of non-empty keywords in keywordsTruncated
 		for(Item item : items) {
 			String[] itemKeywords = item.getKeywords();
 			double[] editDist = new double[numKeywords]; // holds the best edit distance for each keyword in keywords
 			double sum = 0.0;
+			// prevent the cheat where an item with no keywords would get a score of 0 (best possible score)
+			scores[scoreIndex] = 10.0;
 			for(int i = 0; i < numKeywords; i++) {
-				editDist[i] = 0.0;
+				editDist[i] = 10.0;
 				for(int j = 0; j < itemKeywords.length; j++) {
-					double ed = EditDistance.levenshteinNormalized(keywords[i], itemKeywords[j]);
-					editDist[i] = Math.max(editDist[i], ed);
+					double ed = 10.0; // arbitrarly large edit distance
+					// Get the Levenshtein Distance of the keyword pair
+					try {
+						ed = EditDistance.levenshteinNormalized(keywordsTruncated[i], itemKeywords[j]);
+					} catch (IllegalArgumentException e) {
+						// not sure what to do here
+					}
+					editDist[i] = Math.min(editDist[i], ed);
+					/*
+					String levenshteinSummary = "Levenshtein Distance for words " + 
+						keywordsTruncated[i] + " and " + itemKeywords[j] + " is " + ed;
+					System.out.println(levenshteinSummary);
+					*/
 				}
+				// System.out.println("Levenshtein Distance for keyword " + keywordsTruncated[i] + " is " + editDist[i]);
 				sum += editDist[i];
 			}
-			scores[scoreIndex] = sum;
+			// System.out.println("Search score for item " + item.getName() + " is " + sum);
+			if (itemKeywords.length > 0) {
+				scores[scoreIndex] = sum;
+			}
 			scoreIndex++; // after you finish scoring this item, move on to the next one
 		}
 		// now, sort the items; I'll just use selection sort
 		for(int i = 0; i < numKeywords - 1; i++) {
-			double min = scores[i];
+			double min = scores[i]; // start off assuming the first unsorted item has the minimum score
 			int minIndex = i;
 			for(int j = i+1; j < numKeywords; j++) {
 				if(scores[j] < scores[i]) {
@@ -84,16 +115,20 @@ public class BuyerInterfaceServerV1 implements BuyerInterface {
 					minIndex = j;
 				}
 			}
-			// swap scores[i] with scores[minIndex]
+			// swap scores[i] with scores[minIndex]. Also swap the items
 			scores[minIndex] = scores[i];
 			scores[i] = min;
+			Item bestItem = items[minIndex];
+			items[minIndex] = items[i];
+			items[i] = bestItem;
 		}
 		// Now, limit the result to LIMIT items
+		int numItemsInResult = Math.min(LIMIT, numItemsInCategory);
 		Item[] returnArray = null;
 		if(LIMIT > 0) {
-			returnArray = new Item[LIMIT];
+			returnArray = new Item[numItemsInResult];
 			int numItems = items.length;
-			for(int i = 0; i < LIMIT && i < numItems; i++) {
+			for(int i = 0; i < numItemsInResult && i < numItems; i++) {
 				returnArray[i] = items[i];
 			}
 		}

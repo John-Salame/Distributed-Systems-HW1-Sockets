@@ -16,6 +16,7 @@ import common.transport.socket.DBItemEnumV1;
 import common.Item;
 import common.ItemId;
 import java.io.IOException;
+import java.util.NoSuchElementException;
 
 public class DBProductItemSocketClientV1 extends BaseSocketClient implements ItemDAO {
 
@@ -26,7 +27,7 @@ public class DBProductItemSocketClientV1 extends BaseSocketClient implements Ite
 	}
 
 	// ItemDAO Methods
-	public ItemId createItem(Item item) {
+	public ItemId createItem(Item item) throws IllegalArgumentException {
 		int funcId = DBItemEnumV1.CREATE_ITEM.ordinal();
 		ItemId itemId = null;
 		try {
@@ -37,9 +38,10 @@ public class DBProductItemSocketClientV1 extends BaseSocketClient implements Ite
 		catch (IOException i) {
 			System.out.println(i);
 		}
+		// TO-DO: Maybe throw an exception instead of returning a null itemId
 		return itemId;
 	}
-	public Item getItemById(ItemId itemId) {
+	public Item getItemById(ItemId itemId) throws NoSuchElementException {
 		int funcId = DBItemEnumV1.GET_ITEM_BY_ID.ordinal();
 		Item item = null;
 		try {
@@ -50,12 +52,13 @@ public class DBProductItemSocketClientV1 extends BaseSocketClient implements Ite
 		catch (IOException i) {
 			System.out.println(i);
 		}
+		// TO-DO: Maybe throw an exception instead of returning a null item
 		return item;
 	}
-	public void changePrice(ItemId itemId, int sellerId, float newPrice) {
+	public void changePrice(ItemId itemId, int sellerId, float newPrice) throws NoSuchElementException, IllegalArgumentException {
 		int funcId = DBItemEnumV1.CHANGE_PRICE.ordinal();
 		try {
-			byte[] msg = SerializePriceArg.serialize(itemId, sellerId, newPrice);
+			byte[] msg = SerializePriceArgDB.serialize(itemId, sellerId, newPrice);
 			byte[] buf = this.sendAndReceive(msg, funcId);
 		}
 		catch (IOException i) {

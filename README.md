@@ -32,3 +32,7 @@ Then we normalize the edit distance a bit so it's more or less based on the perc
 * Attempting to log in while the database is unreachable will cause the server to crash without closing the socket and the client to hang because it tries to operate on a null string (the session token created by the sessionDao).
 * * Perhaps I should handle this more gracefully. I could maybe return an empty string and then validate on the client side that an empty string means an error.
 * * I could also just close the server socket upon triggering a NullPointerException, but this would also cause the client process to end.
+
+## Style
+I essentially implemented at most once RPCs with sockets. If there is a connection failure during a client API call, 
+I retry the connection 5 times.

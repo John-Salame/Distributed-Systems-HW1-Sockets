@@ -15,7 +15,10 @@ public class EditDistance {
 	 * The Levenshtein distance is an edit distance that accounts for insertion, deletion, and substitution of characters.
 	 * Dynamic Programming implementation taken from https://en.wikipedia.org/wiki/Levenshtein_distance
 	 */
-	 public static int levenshteinDistance(String s1, String s2) {
+	 public static int levenshteinDistance(String s1, String s2) throws IllegalArgumentException {
+		if (s1 == null || s2 == null) {
+			throw new IllegalArgumentException("Strings cannot be null in Levenshtein Distance");
+		}
 		int len1 = s1.length() + 1;
 		int len2 = s2.length() + 1;
 		int d[][] = new int[len1][len2]; // matrix with s1 as rows and s2 as columns
@@ -43,7 +46,7 @@ public class EditDistance {
 				d[i][j] = Math.min(d[i][j-1] + 1, Math.min(d[i-1][j] + 1, d[i-1][j-1] + substitutionCost));
 			}
 		}
-		return d[len1][len2];
+		return d[len1 - 1][len2 - 1];
 	 }
 
 	 /**
@@ -53,7 +56,7 @@ public class EditDistance {
 	  * If that doesn't work, I may try (dist-1)/log(x) or dist/log(x+2)
 	  * Thus, the distance between long words can be compared somewhat fairly to the distance between short words.
 	  */
-	public static double levenshteinNormalized(String s1, String s2) {
+	public static double levenshteinNormalized(String s1, String s2) throws IllegalArgumentException {
 		double dist = (double) levenshteinDistance(s1, s2);
 		return dist / (1 + s1.length());
 	}

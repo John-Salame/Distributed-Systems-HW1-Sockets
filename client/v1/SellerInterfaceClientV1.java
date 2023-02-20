@@ -12,6 +12,9 @@
 package client.v1;
 import common.SellerInterface;
 import common.Item;
+import common.ItemId;
+import common.SaleListingId;
+import java.util.NoSuchElementException;
 
 public class SellerInterfaceClientV1 implements SellerInterface {
 
@@ -35,11 +38,13 @@ public class SellerInterfaceClientV1 implements SellerInterface {
 	public int[] getSellerRating(int sellerId) {
 		return transport.getSellerRating(sellerId);
 	}
-	public void putOnSale(String sessionToken, Item item, int quantity) {
-		transport.putOnSale(sessionToken, item, quantity);
+	public SaleListingId putOnSale(String sessionToken, Item item, int quantity) {
+		return transport.putOnSale(sessionToken, item, quantity);
+	}
+	public void changePriceOfItem(String sessionToken, ItemId itemId, float newPrice) throws NoSuchElementException, IllegalArgumentException, UnsupportedOperationException {
+		transport.changePriceOfItem(sessionToken, itemId, newPrice);
 	}
 	/*
-	public void changePriceOfItem(String sessionToken, ItemId itemId, float newPrice);
 	public void removeItemFromSale(String sessionToken, ItemId itemId, int quantity);
 	public String displayItemsOnSale(String sessionToken);
 	*/

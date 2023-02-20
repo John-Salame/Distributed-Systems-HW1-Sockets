@@ -22,6 +22,7 @@ import db.customer.SellerDAOInMemory;
 import db.customer.SessionDAOInMemory;
 import db.product.ItemDAOInMemory;
 import java.util.Arrays;
+import java.util.NoSuchElementException;
 
  public class ServerRunnerInMemory {
 	public static void main(String[] args) {
@@ -35,6 +36,99 @@ import java.util.Arrays;
 		SellerInterface sellerInterface = new SellerInterfaceServerV1(sellerDao, sessionDao, itemDao);
 
 		// Basic buyer API calls
+		System.out.println("\n\nTesting Buyer edge cases");
+		Buyer testBuyer;
+		try {
+			testBuyer = new Buyer();
+			testBuyer.setName(null);
+		} catch (IllegalArgumentException e) {
+			System.out.println(e);
+		}
+		try {
+			testBuyer = new Buyer();
+			testBuyer.setName("This is a very long name and should throw an IllegalArgumentException");
+		} catch (IllegalArgumentException e) {
+			System.out.println(e);
+		}
+		try {
+			testBuyer = new Buyer();
+			testBuyer.setPassword("");
+		} catch (IllegalArgumentException e) {
+			System.out.println(e);
+		}
+		try {
+			testBuyer = new Buyer();
+			testBuyer.setPassword(null);
+		} catch (IllegalArgumentException e) {
+			System.out.println(e);
+		}
+		try {
+			testBuyer = new Buyer();
+			testBuyer.setId(0);
+		} catch (IllegalArgumentException e) {
+			System.out.println(e);
+		}
+		// demonstrate that null does not interfere with the login credential verification and it will return false
+		testBuyer = new Buyer();
+		System.out.println("Buyer with no username and password should not match null username and password");
+		System.out.println("Does it match? " + testBuyer.isMyLoginCredentials(null, null));
+		// end of demonstration
+		// BuyerDAO tests
+		System.out.println("Testing BuyerDAO edge cases");
+		try {
+			testBuyer = new Buyer();
+			buyerDao.createUser(null, "pass"); // make sure it throws NoSuchElementException
+		} catch (IllegalArgumentException e) {
+			System.out.println(e);
+		}
+		try {
+			buyerDao.createUser("Test", null); // make sure it throws NoSuchElementException
+		} catch (IllegalArgumentException e) {
+			System.out.println(e);
+		}
+		try {
+			buyerDao.createUser("This is a very long name and should throw an IllegalArgumentException", "pass"); // make sure it throws NoSuchElementException
+		} catch (IllegalArgumentException e) {
+			System.out.println(e);
+		}
+		try {
+			buyerDao.getUserId(null, null); // make sure it throws NoSuchElementException
+		} catch (NoSuchElementException e) {
+			System.out.println(e);
+		}
+		try {
+			buyerDao.getUserId("Test", "pass"); // does not exist, so it should throw an exception
+		} catch (NoSuchElementException e) {
+			System.out.println(e);
+		}
+		try {
+			buyerDao.getBuyerById(-1); // does not exist, so it should throw an exception
+		} catch (NoSuchElementException e) {
+			System.out.println(e);
+		}
+		try {
+			buyerDao.getBuyerById(2); // does not exist, so it should throw an exception
+		} catch (NoSuchElementException e) {
+			System.out.println(e);
+		}
+		System.out.println("Testing BuyerInterface edge cases");
+		try {
+			buyerInterface.login("John", "testing");
+		} catch (NoSuchElementException e) {
+			System.out.println(e);
+		}
+		try {
+			buyerInterface.logout("token");
+		} catch (NoSuchElementException e) {
+			System.out.println(e);
+		}
+		try {
+			buyerInterface.getSellerRating(2);
+		} catch (NoSuchElementException e) {
+			System.out.println(e);
+		}
+		
+		System.out.println("Done testing Buyer, BuyerDAO, and BuyerInterface edge cases");
 		String buyer1Username = "Joe";
 		String buyer1Password = "password123";
 		int buyer1Id = buyerInterface.createUser(buyer1Username, buyer1Password);
@@ -45,6 +139,96 @@ import java.util.Arrays;
 		System.out.println(buyer1);
 
 		// Basic seller API calls
+		System.out.println("\n\nTesting Seller functions");
+		Seller testSeller;
+		try {
+			testSeller = new Seller();
+			testSeller.setName(null);
+		} catch (IllegalArgumentException e) {
+			System.out.println(e);
+		}
+		try {
+			testSeller = new Seller();
+			testSeller.setName("This is a very long name and should throw an IllegalArgumentException");
+		} catch (IllegalArgumentException e) {
+			System.out.println(e);
+		}
+		try {
+			testSeller = new Seller();
+			testSeller.setPassword("");
+		} catch (IllegalArgumentException e) {
+			System.out.println(e);
+		}
+		try {
+			testSeller = new Seller();
+			testSeller.setPassword(null);
+		} catch (IllegalArgumentException e) {
+			System.out.println(e);
+		}
+		try {
+			testSeller = new Seller();
+			testSeller.setId(0);
+		} catch (IllegalArgumentException e) {
+			System.out.println(e);
+		}
+		System.out.println("Testing SellerDAO edge cases");
+		try {
+			sellerDao.createUser("", "password");
+		} catch (IllegalArgumentException e) {
+			System.out.println(e);
+		}
+		try {
+			sellerDao.createUser("Test", null);
+		} catch (IllegalArgumentException e) {
+			System.out.println(e);
+		}
+		try {
+			sellerDao.getUserId("Test", null);
+		} catch (NoSuchElementException e) {
+			System.out.println(e);
+		}
+		try {
+			sellerDao.getUserId("", "password");
+		} catch (NoSuchElementException e) {
+			System.out.println(e);
+		}
+		try {
+			sellerDao.getUserId("test", "password"); // does not exist in database
+		} catch (NoSuchElementException e) {
+			System.out.println(e);
+		}
+		try {
+			sellerDao.getSellerById(-1);
+		} catch (NoSuchElementException e) {
+			System.out.println(e);
+		}
+		try {
+			sellerDao.getSellerById(2);
+		} catch (NoSuchElementException e) {
+			System.out.println(e);
+		}
+		try {
+			sellerDao.commitSeller(null);
+		} catch (IllegalArgumentException e) {
+			System.out.println(e);
+		}
+		System.out.println("Testing SellerInterface edge cases");
+		try {
+			sellerInterface.login("John", "testing");
+		} catch (NoSuchElementException e) {
+			System.out.println(e);
+		}
+		try {
+			sellerInterface.logout("token");
+		} catch (NoSuchElementException e) {
+			System.out.println(e);
+		}
+		try {
+			sellerInterface.getSellerRating(2);
+		} catch (NoSuchElementException e) {
+			System.out.println(e);
+		}
+		System.out.println("Done testing Seller, SellerDAO, and SellerInterface edge cases");
 		String seller1Username = "John";
 		String seller1Password = "password321";
 		// do this until I start working on the seller interface
@@ -58,6 +242,81 @@ import java.util.Arrays;
 		System.out.println(Seller.displayFeedback(feedback));
 
 		// Create an item
+		System.out.println("\n\nTesting Item functions");
+		// First, try edge cases
+		Item testItem;
+		try {
+			testItem = new Item();
+			testItem.setId(1, 1);
+			testItem.setCategory(2); // throw IllegalStateException
+		} catch (IllegalStateException e) {
+			System.out.println(e);
+		}
+		try {
+			testItem = new Item();
+			testItem.setId(1, 1);
+			testItem.setSerial(2); // throw IllegalStateException
+		} catch (IllegalStateException e) {
+			System.out.println(e);
+		}
+		System.out.println("Testing ItemDAO edge cases");
+		try {
+			itemDao.createItem(null);
+		} catch (IllegalArgumentException e) {
+			System.out.println(e);
+		}
+		try {
+			testItem = new Item();
+			testItem.setId(1, -2); // negative serial number
+			itemDao.createItem(testItem);
+		} catch (IllegalArgumentException e) {
+			System.out.println(e);
+		}
+		try {
+			testItem = new Item();
+			testItem.setId(1, 2); // this item does not exist in the database but its serial is already set; throw error
+			itemDao.createItem(testItem);
+		}
+		catch (IllegalArgumentException e) {
+			System.out.println(e);
+		}
+		try {
+			testItem = new Item();
+			testItem.setId(10, 2); // illegal category
+			itemDao.createItem(testItem);
+		}
+		catch (IllegalArgumentException e) {
+			System.out.println(e);
+		}
+		try {
+			testItem = new Item();
+			testItem.setId(-1, 2); // illegal category
+			itemDao.createItem(testItem);
+		} catch (IllegalArgumentException e) {
+			System.out.println(e);
+		}
+		try {
+			itemDao.getItemById(null);
+		} catch (NoSuchElementException e) {
+			System.out.println(e);
+		}
+		try {
+			itemDao.getItemById(new ItemId(0, 2)); // this item id doesn't exist in database yet
+		} catch (NoSuchElementException e) {
+			System.out.println(e);
+		}
+		try {
+			itemDao.changePrice(null, 1, (float) 1.00); // should fail due to null itemId
+		} catch (NoSuchElementException e) {
+			System.out.println(e);
+		}
+		Item[] itemsBySeller = itemDao.getItemsBySeller(1);
+		assert itemsBySeller.length == 0;
+		Item[] itemsByCategory = itemDao.getItemsInCategory(-1);
+		assert itemsByCategory.length == 0;
+		System.out.println("Done testing Item, ItemDAO, and ItemInterface edge cases");
+
+		System.out.println("\nCreating first item: apple");
 		int seller2Id = seller1Id + 1;
 		String[] keywords = {"Food", "Fruit", "Crunchy"};
 		// ItemId itemId = new ItemId(0, 1);
@@ -69,10 +328,21 @@ import java.util.Arrays;
 		System.out.println(apple);
 		System.out.println("\n\nChanging price of apple to 0.99\n");
 		itemDao.changePrice(itemId, seller1Id, (float) 0.99);
-		itemDao.changePrice(itemId, seller2Id, (float) 1.22); // this one should fail
+		try {
+			itemDao.changePrice(itemId, seller2Id, (float) 1.22); // this one should fail
+		} catch (UnsupportedOperationException e) {
+			System.out.println("Correctly caught exception changing price using wrong user: " + e);
+		}
 		System.out.println(apple);
+		System.out.println("\n\nChanging price of apple to 0.60 using sellerInterface:\n");
+		sellerInterface.changePriceOfItem(buyer1SessionToken, itemId, (float) 0.60);
+		try {
+			sellerInterface.changePriceOfItem(null, itemId, (float) 0.60); // this one should fail
+		} catch (NoSuchElementException e) {
+			System.out.println("Correctly caught exception using bad token: " + e);
+		}
 		// Test functions to get items by category and get items by seller
-		Item pear = new Item("pear", 0, new String[] {"Food", "Fruit", "Sour", "Sweet"}, "New", (float) 1.23);
+		Item pear = new Item("pear", 0, new String[] {"Food", "Fruit", "Soft", "Sour", "Sweet"}, "New", (float) 1.23);
 		pear.setSellerId(seller2Id);
 		itemDao.createItem(pear);
 		Item chair = new Item("chair", 1, new String[] {"Household", "Furniture"}, "Used", (float) 5.29);
@@ -103,6 +373,14 @@ import java.util.Arrays;
 		int numSold = sale2.decrementQuantity(3);
 		assert numSold == 2;
 		System.out.println(sale2);
+
+		// Search for fruits
+		Item[] searchResults = buyerInterface.searchItem(buyer1SessionToken, 0, new String[] {"fruit"});
+		System.out.println("\nSearch results for fruit:");
+		System.out.println(Arrays.toString(searchResults));
+		searchResults = buyerInterface.searchItem(buyer1SessionToken, 0, new String[] {"fruit", "sweet"});
+		System.out.println("\nSearch results for sweet fruit:");
+		System.out.println(Arrays.toString(searchResults));
 
 		// Test logging out
 		System.out.println("Listing sessions");

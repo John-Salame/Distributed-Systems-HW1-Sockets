@@ -11,6 +11,7 @@ import common.Seller;
 import dao.SellerDAO;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.NoSuchElementException;
 
 public class SellerDAOInMemory implements SellerDAO {
 	static int nextId = 1;
@@ -32,40 +33,61 @@ public class SellerDAOInMemory implements SellerDAO {
 		this.nextId++;
 		return currId;
 	}
-	public int createUser(String username, String password) {
-		int userId = this.getUserId(username, password);
+	// could throw an IllegalArgumentException if the username is invalid
+	public int createUser(String username, String password) throws IllegalArgumentException {
 		// if the user already exists, return the id of the existing user
-		if(userId > 0) {
+		try {
+			int userId = this.getUserId(username, password);
 			return userId;
+		} catch (NoSuchElementException e) {
+			// continue
 		}
 		// create a new user
-		userId = this.generateUniqueId();
 		Seller newSeller = new Seller();
 		newSeller.setName(username);
 		newSeller.setPassword(password);
+		int userId = this.generateUniqueId();
 		newSeller.setId(userId);
 		this.sellers.add(newSeller);
 		return userId;
 	}
-	public int getUserId(String username, String password) {
+	public int getUserId(String username, String password) throws NoSuchElementException {
+		// for large databases, speed up obviously invalid input
+		try {
+			Seller.validateName(username);
+			Seller.validatePassword(password);
+		} catch (IllegalArgumentException e) {
+			throw new NoSuchElementException("Searching for buyer with invalid username or password");
+		}
 		for(Seller seller : this.sellers) {
 			if(seller.isMyLoginCredentials(username, password)) {
 				return seller.getId();
 			}
 		}
-		return 0; // no user with this id exists
+		throw new NoSuchElementException("No seller exists with username " + username + " and the specified password");
 	}
-	public Seller getSellerById(int sellerId) {
+	public Seller getSellerById(int sellerId) throws NoSuchElementException {
+		// for large databases, speed up obviously invalid input
+		try {
+			Seller.validateId(sellerId);
+		} catch (IllegalArgumentException e) {
+			throw new NoSuchElementException("Searching for seller with invalid buyer ID " + sellerId);
+		}
+		// search
 		for(Seller seller: this.sellers) {
 			if(seller.getId() == sellerId) {
 				return seller;
 			}
 		}
-		return null;
+		throw new NoSuchElementException("No seller exists with id " + sellerId);
 	}
 
 	// not thread-safe / safe with multiple simultaneous operations
-	public void commitSeller(Seller seller) {
+	// null seller is invalid
+	public void commitSeller(Seller seller) throws IllegalArgumentException {
+		if (seller == null) {
+			throw new IllegalArgumentException("Cannot commit a null seller");
+		}
 		int id = seller.getId();
 		// update if the seller exists
 		for(int i = 0; i < sellers.size(); i++) {

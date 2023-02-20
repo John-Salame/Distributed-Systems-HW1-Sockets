@@ -36,9 +36,14 @@ public class ItemId {
 	/**
 	 * Throw an IllegalArgumentException if the category is invalid
 	 */
-	public static void validateCategory(int category) {
+	public static void validateCategory(int category) throws IllegalArgumentException {
 		if(category < 0 || category > 9) {
 			throw new IllegalArgumentException("Category must be in range 0-9");
+		}
+	}
+	public static void validateSerial(int serial) throws IllegalArgumentException {
+		if(serial < 1) {
+			throw new IllegalArgumentException("ItemId serial number must be positive");
 		}
 	}
 
@@ -48,8 +53,8 @@ public class ItemId {
 	 * Precondition: The item id has not been initialized.
 	 * The category is part of the primary key and thus is immutable once the item id has been initialized.
 	 */
-	public void setCategory(int category) {
-		this.validateCategory(category);
+	public void setCategory(int category) throws IllegalArgumentException, IllegalStateException {
+		validateCategory(category);
 		if(this.category != -1) {
 			throw new IllegalStateException("Error: Item category cannot be changed after the item has been created.");
 		}
@@ -60,7 +65,8 @@ public class ItemId {
 	 * Precondition: The item id has not been initialized.
 	 * The serial number is part of the primary key and thus is immutable once the item id has been initialized.
 	 */
-	public void setSerial(int serial) {
+	public void setSerial(int serial) throws IllegalArgumentException, IllegalStateException {
+		validateSerial(serial);
 		if(this.serial != -1) {
 			throw new IllegalStateException("Error: Item serial number cannot be changed after the item has been created.");
 		}
@@ -107,6 +113,9 @@ public class ItemId {
 	}
 	@Override
 	public boolean equals(Object other) {
+		if(other == null) {
+			return false;
+		}
 		ItemId otherItemId = (ItemId) other;
 		return (this.category == otherItemId.category && this.serial == otherItemId.serial);
 	}

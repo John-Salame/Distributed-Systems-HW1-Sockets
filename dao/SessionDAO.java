@@ -7,14 +7,15 @@
  */
 
 package dao;
+import java.util.NoSuchElementException;
 
 public interface SessionDAO {
 	// Called by login() on server
 	public abstract String createSession(int userId); // return the session key generated for the user
 	// Called by logout() on server
-	public abstract void expireSession(String sessionKey);
+	public abstract void expireSession(String sessionKey) throws NoSuchElementException;
 	// might throw an error if the session does not exist
-	public abstract int getUserIdFromSession(String sessionKey);
+	public abstract int getUserIdFromSession(String sessionKey) throws NoSuchElementException;
 	// just for debugging purposes
 	public abstract String listSessions();
 }

@@ -40,6 +40,9 @@ public class SaleListingId {
 	}
 	@Override
 	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
 		SaleListingId otherId = (SaleListingId) obj;
 		return (this.itemId.equals(otherId.itemId) && this.quantity == otherId.quantity);
 	}

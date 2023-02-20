@@ -7,6 +7,7 @@
  */
 
 package common;
+import common.Seller;
 import common.transport.serialize.SerializeStringArray;
 import java.io.ByteArrayOutputStream;
 import java.io.ByteArrayInputStream;
@@ -30,7 +31,7 @@ public class Item {
 	}
 	public Item(int sellerId) {
 		initializeDefaults();
-		this.sellerId = sellerId;
+		this.setSellerId(sellerId);
 	}
 	public Item(String name, ItemId id, String[] keywords, String condition, float price, int sellerId) {
 		this.setName(name);
@@ -76,34 +77,78 @@ public class Item {
 		return result;
 	}
 
-	// SETTERS
-	public void setName(String name) {
-		if(name.length() > 32) {
+	// VALIDATORS
+	public static void validateName(String name) throws IllegalArgumentException {
+		if (name == null) {
+			throw new IllegalArgumentException("Item name must not be null");
+		}
+		if (name.length() > 32) {
 			throw new IllegalArgumentException("Item name is too long");
 		}
+	}
+	public static void validateCategory(int category) throws IllegalArgumentException {
+		ItemId.validateCategory(category);
+	}
+	public static void validateSerial(int serial) throws IllegalArgumentException {
+		ItemId.validateSerial(serial);
+	}
+	public static void validatePrice(float price) throws IllegalArgumentException {
+		if (price < 0.0) {
+			throw new IllegalArgumentException("Price cannot be negative");
+		}
+	}
+	// return the keyword, truncated to fit the max length
+	public static String validateKeyword(String keyword) throws IllegalArgumentException {
+		if (keyword == null) {
+			throw new IllegalArgumentException("Keyword should not be null");
+		}
+		else if (keyword.equals("")) {
+			throw new IllegalArgumentException("Keyword should be non-empty string");
+		}
+		if(keyword.length() > 8) {
+			return keyword.substring(0,8);
+		}
+		return keyword;
+	}
+	public static void validateCondition(String condition) throws IllegalArgumentException {
+		if (condition == null) {
+			throw new IllegalArgumentException("Item has null condition");
+		}
+		if(! condition.equals("New") && ! condition.equals("Used")) {
+			throw new IllegalArgumentException("Condition must be New or Used (uppercase matters)");
+		}
+	}
+	public static void validateSellerId(int sellerId) throws IllegalArgumentException {
+		Seller.validateId(sellerId);
+	}
+	
+
+	// SETTERS
+	public void setName(String name) throws IllegalArgumentException {
+		validateName(name);
 		this.name = name;
 	}
-	public void setCategory(int category) {
+	public void setCategory(int category) throws IllegalArgumentException, IllegalStateException {
 		this.id.setCategory(category);
 	}
-	public void setSerial(int serial) {
+	public void setSerial(int serial) throws IllegalArgumentException, IllegalStateException {
 		this.id.setSerial(serial);
 	}
-	public void setId(int category, int serial) {
+	public void setId(int category, int serial) throws IllegalArgumentException, IllegalStateException {
 		this.id.setCategory(category);
 		this.id.setSerial(serial);
 	}
+	// truncate the keyword if it is too large
 	public void addKeyword(String keyword) {
-		String newKeyword = keyword;
 		// if we can add no more keywords, do nothing; if we want to alert the seller, then change this logic
-		if(numKeywords < MAX_KEYWORDS) {
+		if(this.numKeywords < MAX_KEYWORDS) {
 			// limit keywords to 8 characters (truncate)
-			if(keyword.length() > 8) {
-				// alternative would be to truncate the keyword
-				// throw new IllegalArgumentException("Item keywords must be 8 characters or less");
-				newKeyword = keyword.substring(0,8);
+			try {
+				this.keywords[this.numKeywords] = validateKeyword(keyword);
+				this.numKeywords++;
+			} catch (IllegalArgumentException e) {
+				System.out.println("Error adding keyword: " + e);
 			}
-			this.keywords[numKeywords++] = keyword;
 		}
 	}
 	public void addKeywords(String[] keywords) {
@@ -111,18 +156,16 @@ public class Item {
 			this.addKeyword(keyword);
 		}
 	}
-	public void setCondition(String cond) {
-		if(cond == "New" || cond == "Used") {
-			this.condition = cond;
-		}
-		else {
-			throw new IllegalArgumentException("Condition must be New or Used");
-		}
+	public void setCondition(String cond) throws IllegalArgumentException {
+		validateCondition(cond);
+		this.condition = cond;
 	}
-	public void setPrice(float price) {
+	public void setPrice(float price) throws IllegalArgumentException {
+		validatePrice(price);
 		this.price = price;
 	}
-	public void setSellerId(int sellerId) {
+	public void setSellerId(int sellerId) throws IllegalArgumentException {
+		validateSellerId(sellerId);
 		this.sellerId = sellerId;
 	}
 
@@ -142,7 +185,7 @@ public class Item {
 	// return a copy of the keywords array without any blank keywords
 	public String[] getKeywords() {
 		String keywordsCopy[] = new String[this.numKeywords];
-		for(int i = 0; i < numKeywords; i++) {
+		for(int i = 0; i < this.numKeywords; i++) {
 			keywordsCopy[i] = this.keywords[i];
 		}
 		return keywordsCopy;

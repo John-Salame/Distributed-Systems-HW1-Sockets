@@ -8,9 +8,10 @@
 
 package dao;
 import common.Buyer;
+import java.util.NoSuchElementException;
 
 public interface BuyerDAO {
-	public abstract int createUser(String username, String password); // return the user id
-	public abstract int getUserId(String username, String password);
-	public abstract Buyer getBuyerById(int buyerId);
+	public abstract int createUser(String username, String password) throws IllegalArgumentException; // return the user id
+	public abstract int getUserId(String username, String password) throws NoSuchElementException;
+	public abstract Buyer getBuyerById(int buyerId) throws NoSuchElementException;
 }
