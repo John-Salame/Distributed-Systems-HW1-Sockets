@@ -9,10 +9,11 @@
 package dao;
 import common.ItemId;
 import common.SaleListing;
+import java.util.NoSuchElementException;
 
 public interface SaleListingDAO {
 	// NOTE: sellerId is used for authentication purposes; assume that we have already authenticated the seller's session token on the client-facing API
-	public abstract void putItemOnSale(int sellerId, ItemId itemId, int quantity);
-	// choose a sale matching these requirements and remove it from sale; return true if you remove an item from sale.
-	public abstract boolean removeItemFromSale(int sellerId, ItemId itemId, int quantity);
+	public abstract void putItemOnSale(int sellerId, ItemId itemId, int quantity) throws IllegalArgumentException;
+	// choose a sale matching these requirements and remove it from sale
+	public abstract void removeItemFromSale(int sellerId, ItemId itemId, int quantity) throws NoSuchElementException;
 }

@@ -30,6 +30,7 @@ CLASSES = \
 	common/transport/socket/DBBuyerEnumV1.java \
 	common/transport/socket/DBSellerEnumV1.java \
 	common/transport/socket/DBSessionEnumV1.java \
+	common/transport/socket/ErrorEnum.java \
 	common/transport/socket/PacketPrefix.java \
 	common/transport/socket/SellerEnumV1.java \
 	common/transport/socket/SocketMessage.java \

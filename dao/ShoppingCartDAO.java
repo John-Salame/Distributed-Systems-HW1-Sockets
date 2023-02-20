@@ -9,10 +9,11 @@
 package dao;
 import common.CartItem;
 import common.ItemId;
+import java.util.NoSuchElementException;
 
 public interface ShoppingCartDAO {
-	public abstract void addToCart(int buyerId, ItemId itemId, int quantity);
-	public abstract void addtoCart(CartItem cartItem);
-	public abstract void removeFromCart(int buyerId, ItemId itemId, int quantity);
-	public abstract void clearCart(int buyerId); // remove the user's cart items from the database
+	public abstract void addToCart(int buyerId, ItemId itemId, int quantity) throws IllegalArgumentException;
+	public abstract void addtoCart(CartItem cartItem) throws IllegalArgumentException;
+	public abstract void removeFromCart(int buyerId, ItemId itemId, int quantity) throws NoSuchElementException;
+	public abstract void clearCart(int buyerId) throws NoSuchElementException; // remove the user's cart items from the database
 }

@@ -9,17 +9,20 @@
  */
 
 package common.transport.socket;
-import common.transport.socket.APIEnumV1;
-import common.transport.socket.PacketPrefix;
-import common.transport.socket.SocketMessage;
+// import common.transport.socket.APIEnumV1;
+// import common.transport.socket.PacketPrefix;
+// import common.transport.socket.SocketMessage;
 import java.net.*;
+import java.io.ByteArrayInputStream;
 import java.io.DataOutputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.util.NoSuchElementException;
 
 public class BaseSocketClient {
 	private short apiVer;
 	private int api;
+	private int errorApi;
 	private PacketPrefix packetPrefix; // use this to add important metadata to messages over the socket
 	private Socket socket = null;
 	private String serverIp;
@@ -31,10 +34,12 @@ public class BaseSocketClient {
 	public BaseSocketClient() {
 		this.apiVer = 1;
 		this.api = APIEnumV1.ERROR.ordinal();
+		this.errorApi = APIEnumV1.ERROR.ordinal();
 	}
 	public BaseSocketClient(String serverIp, int serverPort, short apiVer, int api) {
 		this.apiVer = apiVer;
 		this.api = api;
+		this.errorApi = APIEnumV1.ERROR.ordinal();
 		this.packetPrefix = new PacketPrefix(this.apiVer, this.api);
 		this.setup(serverIp, serverPort);
 	}
@@ -103,11 +108,47 @@ public class BaseSocketClient {
 		}
 		throw new RuntimeException("Client failed to connect.");
 	}
+
+	// based on the funcId (which is an ordinal in ErrorEnum) and the exception message, throw an exception
+	private void throwExceptionFromNetwork(int funcId, byte[] msg) throws IOException {
+		ErrorEnum[] errKeys = ErrorEnum.values();
+		// extract the message from msg as a String
+		String message;
+		ByteArrayInputStream buf = new ByteArrayInputStream(msg);
+		DataInputStream reader = new DataInputStream(buf);
+		message = reader.readUTF();
+		reader.close();
+		buf.close();
+		ErrorEnum errorType;
+		try {
+			errorType = errKeys[funcId];
+		} catch (RuntimeException e) {
+			throw new RuntimeException("Socket received unknown Exception type with message: " + message);
+		}
+		switch(errorType) {
+			case ILLEGAL_ARGUMENT_EXCEPTION:
+				throw new IllegalArgumentException(message);
+			case NO_SUCH_ELEMENT_EXCEPTION:
+				throw new NoSuchElementException(message);
+			case UNSUPPORTED_OPERATION_EXCEPTION:
+				throw new UnsupportedOperationException(message);
+			default:
+				throw new RuntimeException("Socket received unknown Exception type with message: " + message);
+		}
+	}
+
 	// send the message and return the response
+	// this method is called by subclasses
 	protected byte[] sendAndReceive(byte[] msg, int funcId) throws IOException {
 		this.send(msg, funcId);
 		// wait for response and parse response
 		SocketMessage inMsg = SocketMessage.readAndSplit(this.in);
-		return inMsg.getMsg();
+		PacketPrefix prefix = inMsg.getPrefix();
+		byte[] response = inMsg.getMsg();
+		// if the message is marked as an exception, throw the exception
+		if(prefix.getApi() == this.errorApi) {
+			this.throwExceptionFromNetwork(prefix.getFuncId(), response);
+		}
+		return response;
 	}
 }

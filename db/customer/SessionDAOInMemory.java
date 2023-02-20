@@ -53,6 +53,7 @@ public class SessionDAOInMemory implements SessionDAO {
 	}
 
 	// Called by login() on server
+	// Note: Since we don't know whether a buyer or seller is logging in, we can't validate the userId here and must assume it is correct.
 	public String createSession(int userId) {
 		String sessionKey = this.generateUniqueSessionToken(userId);
 		sessions.put(sessionKey, Integer.valueOf(userId)); // I don't know if this can cause an Exception

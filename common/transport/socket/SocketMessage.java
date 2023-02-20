@@ -20,13 +20,9 @@ public class SocketMessage {
 		this.msg = msg;
 	}
 
-	// utility function that seemed like it might fit in this class
-	public byte[] createEmptyMessage(short apiVer, int funcId) throws IOException {
-		return new PacketPrefix(apiVer).generatePrefix((short) 0, funcId);
-	}
-
 	// read a full message from the socket's DataInputStream and separate it into prefix and the rest of the message
-	// returns null on failure
+	// returns null on failure (this doesn't seem to be true anymore)
+	// throws an exception if the received message should be interpreted as an Exception
 	public static SocketMessage readAndSplit(DataInputStream in) throws IOException, SocketException {
 		PacketPrefix prefix = null;
 		try {
@@ -39,6 +35,7 @@ public class SocketMessage {
 		}
 		short msgSize = prefix.getMsgSize();
 		short apiVer = prefix.getApiVer();
+		int api = prefix.getApi();
 		int funcId = prefix.getFuncId();
 		// read the actual message
 		short bytesLeft = msgSize;

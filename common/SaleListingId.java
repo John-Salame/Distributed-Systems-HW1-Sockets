@@ -18,11 +18,23 @@ public class SaleListingId {
 		this.setQuantity(quantity);
 	}
 
+	// VALIDATION
+	public static void validateItemId(ItemId itemId) throws IllegalArgumentException {
+		ItemId.validateId(itemId);
+	}
+	public static void validateQuantity(int quantity) throws IllegalArgumentException {
+		if (quantity < 1) {
+			throw new IllegalArgumentException("Sale Listing must sell at least one item");
+		}
+	}
+
 	// SETTERS
-	public void setItemId(ItemId itemId) {
+	public void setItemId(ItemId itemId) throws IllegalArgumentException {
+		validateItemId(itemId);
 		this.itemId = itemId;
 	}
-	public void setQuantity(int quantity) {
+	public void setQuantity(int quantity) throws IllegalArgumentException {
+		validateQuantity(quantity);
 		this.quantity = quantity;
 	}
 

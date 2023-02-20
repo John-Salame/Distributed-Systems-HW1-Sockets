@@ -18,6 +18,7 @@ import common.Item;
 import java.net.*;
 import java.io.IOException;
 import java.io.EOFException; // happens when writing to a closed socket
+import java.util.NoSuchElementException;
 
 public class BuyerSocketServerThreadV1 extends BaseSocketServerThread implements BuyerInterface {
 	private BuyerInterface buyerInterfaceV1;
@@ -69,38 +70,38 @@ public class BuyerSocketServerThreadV1 extends BaseSocketServerThread implements
 	}
 
 	// Buyer interface methods and their new counterparts
-	public int createUser(String username, String password) {
+	public int createUser(String username, String password) throws IllegalArgumentException {
 		return this.buyerInterfaceV1.createUser(username, password);
 	}
-	private byte[] bytesCreateUser(byte[] msg) throws IOException {
+	private byte[] bytesCreateUser(byte[] msg) throws IOException, IllegalArgumentException {
 		SerializeLogin serLog = SerializeLogin.deserialize(msg);
 		int userId = this.createUser(serLog.getUsername(), serLog.getPassword());
 		return SerializeInt.serialize(userId);
 	}
 
-	public String login(String username, String password) {
+	public String login(String username, String password) throws NoSuchElementException {
 		return this.buyerInterfaceV1.login(username, password);
 	}
-	private byte[] bytesLogin(byte[] msg) throws IOException {
+	private byte[] bytesLogin(byte[] msg) throws IOException, NoSuchElementException {
 		SerializeLogin serLog = SerializeLogin.deserialize(msg);
 		String sessionToken = this.login(serLog.getUsername(), serLog.getPassword());
 		return SerializeString.serialize(sessionToken);
 	}
-	public void logout(String sessionToken) {
+	public void logout(String sessionToken) throws NoSuchElementException {
 		this.buyerInterfaceV1.logout(sessionToken);
 		this.stopServer();
 		System.out.println("Logging out");
 	}
-	private byte[] bytesLogout(byte[] msg) throws IOException {
+	private byte[] bytesLogout(byte[] msg) throws IOException, NoSuchElementException {
 		String sessionToken = SerializeString.deserialize(msg);
 		this.logout(sessionToken);
 		byte[] output = new byte[0];
 		return output;
 	}
-	public int[] getSellerRating(int sellerId) {
+	public int[] getSellerRating(int sellerId) throws NoSuchElementException {
 		return this.buyerInterfaceV1.getSellerRating(sellerId);
 	}
-	private byte[] bytesGetSellerRating(byte[] msg) throws IOException {
+	private byte[] bytesGetSellerRating(byte[] msg) throws IOException, NoSuchElementException {
 		int sellerId = SerializeInt.deserialize(msg);
 		int[] rating = this.getSellerRating(sellerId);
 		return SerializeIntArray.serialize(rating);

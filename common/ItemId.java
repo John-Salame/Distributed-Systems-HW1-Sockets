@@ -46,6 +46,11 @@ public class ItemId {
 			throw new IllegalArgumentException("ItemId serial number must be positive");
 		}
 	}
+	// validate the ItemId as a whole
+	public static void validateId(ItemId id) {
+		validateCategory(id.getCategory());
+		validateSerial(id.getSerial());
+	}
 
 	// SETTERS
 	/**
