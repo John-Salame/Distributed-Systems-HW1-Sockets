@@ -123,7 +123,7 @@ public class BaseSocketClient {
 		}
 	}
 
-	protected byte[] send(byte[] b, int funcId) throws IOException {
+	protected void send(byte[] b, int funcId) throws IOException {
 		// currently it will do no retries as long as the socket connection is established
 		try {
 			// fault tolerance -- let the client make new requests again after logging out
@@ -142,17 +142,22 @@ public class BaseSocketClient {
 			System.out.println("Error in socket client send(): " + i);
 			throw i;
 		}
-		// wait for a response
-		return new byte[0];
 	}
 
 	// send the message and return the response
 	// this method is called by subclasses
 	protected byte[] sendAndReceive(byte[] msg, int funcId) throws IOException, IllegalArgumentException, NoSuchElementException, UnsupportedOperationException {
 		byte[] response = null;
-		// try to send to peer and then receive from peer. If either operation fails, throw the SocketException as an IOException
+		// Try to send to peer and then receive from peer. If either operation fails, throw the SocketException as an IOException
+		// First, try to send. If we notice a "connection reset" due to the other end failing, try to connect again in case it's back up
+		//   This also has the effect of trying to send twice if we experience an IOException.
 		try {
 			this.send(msg, funcId);
+		} catch (IOException i) {
+			// catch an IOException or a SocketException since it's a subclass
+			this.send(msg, funcId);
+		}
+		try {
 			// wait for response and parse response
 			SocketMessage inMsg = SocketMessage.readAndSplit(this.in);
 			PacketPrefix prefix = inMsg.getPrefix();
