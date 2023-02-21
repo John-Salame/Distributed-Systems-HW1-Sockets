@@ -59,7 +59,7 @@ public class ItemId {
 	 * The category is part of the primary key and thus is immutable once the item id has been initialized.
 	 */
 	public void setCategory(int category) throws IllegalArgumentException, IllegalStateException {
-		validateCategory(category);
+		validateCategory(category); // category should never be invalid, it should always be known from the start
 		if(this.category != -1) {
 			throw new IllegalStateException("Error: Item category cannot be changed after the item has been created.");
 		}
@@ -71,9 +71,12 @@ public class ItemId {
 	 * The serial number is part of the primary key and thus is immutable once the item id has been initialized.
 	 */
 	public void setSerial(int serial) throws IllegalArgumentException, IllegalStateException {
-		validateSerial(serial);
 		if(this.serial != -1) {
 			throw new IllegalStateException("Error: Item serial number cannot be changed after the item has been created.");
+		}
+		// allow the serial number to be -1 (helps with creating an item and passing it over the network before you know its serial number)
+		if (serial != -1) {
+			validateSerial(serial);
 		}
 		this.serial = serial;
 	}

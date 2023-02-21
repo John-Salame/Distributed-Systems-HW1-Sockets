@@ -129,7 +129,6 @@ import java.io.IOException;
 		} catch (NoSuchElementException e) {
 			System.out.println(e);
 		}
-		
 		System.out.println("Done testing Buyer, BuyerDAO, and BuyerInterface edge cases");
 		String buyer1Username = "Joe";
 		String buyer1Password = "password123";
@@ -140,7 +139,9 @@ import java.io.IOException;
 		System.out.println("Printing buyer 1");
 		System.out.println(buyer1);
 
-		// Basic seller API calls
+
+
+
 		System.out.println("\n\nTesting Seller functions");
 		Seller testSeller;
 		try {
@@ -243,6 +244,8 @@ import java.io.IOException;
 		int[] feedback = buyerInterface.getSellerRating(seller1Id);
 		System.out.println(Seller.displayFeedback(feedback));
 
+
+
 		// Create an item
 		System.out.println("\n\nTesting Item functions");
 		// First, try edge cases
@@ -259,6 +262,20 @@ import java.io.IOException;
 			testItem.setId(1, 1);
 			testItem.setSerial(2); // throw IllegalStateException
 		} catch (IllegalStateException e) {
+			System.out.println(e);
+		}
+		// test that an incomplete item sent over the network can deserialize without throwing an exception
+		System.out.println("Testing serializing and deserializing an item");
+		testItem = new Item();
+		testItem.setCategory(2);
+		byte[] serItem = Item.serialize(testItem);
+		Item deserItem = Item.deserialize(serItem);
+		System.out.println("Deserialized item:");
+		System.out.println(deserItem);
+		System.out.println("Make sure the deserialized item fails regular validation");
+		try {
+			Item.validateItem(deserItem);
+		} catch (IllegalArgumentException e) {
 			System.out.println(e);
 		}
 		System.out.println("Testing ItemDAO edge cases");

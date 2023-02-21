@@ -28,69 +28,47 @@ public class DBProductItemSocketClientV1 extends BaseSocketClient implements Ite
 	}
 
 	// ItemDAO Methods
-	public ItemId createItem(Item item) throws IllegalArgumentException {
+	public ItemId createItem(Item item) throws IOException, IllegalArgumentException {
 		int funcId = DBItemEnumV1.CREATE_ITEM.ordinal();
 		ItemId itemId = null;
-		try {
-			byte[] msg = Item.serialize(item);
-			byte[] buf = this.sendAndReceive(msg, funcId);
-			itemId = ItemId.deserialize(buf);
-		}
-		catch (IOException i) {
-			System.out.println(i);
-		}
-		// TO-DO: Maybe throw an exception instead of returning a null itemId
+		// all these functions can throw an exception. My functions are at-most-once at all interfaces and will not retry on failure, they will simply throw an Exception.
+		byte[] msg = Item.serialize(item);
+		byte[] buf = this.sendAndReceive(msg, funcId);
+		itemId = ItemId.deserialize(buf);
 		return itemId;
 	}
-	public Item getItemById(ItemId itemId) throws NoSuchElementException {
+	public Item getItemById(ItemId itemId) throws IOException, NoSuchElementException {
 		int funcId = DBItemEnumV1.GET_ITEM_BY_ID.ordinal();
 		Item item = null;
-		try {
-			byte[] msg = ItemId.serialize(itemId);
-			byte[] buf = this.sendAndReceive(msg, funcId);
-			item = Item.deserialize(buf);
-		}
-		catch (IOException i) {
-			System.out.println(i);
-		}
-		// TO-DO: Maybe throw an exception instead of returning a null item
+		// all these functions can throw an exception. My functions are at-most-once at all interfaces and will not retry on failure, they will simply throw an Exception.
+		byte[] msg = ItemId.serialize(itemId);
+		byte[] buf = this.sendAndReceive(msg, funcId);
+		item = Item.deserialize(buf);
 		return item;
 	}
-	public void changePrice(ItemId itemId, int sellerId, float newPrice) throws NoSuchElementException, IllegalArgumentException {
+	public void changePrice(ItemId itemId, int sellerId, float newPrice) throws IOException, NoSuchElementException, IllegalArgumentException, UnsupportedOperationException {
 		int funcId = DBItemEnumV1.CHANGE_PRICE.ordinal();
-		try {
-			byte[] msg = SerializePriceArgDB.serialize(itemId, sellerId, newPrice);
-			byte[] buf = this.sendAndReceive(msg, funcId);
-		}
-		catch (IOException i) {
-			System.out.println(i);
-		}
+		// all these functions can throw an exception. My functions are at-most-once at all interfaces and will not retry on failure, they will simply throw an Exception.
+		byte[] msg = SerializePriceArgDB.serialize(itemId, sellerId, newPrice);
+		byte[] buf = this.sendAndReceive(msg, funcId);
+		assert buf.length == 0;
 	}
-	public Item[] getItemsBySeller(int sellerId) {
+	public Item[] getItemsBySeller(int sellerId) throws IOException {
 		int funcId = DBItemEnumV1.GET_ITEMS_BY_SELLER.ordinal();
 		Item[] sellerItems = null;
-		try {
-			byte[] msg = SerializeInt.serialize(sellerId);
-			byte[] buf = this.sendAndReceive(msg, funcId);
-			sellerItems = Item.deserializeArray(buf);
-		}
-		catch (IOException i) {
-			System.out.println(i);
-		}
+		// all these functions can throw an exception. My functions are at-most-once at all interfaces and will not retry on failure, they will simply throw an Exception.
+		byte[] msg = SerializeInt.serialize(sellerId);
+		byte[] buf = this.sendAndReceive(msg, funcId);
+		sellerItems = Item.deserializeArray(buf);
 		return sellerItems;
 	}
-	// TO-DO: Figure out if I want to include sold out / removed items in the output
-	public Item[] getItemsInCategory(int category) {
-		int funcId = DBItemEnumV1.GET_ITEMS_BY_CATEGORY.ordinal();
+	public Item[] getItemsInCategory(int category) throws IOException {
+		int funcId = DBItemEnumV1.GET_ITEMS_IN_CATEGORY.ordinal();
 		Item[] catItems = null;
-		try {
-			byte[] msg = SerializeInt.serialize(category);
-			byte[] buf = this.sendAndReceive(msg, funcId);
-			catItems = Item.deserializeArray(buf);
-		}
-		catch (IOException i) {
-			System.out.println(i);
-		}
+		// all these functions can throw an exception. My functions are at-most-once at all interfaces and will not retry on failure, they will simply throw an Exception.
+		byte[] msg = SerializeInt.serialize(category);
+		byte[] buf = this.sendAndReceive(msg, funcId);
+		catItems = Item.deserializeArray(buf);
 		return catItems;
 	}
 }

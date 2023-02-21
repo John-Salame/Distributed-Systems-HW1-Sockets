@@ -121,6 +121,14 @@ public class Item {
 	public static void validateSellerId(int sellerId) throws IllegalArgumentException {
 		Seller.validateId(sellerId);
 	}
+	// run all the validations on the item
+	public static void validateItem(Item item) throws IllegalArgumentException {
+		Item.validateName(item.getName());
+		Item.validateCategory(item.getCategory());
+		Item.validateSerial(item.getSerial());
+		Item.validatePrice(item.getPrice());
+		Item.validateCondition(item.getCondition());
+	}
 	
 
 	// SETTERS
@@ -165,7 +173,10 @@ public class Item {
 		this.price = price;
 	}
 	public void setSellerId(int sellerId) throws IllegalArgumentException {
-		validateSellerId(sellerId);
+		// work-around for desrialization
+		if (sellerId != 0 || this.sellerId != 0) {
+			validateSellerId(sellerId);
+		}
 		this.sellerId = sellerId;
 	}
 

@@ -81,7 +81,7 @@ public class BuyerInterfaceServerV1 implements BuyerInterface {
 				keyword = Item.validateKeyword(keyword); // truncate, or throw error if keyword is null or empty string
 				keywordsTruncated[numKeywords++] = keyword;
 			} catch (IllegalArgumentException e) {
-				// do nothing; prevents the keyword from being added
+				// do nothing; prevents the null or empty keyword from being added
 			}
 		}
 		// numKeywords is the number of non-empty keywords in keywordsTruncated
@@ -111,17 +111,17 @@ public class BuyerInterfaceServerV1 implements BuyerInterface {
 				// System.out.println("Levenshtein Distance for keyword " + keywordsTruncated[i] + " is " + editDist[i]);
 				sum += editDist[i];
 			}
-			// System.out.println("Search score for item " + item.getName() + " is " + sum);
+			System.out.println("Search score for item " + item.getName() + " is " + sum);
 			if (itemKeywords.length > 0) {
 				scores[scoreIndex] = sum;
 			}
 			scoreIndex++; // after you finish scoring this item, move on to the next one
 		}
 		// now, sort the items; I'll just use selection sort
-		for(int i = 0; i < numKeywords - 1; i++) {
+		for(int i = 0; i < numItemsInCategory - 1; i++) {
 			double min = scores[i]; // start off assuming the first unsorted item has the minimum score
 			int minIndex = i;
-			for(int j = i+1; j < numKeywords; j++) {
+			for(int j = i+1; j < numItemsInCategory; j++) {
 				if(scores[j] < scores[i]) {
 					min = scores[j];
 					minIndex = j;
@@ -145,7 +145,7 @@ public class BuyerInterfaceServerV1 implements BuyerInterface {
 			}
 		}
 		else {
-			returnArray = items;
+			returnArray = items; // no limit; return all items from original search
 		}
 		return returnArray;
 		// TO-DO: use the DAO to describe sales listings associated with each item

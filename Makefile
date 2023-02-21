@@ -29,6 +29,7 @@ CLASSES = \
 	common/transport/socket/BaseSocketServerThread.java \
 	common/transport/socket/BuyerEnumV1.java \
 	common/transport/socket/DBBuyerEnumV1.java \
+	common/transport/socket/DBItemEnumV1.java \
 	common/transport/socket/DBSellerEnumV1.java \
 	common/transport/socket/DBSessionEnumV1.java \
 	common/transport/socket/ErrorEnum.java \
@@ -57,12 +58,16 @@ CLASSES = \
 	db/customer/DBCustomerRunner.java \
 	db/customer/SellerDAOInMemory.java \
 	db/customer/SessionDAOInMemory.java \
+	db/product/v1/DBProductSocketServerListenerV1.java \
+	db/product/v1/DBProductSocketServerThreadV1.java \
+	db/product/DBProductRunner.java \
 	db/product/ItemDAOInMemory.java \
 	server/v1/BuyerInterfaceServerV1.java \
 	server/v1/BuyerSocketServerListenerV1.java \
 	server/v1/BuyerSocketServerThreadV1.java \
 	server/v1/DBCustomerBuyerSocketClientV1.java \
 	server/v1/DBCustomerSellerSocketClientV1.java \
+	server/v1/DBCustomerSessionSocketClientV1.java \
 	server/v1/DBProductItemSocketClientV1.java \
 	server/v1/SellerInterfaceServerV1.java \
 	server/v1/SellerSocketServerListenerV1.java \
@@ -97,3 +102,6 @@ run_seller_server:
 
 run_db_customer:
 	$(JR) db/customer/DBCustomerRunner.java
+
+run_db_product:
+	$(JR) db/product/DBProductRunner.java

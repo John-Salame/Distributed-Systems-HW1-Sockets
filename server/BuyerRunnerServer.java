@@ -14,18 +14,21 @@ import java.net.SocketException;
 
 public class BuyerRunnerServer {
 	public static void main(String[] args) throws SocketException {
-		// connnections to the customer database
+		int serverPort = 8100;
+		int maxConnections = 100;
 		String customerDBHost = "localhost";
 		int customerDBIp = 8300;
+		String productDBHost = "localhost";
+		int productDBIp = 8400;
+		// customer database
 		BuyerDAO buyerDao = new DBCustomerBuyerSocketClientV1(customerDBHost, customerDBIp);
 		SellerDAO sellerDao = new DBCustomerSellerSocketClientV1(customerDBHost, customerDBIp);
 		SessionDAO sessionDao = new DBCustomerSessionSocketClientV1(customerDBHost, customerDBIp);
-		// other database connections
-		ItemDAO itemDao = null;
+		// product database
+		ItemDAO itemDao = new DBProductItemSocketClientV1(productDBHost, productDBIp);
+
 		BuyerInterface buyerInterface = new BuyerInterfaceServerV1(buyerDao, sellerDao, sessionDao, itemDao);
 		BuyerSocketServerListenerV1 server = new BuyerSocketServerListenerV1(buyerInterface);
-		int port = 8100;
-		int maxConnections = 100;
-		server.startServer(port, maxConnections);
+		server.startServer(serverPort, maxConnections);
 	}
 }

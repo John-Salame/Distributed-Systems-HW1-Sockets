@@ -1,33 +1,26 @@
 /**
- * Class DBCustomerSocketServerListenerV1
+ * Class DBProductSocketServerListenerV1
  * Author: John Salame
  * CSCI 5673 Distributed Systems
  * Assignment 1 - Sockets
  * API version 1
- * Description: Socket implementation of customer server-database IPC on database side
+ * Description: Socket implementation of product server-database IPC on database side
  * Socket programming reference: https://www.geeksforgeeks.org/socket-programming-in-java/
  */
 
-package db.customer.v1;
-import common.SellerInterface;
-import dao.BuyerDAO;
-import dao.SellerDAO;
-import dao.SessionDAO;
+package db.product.v1;
+import dao.ItemDAO;
 import java.net.*;
 import java.io.IOException;
 
-public class DBCustomerSocketServerListenerV1 {
-	private BuyerDAO buyerDaoV1;
-	private SellerDAO sellerDaoV1;
-	private SessionDAO sessionDaoV1;
+public class DBProductSocketServerListenerV1 {
+	private ItemDAO itemDaoV1;
 	private ServerSocket server = null;
 
 	// CONSTRUCTORS
 	// starting the server - use this constructor and then call startServer()
-	public DBCustomerSocketServerListenerV1(BuyerDAO buyerDaoV1, SellerDAO sellerDaoV1, SessionDAO sessionDaoV1) {
-		this.buyerDaoV1 = buyerDaoV1;
-		this.sellerDaoV1 = sellerDaoV1;
-		this.sessionDaoV1 = sessionDaoV1;
+	public DBProductSocketServerListenerV1(ItemDAO itemDaoV1) {
+		this.itemDaoV1 = itemDaoV1;
 	}
 
 	// create the listener and enter the server loop
@@ -37,7 +30,7 @@ public class DBCustomerSocketServerListenerV1 {
 		}
 		try {
 			this.server = new ServerSocket(serverPort, maxConnections);
-			System.out.println("Customer Database Socket Server listening on port " + serverPort + " with max connections " + maxConnections);
+			System.out.println("Product Database Socket Server listening on port " + serverPort + " with max connections " + maxConnections);
 		} catch (IOException i) {
 			System.out.println("Error binding server socket: " + i);
 			return;
@@ -46,7 +39,7 @@ public class DBCustomerSocketServerListenerV1 {
 		while(true) {
 			try {
 				Socket socket = server.accept();
-				Thread t = new Thread((Runnable) new DBCustomerSocketServerThreadV1(this.buyerDaoV1, this.sellerDaoV1, this.sessionDaoV1, socket));
+				Thread t = new Thread((Runnable) new DBProductSocketServerThreadV1(this.itemDaoV1, socket));
 				t.start(); // run the run() function on a new thread
 				// TO-DO: Figure out how to join threads and maybe do something with the thread interrupts
 				// I could potentially check the socket.getRemoteSocketAddress() for each thread to check if it's ready to join

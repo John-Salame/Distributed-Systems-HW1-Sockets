@@ -37,7 +37,10 @@ import java.util.Arrays;
 		searchResults = buyerInterfaceClient.searchItem(buyer1SessionToken, 0, new String[] {"fruit"}); // apple should top the list
 		System.out.println(Arrays.toString(searchResults));
 		System.out.println("\nSearching for sweet fruit");
-		searchResults = buyerInterfaceClient.searchItem(buyer1SessionToken, 0, new String[] {"fruit", "sweet"}); // apple should top the list
+		searchResults = buyerInterfaceClient.searchItem(buyer1SessionToken, 0, new String[] {"fruit", "sweet"}); // pear should top the list
+		System.out.println(Arrays.toString(searchResults));
+		System.out.println("\nSearching for furniture in category 1");
+		searchResults = buyerInterfaceClient.searchItem(buyer1SessionToken, 1, new String[] {"furniture"});
 		System.out.println(Arrays.toString(searchResults));
 		System.out.println("Buyer 1 session token = " + buyer1SessionToken);
 		System.out.println("Buyer 1 logging out");
