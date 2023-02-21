@@ -8,13 +8,14 @@
 
 package common;
 import java.util.NoSuchElementException;
+import java.io.IOException;
 
 public interface SellerInterface extends CommonUserInterface {
 	// Inherited Methods
 	//   Implement methods from CommonUserInterface
 	// New Methods
-	public abstract SaleListingId putOnSale(String sessionToken, Item item, int quantity);
-	public abstract void changePriceOfItem(String sessionToken, ItemId itemId, float newPrice) throws NoSuchElementException, IllegalArgumentException, UnsupportedOperationException;
+	public abstract SaleListingId putOnSale(String sessionToken, Item item, int quantity) throws IOException, IllegalArgumentException;
+	public abstract void changePriceOfItem(String sessionToken, ItemId itemId, float newPrice) throws IOException, NoSuchElementException, IllegalArgumentException, UnsupportedOperationException;
 	/*
 	public abstract void removeItemFromSale(String sessionToken, ItemId itemId, int quantity);
 	public abstract String displayItemsOnSale(String sessionToken);

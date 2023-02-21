@@ -29,9 +29,15 @@ Each keyword in the search query calculates its distance to each keyword in the 
 Then we normalize the edit distance a bit so it's more or less based on the percentage of the string that is correct, with some boosting for shorter strings.
 
 ## Bugs
-* Attempting to log in while the database is unreachable will cause the server to crash without closing the socket and the client to hang because it tries to operate on a null string (the session token created by the sessionDao).
-* * Perhaps I should handle this more gracefully. I could maybe return an empty string and then validate on the client side that an empty string means an error.
-* * I could also just close the server socket upon triggering a NullPointerException, but this would also cause the client process to end.
+* Attempting to log in while the database is unreachable will cause the client program to receive an Exception over the network, as expected.
+* The first time you connect from a client to a server after the database goes down, the client immediately receives a "Connection reset by peer" from the server. The client still retains its connection with the server, which is good.
+*  * The server only attempts to reconnect to the database using retries after the client sends another request. So, the first client request results in the server immediately saying "I can't reach the database", and the following requests attempt a retry.
+*  * The "Connection reset" is a big issue because it could potentially prevent a "create user" or a login and make every request afterward useless.
+*  * This is an issue with the "client socket" on the server that initiates a connection with the database.
+* Each database has its own socket connection. On the server, Buyer, Seller, and Session each have their own connections with their own source ports despite all having the same destination port.
+*  * I'm not sure if this is really a bug, but it does mean that each of the database connections will lazily reconnect to the database after it goes down.
+*  * The database also cleanly closes the connection on each of these threads if the server shuts down. Strangely, I was able to have multiple of these threads at once even with the database listener set to 1 maximum connection.
+
 
 ## Style
 I essentially implemented at most once RPCs with sockets. If there is a connection failure during a client API call, 

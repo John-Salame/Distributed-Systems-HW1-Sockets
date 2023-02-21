@@ -23,9 +23,11 @@ import db.customer.SessionDAOInMemory;
 import db.product.ItemDAOInMemory;
 import java.util.Arrays;
 import java.util.NoSuchElementException;
+import java.io.IOException;
 
  public class ServerRunnerInMemory {
-	public static void main(String[] args) {
+	// Note: The BuyerInterface and sellerInterface will never throw IOException, but some edge cases might, such as serialization.
+	public static void main(String[] args) throws IOException {
 		System.out.println("Starting program");
 		BuyerDAO buyerDao = new BuyerDAOInMemory();
 		SellerDAO sellerDao = new SellerDAOInMemory();

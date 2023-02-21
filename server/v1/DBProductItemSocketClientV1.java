@@ -17,12 +17,13 @@ import common.Item;
 import common.ItemId;
 import java.io.IOException;
 import java.util.NoSuchElementException;
+import java.net.SocketException;
 
 public class DBProductItemSocketClientV1 extends BaseSocketClient implements ItemDAO {
 
 	// CONSTRUCTORS
 	// recommend serverIp = localhost
-	public DBProductItemSocketClientV1(String serverIp, int serverPort) {
+	public DBProductItemSocketClientV1(String serverIp, int serverPort) throws SocketException {
 		super(serverIp, serverPort, (short) 1, APIEnumV1.DB_ITEM.ordinal());
 	}
 

@@ -13,6 +13,7 @@ import common.BuyerInterface;
 import common.Item;
 import common.ItemId;
 import util.EditDistance;
+import java.io.IOException;
 import java.util.NoSuchElementException;
 
 public class BuyerInterfaceServerV1 implements BuyerInterface {
@@ -31,18 +32,29 @@ public class BuyerInterfaceServerV1 implements BuyerInterface {
 		this.itemDao = itemDao;
 	}
 
-	public int createUser(String username, String password) throws IllegalArgumentException {
+	public int createUser(String username, String password) throws IOException, IllegalArgumentException {
 		return buyerDao.createUser(username, password);
 	}
-	public String login(String username, String password) throws NoSuchElementException {
+	public String login(String username, String password) throws IOException, NoSuchElementException {
+		String sessionToken;
 		int userId = buyerDao.getUserId(username, password); // may raise a NoSuchElementException
-		String sessionToken = sessionDao.createSession(userId);
+		sessionToken = sessionDao.createSession(userId);
 		return sessionToken;
 	}
-	public void logout(String sessionToken) throws NoSuchElementException {
-		sessionDao.expireSession(sessionToken);
+	// NoSuchElementException means the session is gone for sure. IOException means we should retry.
+	public void logout(String sessionToken) throws IOException, NoSuchElementException {
+		// try to log out until it works
+		boolean logoutSuccess = false;
+		while (!logoutSuccess) {
+			try {
+				sessionDao.expireSession(sessionToken);
+				logoutSuccess = true;
+			} catch (IOException e) {
+				System.out.println("SellerInterfaceServerV1 failed logout");
+			}
+		}
 	}
-	public int[] getSellerRating(int sellerId) throws NoSuchElementException {
+	public int[] getSellerRating(int sellerId) throws IOException, NoSuchElementException {
 		return sellerDao.getSellerById(sellerId).getFeedback();
 	}
 	/**
@@ -54,9 +66,9 @@ public class BuyerInterfaceServerV1 implements BuyerInterface {
 	 *   Then, take the sum of those edit distances. That is your distance score for that item.
 	 *   Keep the top LIMIT items (lowest score is the best).
 	 */
-	public Item[] searchItem(String sessionToken, int category, String[] keywords) {
+	public Item[] searchItem(String sessionToken, int category, String[] keywords) throws IOException {
 		final int LIMIT = 20; // how many search results to show
-		Item[] items = itemDao.getItemsInCategory(category);
+		Item[] items = itemDao.getItemsInCategory(category); // may throw an IOException
 		int numItemsInCategory = items.length;
 		double[] scores = new double[numItemsInCategory];
 		int scoreIndex = 0;

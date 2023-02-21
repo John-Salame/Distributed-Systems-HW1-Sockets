@@ -17,17 +17,27 @@ import java.io.IOException;
 public class SerializeStringArray {
 
 	public static byte[] serialize(String[] strings) throws IOException {
+		byte[] ret;
+		if (strings == null) {
+			throw new IOException("SerializeStringArray attempted to serialize null array");
+		}
 		short numElements = (short) strings.length;
 		ByteArrayOutputStream buf = new ByteArrayOutputStream(); // dynamically grow
 		DataOutputStream writer = new DataOutputStream(buf);
 		writer.writeShort(numElements);
-		// I don't remember if enumerators on arrays are ordered, so I will access elements by index
-		for(short i = 0; i < numElements; i++) {
-			writer.writeUTF(strings[i]);
+		try {
+			// I don't remember if enumerators on arrays are ordered, so I will access elements by index
+			for(short i = 0; i < numElements; i++) {
+				writer.writeUTF(strings[i]);
+			}
+			ret = buf.toByteArray();
+			writer.close();
+			buf.close();
+		} catch (NullPointerException e) {
+			writer.close();
+			buf.close();
+			throw new IOException(e.getMessage());
 		}
-		byte ret[] = buf.toByteArray();
-		writer.close();
-		buf.close();
 		return ret;
 	}
 

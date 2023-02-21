@@ -28,6 +28,9 @@ public class SerializePriceArgClientServer {
 
 	// we are not enforcing username length at this point, though we could.
 	public static byte[] serialize(String sessionToken, ItemId itemId, float price) throws IOException {
+		if (sessionToken == null) {
+			throw new IOException("SerializePriceArgClientServer attempted to serialize null sessionToken");
+		}
 		ByteArrayOutputStream buf = new ByteArrayOutputStream(); // grow dynamically
 		DataOutputStream writer = new DataOutputStream(buf);
 		writer.writeUTF(sessionToken);
@@ -40,11 +43,11 @@ public class SerializePriceArgClientServer {
 		return ret;
 	}
 
-	public static SerializePriceArgClientServer deserialize(byte[] b) throws IOException {
+	public static SerializePriceArgClientServer deserialize(byte[] b) throws IOException, IllegalArgumentException {
 		ByteArrayInputStream buf = new ByteArrayInputStream(b);
 		DataInputStream reader = new DataInputStream(buf);
 		String sessionToken = reader.readUTF();
-		ItemId itemId = ItemId.deserializeFromStream(reader);
+		ItemId itemId = ItemId.deserializeFromStream(reader); // can throw IllegalArgumentException
 		float price = reader.readFloat();
 		reader.close();
 		buf.close();

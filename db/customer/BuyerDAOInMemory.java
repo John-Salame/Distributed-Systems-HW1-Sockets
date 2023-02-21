@@ -12,6 +12,7 @@ import dao.BuyerDAO;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
+import java.io.IOException;
 
 public class BuyerDAOInMemory implements BuyerDAO {
 	private static int nextId = 1;

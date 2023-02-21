@@ -15,65 +15,51 @@ import common.transport.socket.APIEnumV1;
 import common.transport.socket.BaseSocketClient;
 import common.transport.socket.DBSellerEnumV1;
 import common.Seller;
+import java.util.NoSuchElementException;
 import java.io.IOException;
+import java.net.SocketException;
 
 public class DBCustomerSellerSocketClientV1 extends BaseSocketClient implements SellerDAO {
 
 	// CONSTRUCTORS
 	// recommend serverIp = localhost
-	public DBCustomerSellerSocketClientV1(String serverIp, int serverPort) {
+	public DBCustomerSellerSocketClientV1(String serverIp, int serverPort) throws SocketException {
 		super(serverIp, serverPort, (short) 1, APIEnumV1.DB_SELLER.ordinal());
 	}
 
 	// SellerDAO Methods
-	public int createUser(String username, String password) {
+	public int createUser(String username, String password) throws IOException, IllegalArgumentException {
 		int funcId = DBSellerEnumV1.CREATE_USER.ordinal();
-		int userId = 0; // user id 0 indicates error
-		try {
-			byte[] msg = SerializeLogin.serialize(username, password);
-			byte[] buf = this.sendAndReceive(msg, funcId);
-			userId = SerializeInt.deserialize(buf);
-		}
-		catch (IOException i) {
-			System.out.println(i);
-		}
+		int userId = 0;
+		// all these functions can throw an exception. My functions are at-most-once at all interfaces and will not retry on failure, they will simply throw an Exception.
+		byte[] msg = SerializeLogin.serialize(username, password);
+		byte[] buf = this.sendAndReceive(msg, funcId);
+		userId = SerializeInt.deserialize(buf);
 		return userId;
 	}
-	public int getUserId(String username, String password) {
+	public int getUserId(String username, String password) throws IOException, NoSuchElementException {
 		int funcId = DBSellerEnumV1.GET_USER_ID.ordinal();
-		int userId = 0; // user id 0 indicates error
-		try {
-			byte[] msg = SerializeLogin.serialize(username, password);
-			byte[] buf = this.sendAndReceive(msg, funcId);
-			userId = SerializeInt.deserialize(buf);
-		}
-		catch (IOException i) {
-			System.out.println(i);
-		}
+		int userId = 0;
+		// all these functions can throw an exception. My functions are at-most-once at all interfaces and will not retry on failure, they will simply throw an Exception.
+		byte[] msg = SerializeLogin.serialize(username, password);
+		byte[] buf = this.sendAndReceive(msg, funcId);
+		userId = SerializeInt.deserialize(buf);
 		return userId;
 	}
-	public Seller getSellerById(int sellerId) {
+	public Seller getSellerById(int sellerId) throws IOException, NoSuchElementException {
 		int funcId = DBSellerEnumV1.GET_SELLER_BY_ID.ordinal();
 		Seller seller = null;
-		try {
-			byte[] msg = SerializeInt.serialize(sellerId);
-			byte[] buf = this.sendAndReceive(msg, funcId);
-			seller = Seller.deserialize(buf);
-		}
-		catch (IOException i) {
-			System.out.println(i);
-		}
+		// all these functions can throw an exception. My functions are at-most-once at all interfaces and will not retry on failure, they will simply throw an Exception.
+		byte[] msg = SerializeInt.serialize(sellerId);
+		byte[] buf = this.sendAndReceive(msg, funcId);
+		seller = Seller.deserialize(buf); // could potentially throw IllegalArgumentException if the sender is malicious
 		return seller;
 	}
-	public void commitSeller(Seller seller) {
+	public void commitSeller(Seller seller) throws IOException, IllegalArgumentException {
 		int funcId = DBSellerEnumV1.COMMIT_SELLER.ordinal();
-		try {
-			byte[] msg = Seller.serialize(seller);
-			byte[] buf = this.sendAndReceive(msg, funcId);
-			assert buf.length == 0;
-		}
-		catch (IOException i) {
-			System.out.println(i);
-		}
+		// all these functions can throw an exception. My functions are at-most-once at all interfaces and will not retry on failure, they will simply throw an Exception.
+		byte[] msg = Seller.serialize(seller);
+		byte[] buf = this.sendAndReceive(msg, funcId);
+		assert buf.length == 0;
 	}
 }

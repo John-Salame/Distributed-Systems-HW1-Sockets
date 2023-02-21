@@ -27,22 +27,54 @@ public class SellerInterfaceClientV1 implements SellerInterface {
 	}
 
 	public int createUser(String username, String password) {
-		return transport.createUser(username, password);
+		int userId = 0;
+		try {
+			userId = transport.createUser(username, password);
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+		return userId;
 	}
 	public String login(String username, String password) {
-		return transport.login(username, password);
+		String sessionToken = "";
+		try {
+			sessionToken = transport.login(username, password);
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+		return sessionToken;
 	}
 	public void logout(String sessionToken) {
-		transport.logout(sessionToken);
+		try {
+			transport.logout(sessionToken);
+		} catch (Exception e) {
+			System.out.println(e);
+		}
 	}
 	public int[] getSellerRating(int sellerId) {
-		return transport.getSellerRating(sellerId);
+		int[] sellerRating = new int[] {0, 0};
+		try {
+			sellerRating = transport.getSellerRating(sellerId);
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+		return sellerRating;
 	}
 	public SaleListingId putOnSale(String sessionToken, Item item, int quantity) {
-		return transport.putOnSale(sessionToken, item, quantity);
+		SaleListingId saleId = null;
+		try {
+			saleId = transport.putOnSale(sessionToken, item, quantity);
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+		return saleId;
 	}
-	public void changePriceOfItem(String sessionToken, ItemId itemId, float newPrice) throws NoSuchElementException, IllegalArgumentException, UnsupportedOperationException {
-		transport.changePriceOfItem(sessionToken, itemId, newPrice);
+	public void changePriceOfItem(String sessionToken, ItemId itemId, float newPrice) {
+		try {
+			transport.changePriceOfItem(sessionToken, itemId, newPrice);
+		} catch (Exception e) {
+			System.out.println(e);
+		}
 	}
 	/*
 	public void removeItemFromSale(String sessionToken, ItemId itemId, int quantity);

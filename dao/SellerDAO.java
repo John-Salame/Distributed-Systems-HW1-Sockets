@@ -8,11 +8,12 @@
 
 package dao;
 import common.Seller;
+import java.io.IOException;
 import java.util.NoSuchElementException;
 
 public interface SellerDAO {
-	public abstract int createUser(String username, String password) throws IllegalArgumentException; // return the user id
-	public abstract int getUserId(String username, String password) throws NoSuchElementException;
-	public abstract Seller getSellerById(int sellerId) throws NoSuchElementException;
-	public abstract void commitSeller(Seller seller) throws IllegalArgumentException;
+	public abstract int createUser(String username, String password) throws IOException, IllegalArgumentException; // return the user id
+	public abstract int getUserId(String username, String password) throws IOException, NoSuchElementException;
+	public abstract Seller getSellerById(int sellerId) throws IOException, NoSuchElementException;
+	public abstract void commitSeller(Seller seller) throws IOException, IllegalArgumentException;
 }

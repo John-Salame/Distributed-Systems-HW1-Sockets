@@ -21,6 +21,7 @@ CLASSES = \
 	common/transport/serialize/SerializeLogin.java \
 	common/transport/serialize/SerializePriceArgClientServer.java \
 	common/transport/serialize/SerializePriceArgDB.java \
+	common/transport/serialize/SerializeSearchArg.java \
 	common/transport/serialize/SerializeString.java \
 	common/transport/serialize/SerializeStringArray.java \
 	common/transport/socket/APIEnumV1.java \
@@ -53,6 +54,7 @@ CLASSES = \
 	db/customer/v1/DBCustomerSocketServerListenerV1.java \
 	db/customer/v1/DBCustomerSocketServerThreadV1.java \
 	db/customer/BuyerDAOInMemory.java \
+	db/customer/DBCustomerRunner.java \
 	db/customer/SellerDAOInMemory.java \
 	db/customer/SessionDAOInMemory.java \
 	db/product/ItemDAOInMemory.java \
@@ -75,7 +77,7 @@ all: classes
 classes: $(CLASSES:.java=.class)
 
 clean:
-	$(RM) **/*.class
+	find . -name "*.class" -type f -delete
 
 # Run the server's test program using server-local in-memory "databases"
 run_server_in_memory:
@@ -94,4 +96,4 @@ run_seller_server:
 	$(JR) server/SellerRunnerServer.java
 
 run_db_customer:
-	$(JR) db/customer/CustomerRunner.java
+	$(JR) db/customer/DBCustomerRunner.java

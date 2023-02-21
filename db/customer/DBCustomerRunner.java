@@ -1,5 +1,5 @@
 /**
- * Class CustomerRunner
+ * Class DBCustomerRunner
  * Author: John Salame
  * CSCI 5673 Distributed Systems
  * Assignment 1 - Sockets
@@ -11,9 +11,10 @@ import db.customer.v1.*;
 import dao.BuyerDAO;
 import dao.SellerDAO;
 import dao.SessionDAO;
+import java.net.SocketException;
 
-public class CustomerRunner {
-	public static void main(String[] args) {
+public class DBCustomerRunner {
+	public static void main(String[] args) throws SocketException {
 		SellerDAO sellerDaoV1 = new SellerDAOInMemory();
 		BuyerDAO buyerDaoV1 = new BuyerDAOInMemory();
 		SessionDAO sessionDaoV1 = new SessionDAOInMemory();

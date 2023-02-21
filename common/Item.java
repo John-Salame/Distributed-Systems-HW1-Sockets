@@ -29,11 +29,11 @@ public class Item {
 	public Item() {
 		initializeDefaults();
 	}
-	public Item(int sellerId) {
+	public Item(int sellerId) throws IllegalArgumentException {
 		initializeDefaults();
 		this.setSellerId(sellerId);
 	}
-	public Item(String name, ItemId id, String[] keywords, String condition, float price, int sellerId) {
+	public Item(String name, ItemId id, String[] keywords, String condition, float price, int sellerId) throws IllegalArgumentException {
 		this.setName(name);
 		this.id = id; // assume that the constraints in the creation of itemId have provided our validation for us
 		this.keywords = new String[MAX_KEYWORDS];
@@ -43,7 +43,7 @@ public class Item {
 		this.setSellerId(sellerId);
 	}
 	// use this constructor for client-side request
-	public Item(String name, int category, String[] keywords, String condition, float price) {
+	public Item(String name, int category, String[] keywords, String condition, float price) throws IllegalArgumentException {
 		this.initializeDefaults();
 		this.setName(name);
 		this.setCategory(category);
@@ -207,7 +207,7 @@ public class Item {
 		writer.writeUTF(item.getName());
 		byte[] itemIdSer = ItemId.serialize(item.getId());
 		writer.write(itemIdSer);
-		byte[] keywordsSer = SerializeStringArray.serialize(item.getKeywords());
+		byte[] keywordsSer = SerializeStringArray.serialize(item.getKeywords()); // could throw IllegalArgumentException
 		writer.write(keywordsSer);
 		writer.writeUTF(item.getCondition());
 		writer.writeFloat(item.getPrice());
@@ -217,7 +217,7 @@ public class Item {
 		buf.close();
 		return ret;
 	}
-	public static Item deserialize(byte[] b) throws IOException {
+	public static Item deserialize(byte[] b) throws IOException, IllegalArgumentException {
 		ByteArrayInputStream buf = new ByteArrayInputStream(b);
 		DataInputStream reader = new DataInputStream(buf);
 		Item item = deserializeFromStream(reader);
@@ -225,7 +225,7 @@ public class Item {
 		buf.close();
 		return item;
 	}
-	public static Item deserializeFromStream(DataInputStream reader) throws IOException {
+	public static Item deserializeFromStream(DataInputStream reader) throws IOException, IllegalArgumentException {
 		String name = reader.readUTF();
 		ItemId itemId = ItemId.deserializeFromStream(reader);
 		String[] keywords = SerializeStringArray.deserializeFromStream(reader);
@@ -251,7 +251,7 @@ public class Item {
 		return ret;
 	}
 
-	public static Item[] deserializeArray(byte[] b) throws IOException {
+	public static Item[] deserializeArray(byte[] b) throws IOException, IllegalArgumentException {
 		ByteArrayInputStream buf = new ByteArrayInputStream(b);
 		DataInputStream reader = new DataInputStream(buf);
 		short numElements = reader.readShort();

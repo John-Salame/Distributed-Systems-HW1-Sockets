@@ -23,6 +23,7 @@ import common.Item;
 import common.Seller;
 import java.net.*;
 import java.io.IOException;
+import java.util.NoSuchElementException;
 
 public class DBCustomerSocketServerThreadV1 extends BaseSocketServerThread implements BuyerDAO, SellerDAO {
 	private BuyerDAO buyerDaoV1;
@@ -112,70 +113,69 @@ public class DBCustomerSocketServerThreadV1 extends BaseSocketServerThread imple
 		}
 	}
 
-	// Defunct functions
-	public int createUser(String username, String password) {
+	// Defunct functions from common user interface
+	public int createUser(String username, String password) throws IOException {
 		throw new RuntimeException("Err SellerSocketServerThreadV1: createUser() not implemented");
 	}
-	public int getUserId(String username, String password) {
+	public int getUserId(String username, String password) throws IOException {
 		throw new RuntimeException("Err SellerSocketServerThreadV1: getUserId() not implemented");
 	}
 
 	// Buyer functions
-	public int createBuyer(String username, String password) {
+	public int createBuyer(String username, String password) throws IOException, IllegalArgumentException {
 		return this.buyerDaoV1.createUser(username, password);
 	}
-	private byte[] bytesCreateBuyer(byte[] msg) throws IOException {
+	private byte[] bytesCreateBuyer(byte[] msg) throws IOException, IllegalArgumentException {
 		SerializeLogin serLog = SerializeLogin.deserialize(msg);
 		int userId = this.createBuyer(serLog.getUsername(), serLog.getPassword());
 		return SerializeInt.serialize(userId);
 	}
-	public int getBuyerId(String username, String password) {
+	public int getBuyerId(String username, String password) throws IOException, NoSuchElementException {
 		return this.buyerDaoV1.getUserId(username, password);
 	}
-	private byte[] bytesGetBuyerId(byte[] msg) throws IOException {
+	private byte[] bytesGetBuyerId(byte[] msg) throws IOException, NoSuchElementException {
 		SerializeLogin serLog = SerializeLogin.deserialize(msg);
 		int userId = this.getBuyerId(serLog.getUsername(), serLog.getPassword());
 		return SerializeInt.serialize(userId);
 	}
-	public Buyer getBuyerById(int sellerId) {
+	public Buyer getBuyerById(int sellerId) throws IOException, NoSuchElementException {
 		return this.buyerDaoV1.getBuyerById(sellerId);
 	}
-	private byte[] bytesGetBuyerById(byte[] msg) throws IOException {
+	private byte[] bytesGetBuyerById(byte[] msg) throws IOException, NoSuchElementException {
 		int sellerId = SerializeInt.deserialize(msg);
 		Buyer buyer = this.getBuyerById(sellerId);
 		return Buyer.serialize(buyer);
 	}
 
 	// Seller functions
-	public int createSeller(String username, String password) {
+	public int createSeller(String username, String password) throws IOException, IllegalArgumentException {
 		return this.sellerDaoV1.createUser(username, password);
 	}
-	private byte[] bytesCreateSeller(byte[] msg) throws IOException {
+	private byte[] bytesCreateSeller(byte[] msg) throws IOException, IllegalArgumentException {
 		SerializeLogin serLog = SerializeLogin.deserialize(msg);
 		int userId = this.createSeller(serLog.getUsername(), serLog.getPassword());
 		return SerializeInt.serialize(userId);
 	}
-	public int getSellerId(String username, String password) {
+	public int getSellerId(String username, String password) throws IOException, NoSuchElementException {
 		return this.sellerDaoV1.getUserId(username, password);
 	}
-	private byte[] bytesGetSellerId(byte[] msg) throws IOException {
+	private byte[] bytesGetSellerId(byte[] msg) throws IOException, NoSuchElementException {
 		SerializeLogin serLog = SerializeLogin.deserialize(msg);
 		int userId = this.getSellerId(serLog.getUsername(), serLog.getPassword());
 		return SerializeInt.serialize(userId);
 	}
-	public Seller getSellerById(int sellerId) {
+	public Seller getSellerById(int sellerId) throws IOException, NoSuchElementException {
 		return this.sellerDaoV1.getSellerById(sellerId);
 	}
-	private byte[] bytesGetSellerById(byte[] msg) throws IOException {
+	private byte[] bytesGetSellerById(byte[] msg) throws IOException, NoSuchElementException {
 		int sellerId = SerializeInt.deserialize(msg);
 		Seller seller = this.getSellerById(sellerId);
 		return Seller.serialize(seller);
 	}
-	public void commitSeller(Seller seller) {
+	public void commitSeller(Seller seller) throws IOException, IllegalArgumentException {
 		this.sellerDaoV1.commitSeller(seller);
 	}
-
-	private byte[] bytesCommitSeller(byte[] msg) throws IOException {
+	private byte[] bytesCommitSeller(byte[] msg) throws IOException, IllegalArgumentException {
 		Seller seller = Seller.deserialize(msg);
 		this.commitSeller(seller);
 		return new byte[0]; // empty response for void functions
@@ -183,7 +183,7 @@ public class DBCustomerSocketServerThreadV1 extends BaseSocketServerThread imple
 
 	// Session functions
 	// return the session key generated for the user
-	public String createSession(int userId) {
+	public String createSession(int userId) throws IOException {
 		return this.sessionDaoV1.createSession(userId);
 	}
 	private byte[] bytesCreateSession(byte[] msg) throws IOException {
@@ -192,25 +192,25 @@ public class DBCustomerSocketServerThreadV1 extends BaseSocketServerThread imple
 		return SerializeString.serialize(sessionToken);
 	}
 	// Called by logout() on server
-	public void expireSession(String sessionKey) {
+	public void expireSession(String sessionKey) throws IOException, NoSuchElementException {
 		this.sessionDaoV1.expireSession(sessionKey);
 	}
-	private byte[] bytesExpireSession(byte[] msg) throws IOException {
+	private byte[] bytesExpireSession(byte[] msg) throws IOException, NoSuchElementException {
 		String sessionKey = SerializeString.deserialize(msg);
 		this.expireSession(sessionKey);
 		return new byte[0];
 	}
 	// might throw an error if the session does not exist
-	public int getUserIdFromSession(String sessionKey) {
+	public int getUserIdFromSession(String sessionKey) throws IOException, NoSuchElementException {
 		return this.sessionDaoV1.getUserIdFromSession(sessionKey);
 	}
-	private byte[] bytesGetUserIdFromSession(byte[] msg) throws IOException {
+	private byte[] bytesGetUserIdFromSession(byte[] msg) throws IOException, NoSuchElementException {
 		String sessionKey = SerializeString.deserialize(msg);
 		int userId = this.getUserIdFromSession(sessionKey);
 		return SerializeInt.serialize(userId);
 	}
 	// just for debugging purposes
-	public String listSessions() {
+	public String listSessions() throws IOException {
 		return this.sessionDaoV1.listSessions();
 	}
 	private byte[] bytesListSessions(byte[] msg) throws IOException {

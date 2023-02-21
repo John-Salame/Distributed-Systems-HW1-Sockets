@@ -40,7 +40,7 @@ public class SerializePriceArgDB {
 		return ret;
 	}
 
-	public static SerializePriceArgDB deserialize(byte[] b) throws IOException {
+	public static SerializePriceArgDB deserialize(byte[] b) throws IOException, IllegalArgumentException {
 		ByteArrayInputStream buf = new ByteArrayInputStream(b);
 		DataInputStream reader = new DataInputStream(buf);
 		ItemId itemId = ItemId.deserializeFromStream(reader);

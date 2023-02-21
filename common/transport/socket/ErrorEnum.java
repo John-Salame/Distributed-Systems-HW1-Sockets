@@ -17,6 +17,7 @@
 package common.transport.socket;
 
 public enum ErrorEnum {
+	IO_EXCEPTION,
 	ILLEGAL_ARGUMENT_EXCEPTION,
 	NO_SUCH_ELEMENT_EXCEPTION,
 	UNSUPPORTED_OPERATION_EXCEPTION

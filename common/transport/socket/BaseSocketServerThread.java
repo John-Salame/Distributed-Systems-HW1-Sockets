@@ -66,6 +66,9 @@ public class BaseSocketServerThread implements Runnable {
 						byte[] response = this.demux(apiVer, api, funcId, buf); // this is where the Exception is thrown for the try/catch below
 						this.sendResponse(apiVer, api, funcId, response);
 					}
+					catch (IOException e) {
+						this.sendException(ErrorEnum.IO_EXCEPTION.ordinal(), e.getMessage());
+					}
 					catch (IllegalArgumentException e) {
 						this.sendException(ErrorEnum.ILLEGAL_ARGUMENT_EXCEPTION.ordinal(), e.getMessage());
 					}
@@ -91,6 +94,7 @@ public class BaseSocketServerThread implements Runnable {
 				this.stop = true;
 			}
 			catch (IOException i) {
+				// This could potentially cause the client and server to both hang if we experience an IOException while packaging a response
 				System.out.println(i);
 			}
 		}
@@ -100,8 +104,13 @@ public class BaseSocketServerThread implements Runnable {
 
 	// for now, assume apiVer to be 1
 	// funcId is the ordinal number of the Exception in ErrorEnum
-	private void sendException(int funcId, String message) throws IOException {
-		this.sendResponse((short) 1, this.errorApi, funcId, SerializeString.serialize(message));
+	private void sendException(int funcId, String message) throws SocketException, IOException {
+		try {
+			this.sendResponse((short) 1, this.errorApi, funcId, SerializeString.serialize(message));
+		} catch (SocketException se) {
+			System.out.println("Error in socket server thread: " + se);
+			throw se;
+		}
 	}
 
 	// b is the response we want to send, which does not yet have the packet prefix

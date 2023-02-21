@@ -7,11 +7,13 @@
  * Description: Client-side implementation of the buyer API
  * Note: This could theoretically be removed right now since it is just using delegation,
  * but it could be turned into middleware later on or connected to middlware.
+ * I will return reasonable values when an Exception occurs. This should make it easier for the timing studies to make the required number of API calls.
  */
 
 package client.v1;
 import common.BuyerInterface;
 import common.Item;
+import java.io.IOException;
 
 public class BuyerInterfaceClientV1 implements BuyerInterface {
 
@@ -24,16 +26,38 @@ public class BuyerInterfaceClientV1 implements BuyerInterface {
 	}
 
 	public int createUser(String username, String password) {
-		return transport.createUser(username, password);
+		int userId = 0;
+		try {
+			userId = transport.createUser(username, password);
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+		return userId;
 	}
 	public String login(String username, String password) {
-		return transport.login(username, password);
+		String sessionToken = "";
+		try {
+			sessionToken = transport.login(username, password);
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+		return sessionToken;
 	}
 	public void logout(String sessionToken) {
-		transport.logout(sessionToken);
+		try {
+			transport.logout(sessionToken);
+		} catch (Exception e) {
+			System.out.println(e);
+		}
 	}
 	public int[] getSellerRating(int sellerId) {
-		return transport.getSellerRating(sellerId);
+		int[] sellerRating = new int[] {0, 0};
+		try {
+			sellerRating = transport.getSellerRating(sellerId);
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+		return sellerRating;
 	}
 	/**
 	 * Method searchItem()
@@ -45,6 +69,12 @@ public class BuyerInterfaceClientV1 implements BuyerInterface {
 	 *   Keep the top LIMIT items (lowest score is the best).
 	 */
 	public Item[] searchItem(String sessionToken, int category, String[] keywords) {
-		return searchItem(sessionToken, category, keywords);
+		Item[] results = new Item[0];
+		try {
+			results = searchItem(sessionToken, category, keywords);
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+		return results;
 	}
 }

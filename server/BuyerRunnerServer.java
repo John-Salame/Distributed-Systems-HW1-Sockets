@@ -10,10 +10,10 @@ package server;
 import server.v1.*;
 import dao.*;
 import common.BuyerInterface;
-import db.customer.SellerDAOInMemory;
+import java.net.SocketException;
 
 public class BuyerRunnerServer {
-	public static void main(String[] args) {
+	public static void main(String[] args) throws SocketException {
 		// connnections to the customer database
 		String customerDBHost = "localhost";
 		int customerDBIp = 8300;
@@ -25,7 +25,7 @@ public class BuyerRunnerServer {
 		BuyerInterface buyerInterface = new BuyerInterfaceServerV1(buyerDao, sellerDao, sessionDao, itemDao);
 		BuyerSocketServerListenerV1 server = new BuyerSocketServerListenerV1(buyerInterface);
 		int port = 8100;
-		int maxConnections = 1;
+		int maxConnections = 100;
 		server.startServer(port, maxConnections);
 	}
 }

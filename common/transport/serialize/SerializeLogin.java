@@ -24,6 +24,9 @@ public class SerializeLogin {
 
 	// we are not enforcing username length at this point, though we could.
 	public static byte[] serialize(String username, String password) throws IOException {
+		if (username == null || password == null) {
+			throw new IOException("SerializeLogin attempted to write null username or password");
+		}
 		ByteArrayOutputStream buf = new ByteArrayOutputStream(); // grow dynamically
 		DataOutputStream writer = new DataOutputStream(buf);
 		writer.writeUTF(username);

@@ -64,13 +64,15 @@ public class BuyerSocketServerThreadV1 extends BaseSocketServerThread implements
 				return this.bytesLogout(msg);
 			case GET_SELLER_RATING:
 				return this.bytesGetSellerRating(msg);
+			case SEARCH_ITEM:
+				return this.bytesSearchItem(msg);
 			default:
 				throw new RuntimeException("Err BuyerSocketServerThreadV1: Unsupported method triggered by enum.");
 		}
 	}
 
 	// Buyer interface methods and their new counterparts
-	public int createUser(String username, String password) throws IllegalArgumentException {
+	public int createUser(String username, String password) throws IOException, IllegalArgumentException {
 		return this.buyerInterfaceV1.createUser(username, password);
 	}
 	private byte[] bytesCreateUser(byte[] msg) throws IOException, IllegalArgumentException {
@@ -79,7 +81,7 @@ public class BuyerSocketServerThreadV1 extends BaseSocketServerThread implements
 		return SerializeInt.serialize(userId);
 	}
 
-	public String login(String username, String password) throws NoSuchElementException {
+	public String login(String username, String password) throws IOException, NoSuchElementException {
 		return this.buyerInterfaceV1.login(username, password);
 	}
 	private byte[] bytesLogin(byte[] msg) throws IOException, NoSuchElementException {
@@ -87,7 +89,7 @@ public class BuyerSocketServerThreadV1 extends BaseSocketServerThread implements
 		String sessionToken = this.login(serLog.getUsername(), serLog.getPassword());
 		return SerializeString.serialize(sessionToken);
 	}
-	public void logout(String sessionToken) throws NoSuchElementException {
+	public void logout(String sessionToken) throws IOException, NoSuchElementException {
 		this.buyerInterfaceV1.logout(sessionToken);
 		this.stopServer();
 		System.out.println("Logging out");
@@ -98,7 +100,7 @@ public class BuyerSocketServerThreadV1 extends BaseSocketServerThread implements
 		byte[] output = new byte[0];
 		return output;
 	}
-	public int[] getSellerRating(int sellerId) throws NoSuchElementException {
+	public int[] getSellerRating(int sellerId) throws IOException, NoSuchElementException {
 		return this.buyerInterfaceV1.getSellerRating(sellerId);
 	}
 	private byte[] bytesGetSellerRating(byte[] msg) throws IOException, NoSuchElementException {
@@ -106,10 +108,14 @@ public class BuyerSocketServerThreadV1 extends BaseSocketServerThread implements
 		int[] rating = this.getSellerRating(sellerId);
 		return SerializeIntArray.serialize(rating);
 	}
-	public Item[] searchItem(String sessionToken, int category, String[] keywords) {
+	public Item[] searchItem(String sessionToken, int category, String[] keywords) throws IOException {
 		int funcId = BuyerEnumV1.SEARCH_ITEM.ordinal();
-		System.out.println(funcId);
-		throw new RuntimeException("Method not implemented BuyerSocketServerV1: searchItem()");
+		return buyerInterfaceV1.searchItem(sessionToken, category, keywords);
+	}
+	private byte[] bytesSearchItem(byte[] msg) throws IOException {
+		SerializeSearchArg searchArg = SerializeSearchArg.deserialize(msg);
+		Item [] searchResults = this.searchItem(searchArg.getSessionToken(), searchArg.getCategory(), searchArg.getKeywords());
+		return Item.serializeArray(searchResults);
 	}
 	// public abstract void addToCart(String sessionToken, ItemId itemId, int quantity);
 	// public abstract void removeFromCart(String sessionToken, ItemId itemId, int quantity);

@@ -14,9 +14,10 @@ import common.Item;
 import common.ItemId;
 import common.SaleListing;
 import common.SaleListingId;
+import java.io.IOException;
 
  public class SellerRunnerClient {
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		SellerInterface transport = new SellerSocketClientV1("localhost", 8200);
 		SellerInterface sellerInterface = new SellerInterfaceClientV1(transport);
 

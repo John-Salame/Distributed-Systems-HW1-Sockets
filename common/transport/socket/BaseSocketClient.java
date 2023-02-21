@@ -36,7 +36,7 @@ public class BaseSocketClient {
 		this.api = APIEnumV1.ERROR.ordinal();
 		this.errorApi = APIEnumV1.ERROR.ordinal();
 	}
-	public BaseSocketClient(String serverIp, int serverPort, short apiVer, int api) {
+	public BaseSocketClient(String serverIp, int serverPort, short apiVer, int api) throws SocketException {
 		this.apiVer = apiVer;
 		this.api = api;
 		this.errorApi = APIEnumV1.ERROR.ordinal();
@@ -44,22 +44,6 @@ public class BaseSocketClient {
 		this.setup(serverIp, serverPort);
 	}
 	
-	protected byte[] send(byte[] b, int funcId) {
-		// fault tolerance -- let the client make new requests again after logging out
-		if(socket == null) {
-			this.setup(this.serverIp, this.serverPort);
-		}
-		// currently no resiliency for sending message once socket connection has been created
-		try {
-			byte[] msg = packetPrefix.prependPrefix(b, funcId); // prepare the message
-			System.out.println("Sending " + new PacketPrefix((short) b.length, this.apiVer, this.api, funcId));
-			this.out.write(msg); // send the message over the socket
-		} catch (IOException i) {
-			System.out.println(i);
-		}
-		// wait for a response
-		return new byte[0];
-	}
 	protected void cleanup() {
 		try {
 			this.in.close();
@@ -70,7 +54,7 @@ public class BaseSocketClient {
 		}
 		this.socket = null;
 	}
-	public void setup(String serverIp, int serverPort) {
+	public void setup(String serverIp, int serverPort) throws SocketException {
 		if(this.socket != null) {
 			return;
 		}
@@ -106,11 +90,11 @@ public class BaseSocketClient {
 				return;
 			}
 		}
-		throw new RuntimeException("Client failed to connect.");
+		throw new SocketException("Client failed to connect.");
 	}
 
 	// based on the funcId (which is an ordinal in ErrorEnum) and the exception message, throw an exception
-	private void throwExceptionFromNetwork(int funcId, byte[] msg) throws IOException {
+	private void throwExceptionFromNetwork(int funcId, byte[] msg) throws IOException, IllegalArgumentException, NoSuchElementException, UnsupportedOperationException {
 		ErrorEnum[] errKeys = ErrorEnum.values();
 		// extract the message from msg as a String
 		String message;
@@ -126,6 +110,8 @@ public class BaseSocketClient {
 			throw new RuntimeException("Socket received unknown Exception type with message: " + message);
 		}
 		switch(errorType) {
+			case IO_EXCEPTION:
+				throw new IOException(message);
 			case ILLEGAL_ARGUMENT_EXCEPTION:
 				throw new IllegalArgumentException(message);
 			case NO_SUCH_ELEMENT_EXCEPTION:
@@ -137,18 +123,50 @@ public class BaseSocketClient {
 		}
 	}
 
+	protected byte[] send(byte[] b, int funcId) throws IOException {
+		// currently it will do no retries as long as the socket connection is established
+		try {
+			// fault tolerance -- let the client make new requests again after logging out
+			if(socket == null) {
+				this.setup(this.serverIp, this.serverPort);
+			}
+			byte[] msg = packetPrefix.prependPrefix(b, funcId); // prepare the message
+			System.out.println("Sending " + new PacketPrefix((short) b.length, this.apiVer, this.api, funcId));
+			this.out.write(msg); // send the message over the socket
+		} catch (SocketException se) {
+			// catch what is hopefully a "Connection reset""
+			System.out.println("Error socket client send(): " + se);
+			this.socket = null; // change it to null so we can retry the connection later
+			throw new IOException(se.getMessage());
+		} catch (IOException i) {
+			System.out.println("Error in socket client send(): " + i);
+			throw i;
+		}
+		// wait for a response
+		return new byte[0];
+	}
+
 	// send the message and return the response
 	// this method is called by subclasses
-	protected byte[] sendAndReceive(byte[] msg, int funcId) throws IOException {
-		this.send(msg, funcId);
-		// wait for response and parse response
-		SocketMessage inMsg = SocketMessage.readAndSplit(this.in);
-		PacketPrefix prefix = inMsg.getPrefix();
-		byte[] response = inMsg.getMsg();
-		// if the message is marked as an exception, throw the exception
-		if(prefix.getApi() == this.errorApi) {
-			this.throwExceptionFromNetwork(prefix.getFuncId(), response);
+	protected byte[] sendAndReceive(byte[] msg, int funcId) throws IOException, IllegalArgumentException, NoSuchElementException, UnsupportedOperationException {
+		byte[] response = null;
+		// try to send to peer and then receive from peer. If either operation fails, throw the SocketException as an IOException
+		try {
+			this.send(msg, funcId);
+			// wait for response and parse response
+			SocketMessage inMsg = SocketMessage.readAndSplit(this.in);
+			PacketPrefix prefix = inMsg.getPrefix();
+			response = inMsg.getMsg();
+			// if the message is marked as an exception, throw the exception
+			if(prefix.getApi() == this.errorApi) {
+				this.throwExceptionFromNetwork(prefix.getFuncId(), response);
+			}
+		} catch (SocketException se) {
+			// catch what is hopefully a "Connection reset""
+			System.out.println("Error socket client sendAndReceive(): " + se);
+			this.socket = null; // change it to null so we can retry the connection later
+			throw new IOException(se.getMessage());
 		}
-		return response;
+		return response; // if no error occurred or no exception was transmitted over the socket, return the expected result
 	}
 }

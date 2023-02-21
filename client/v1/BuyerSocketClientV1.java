@@ -16,72 +16,62 @@ import common.transport.socket.BaseSocketClient;
 import common.transport.socket.BuyerEnumV1;
 import common.Item;
 import java.io.IOException;
+import java.util.NoSuchElementException;
+import java.net.SocketException;
 
 public class BuyerSocketClientV1 extends BaseSocketClient implements BuyerInterface {
 
 	// CONSTRUCTORS
 	// recommend serverIp = localhost
-	public BuyerSocketClientV1(String serverIp, int serverPort) {
+	public BuyerSocketClientV1(String serverIp, int serverPort) throws SocketException {
 		super(serverIp, serverPort, (short) 1, APIEnumV1.BUYER.ordinal());
 	}
 
 	// Inherited Methods
-	public int createUser(String username, String password) {
+	public int createUser(String username, String password) throws IOException, IllegalArgumentException {
 		int funcId = BuyerEnumV1.CREATE_USER.ordinal();
 		int userId = 0;
-		try {
-			byte[] msg = SerializeLogin.serialize(username, password);
-			byte[] buf = this.sendAndReceive(msg, funcId);
-			userId = SerializeInt.deserialize(buf);
-		}
-		catch (IOException i) {
-			System.out.println(i);
-			return 0; // user id 0 indicates error
-		}
+		byte[] msg = SerializeLogin.serialize(username, password);
+		byte[] buf = this.sendAndReceive(msg, funcId);
+		userId = SerializeInt.deserialize(buf);
 		return userId;
 	}
-	public String login(String username, String password) {
+	public String login(String username, String password) throws IOException, NoSuchElementException {
 		int funcId = BuyerEnumV1.LOGIN.ordinal();
 		String sessionToken = null;
-		try {
-			byte[] msg = SerializeLogin.serialize(username, password);
-			byte[] buf = this.sendAndReceive(msg, funcId);
-			sessionToken = SerializeString.deserialize(buf);
-		}
-		catch (IOException i) {
-			System.out.println(i);
-		}
+		byte[] msg = SerializeLogin.serialize(username, password);
+		byte[] buf = this.sendAndReceive(msg, funcId);
+		sessionToken = SerializeString.deserialize(buf);
 		return sessionToken;
 	}
 	// clean up (close buffers and close the connection) when finished
-	public void logout(String sessionToken) {
+	// not sure if I should clean up if I get an IOException from the database logout operation
+	public void logout(String sessionToken) throws IOException, NoSuchElementException {
 		int funcId = BuyerEnumV1.LOGOUT.ordinal();
 		try {
 			byte[] msg = SerializeString.serialize(sessionToken);
 			byte[] buf = this.sendAndReceive(msg, funcId);
 			assert buf.length == 0; // server sending empty response after packet prefix
-		}
-		catch (IOException i) {
-			System.out.println(i);
+		} catch (Exception e) {
+			System.out.println(e);
 		}
 		this.cleanup();
 	}
-	public int[] getSellerRating(int sellerId) {
+	public int[] getSellerRating(int sellerId) throws IOException, NoSuchElementException {
 		int funcId = BuyerEnumV1.GET_SELLER_RATING.ordinal();
 		int[] rating = null;
-		try {
-			byte[] msg = SerializeInt.serialize(sellerId);
-			byte[] buf = this.sendAndReceive(msg, funcId);
-			rating = SerializeIntArray.deserialize(buf);
-		}
-		catch (IOException i) {
-			System.out.println(i);
-		}
+		byte[] msg = SerializeInt.serialize(sellerId);
+		byte[] buf = this.sendAndReceive(msg, funcId);
+		rating = SerializeIntArray.deserialize(buf);
 		return rating;
 	}
-	public Item[] searchItem(String sessionToken, int category, String[] keywords) {
+	public Item[] searchItem(String sessionToken, int category, String[] keywords) throws IOException {
 		int funcId = BuyerEnumV1.SEARCH_ITEM.ordinal();
-		throw new RuntimeException("Method not implemented BuyerSocketClientV1: searchItem()");
+		Item[] results = null;
+		byte[] msg = SerializeSearchArg.serialize(sessionToken, category, keywords);
+		byte[] buf = this.sendAndReceive(msg, funcId);
+		results = Item.deserializeArray(buf); // could potentially throw an IllegalArgumentException if the packet source is malicious
+		return results;
 	}
 	// public abstract void addToCart(String sessionToken, ItemId itemId, int quantity);
 	// public abstract void removeFromCart(String sessionToken, ItemId itemId, int quantity);

@@ -39,7 +39,7 @@ public class BuyerSocketServerListenerV1 {
 		while(true) {
 			try {
 				Socket socket = server.accept();
-				Thread t = new Thread((Runnable) new BuyerSocketServerThreadV1(this.buyerInterfaceV1, socket));
+				Thread t = new Thread((Runnable) new BuyerSocketServerThreadV1(this.buyerInterfaceV1, socket)); // I would create a base class if I knew how to abstract this line away
 				t.start(); // run the run() function on a new thread
 				// TO-DO: Figure out how to join threads and maybe do something with the thread interrupts
 				// I could potentially check the socket.getRemoteSocketAddress() for each thread to check if it's ready to join

@@ -15,12 +15,13 @@ import common.transport.socket.BaseSocketClient;
 import common.transport.socket.DBSessionEnumV1;
 import common.Seller;
 import java.io.IOException;
+import java.net.SocketException;
 
 public class DBCustomerSessionSocketClientV1 extends BaseSocketClient implements SessionDAO {
 
 	// CONSTRUCTORS
 	// recommend serverIp = localhost
-	public DBCustomerSessionSocketClientV1(String serverIp, int serverPort) {
+	public DBCustomerSessionSocketClientV1(String serverIp, int serverPort) throws SocketException {
 		super(serverIp, serverPort, (short) 1, APIEnumV1.DB_SESSION.ordinal());
 	}
 

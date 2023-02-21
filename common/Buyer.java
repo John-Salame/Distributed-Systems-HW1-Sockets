@@ -26,7 +26,7 @@ public class Buyer {
 		this.id = 0;
 		this.numPurchases = 0;
 	}
-	public Buyer(String name, String password, int id, int numPurchases) {
+	public Buyer(String name, String password, int id, int numPurchases) throws IllegalArgumentException {
 		this.setName(name);
 		this.setPassword(password);
 		this.setId(id);
@@ -99,7 +99,7 @@ public class Buyer {
 		buf.close();
 		return ret;
 	}
-	public static Buyer deserialize(byte[] b) throws IOException {
+	public static Buyer deserialize(byte[] b) throws IOException, IllegalArgumentException {
 	ByteArrayInputStream buf = new ByteArrayInputStream(b);
 		DataInputStream reader = new DataInputStream(buf);
 		Buyer buyer = new Buyer();

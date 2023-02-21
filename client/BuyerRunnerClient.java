@@ -16,21 +16,28 @@ import common.Item;
 import common.ItemId;
 import common.SaleListing;
 import common.SaleListingId;
+import java.io.IOException;
 
  public class BuyerRunnerClient {
-	public static void main(String[] args) {
-		BuyerInterface transport = new BuyerSocketClientV1("localhost", 8100);
-		BuyerInterface buyerInterface = new BuyerInterfaceClientV1(transport);
+	public static void main(String[] args) throws IOException {
+		String serverIp = "localhost";
+		int serverPort = 8100;
+		BuyerInterface transport = new BuyerSocketClientV1(serverIp, serverPort);
+		BuyerInterface buyerInterfaceClient = new BuyerInterfaceClientV1(transport);
 
 		// Basic buyer API calls
-		String buyer1Username = "Joe";
-		String buyer1Password = "password123";
-		int buyer1Id = buyerInterface.createUser(buyer1Username, buyer1Password);
-		System.out.println("Buyer 1 id: " + buyer1Id);
-		String buyer1SessionToken = buyerInterface.login(buyer1Username, buyer1Password);
-		System.out.println("Buyer 1 session token = " + buyer1SessionToken);
-		System.out.println("Buyer 1 logging out");
-		buyerInterface.logout(buyer1SessionToken);
+		try {
+			String buyer1Username = "Joe";
+			String buyer1Password = "password123";
+			int buyer1Id = buyerInterfaceClient.createUser(buyer1Username, buyer1Password);
+			System.out.println("Buyer 1 id: " + buyer1Id);
+			String buyer1SessionToken = buyerInterfaceClient.login(buyer1Username, buyer1Password);
+			System.out.println("Buyer 1 session token = " + buyer1SessionToken);
+			System.out.println("Buyer 1 logging out");
+			buyerInterfaceClient.logout(buyer1SessionToken);
+		} catch (Exception e) {
+			System.out.println(e);
+		}
 
 		/*
 		// Basic seller API calls
@@ -43,7 +50,7 @@ import common.SaleListingId;
 		Seller seller1 = sellerDao.getSellerById(seller1Id);
 		System.out.println("Printing seller 1");
 		System.out.println(seller1);
-		int[] feedback = buyerInterface.getSellerRating(seller1Id);
+		int[] feedback = buyerInterfaceClient.getSellerRating(seller1Id);
 		System.out.println(Seller.displayFeedback(feedback));
 
 		// Create an item
@@ -76,7 +83,7 @@ import common.SaleListingId;
 		System.out.println("Listing sessions");
 		System.out.println(sessionDao.listSessions());
 		System.out.println("Buyer 1 logging out");
-		buyerInterface.logout(buyer1SessionToken);
+		buyerInterfaceClient.logout(buyer1SessionToken);
 		System.out.println(sessionDao.listSessions());
 		System.out.println("Seller 1 logging out");
 		sellerInterface.logout(seller1SessionToken);

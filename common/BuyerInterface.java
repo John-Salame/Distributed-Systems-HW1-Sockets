@@ -7,12 +7,13 @@
  */
 
 package common;
+import java.io.IOException;
 
 public interface BuyerInterface extends CommonUserInterface {
 	// Inherited Methods
 	//   Implement methods from CommonUserInterface
 	// New Methods
-	public abstract Item[] searchItem(String sessionToken, int category, String[] keywords);
+	public abstract Item[] searchItem(String sessionToken, int category, String[] keywords) throws IOException;
 	// public abstract void addToCart(String sessionToken, ItemId itemId, int quantity);
 	// public abstract void removeFromCart(String sessionToken, ItemId itemId, int quantity);
 	// public abstract void clearCart(String sessionToken);

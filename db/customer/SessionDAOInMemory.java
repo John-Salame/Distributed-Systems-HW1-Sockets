@@ -11,6 +11,7 @@ import dao.SessionDAO;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.NoSuchElementException;
+import java.io.IOException;
 
 public class SessionDAOInMemory implements SessionDAO {
 	// https://www.geeksforgeeks.org/map-interface-java-examples/
@@ -54,14 +55,18 @@ public class SessionDAOInMemory implements SessionDAO {
 
 	// Called by login() on server
 	// Note: Since we don't know whether a buyer or seller is logging in, we can't validate the userId here and must assume it is correct.
-	public String createSession(int userId) {
+	public String createSession(int userId) throws IOException {
 		String sessionKey = this.generateUniqueSessionToken(userId);
-		sessions.put(sessionKey, Integer.valueOf(userId)); // I don't know if this can cause an Exception
+		try {
+			sessions.put(sessionKey, Integer.valueOf(userId)); // I don't know if this can cause an Exception
+		} catch (Exception e) {
+			throw new IOException("Failed to create session for user " + userId);
+		}
 		return sessionKey;
 	}
 
 	// Called by logout() on server
-	public void expireSession(String sessionKey) throws NoSuchElementException {
+	public void expireSession(String sessionKey) throws IOException, NoSuchElementException {
 		if (!sessions.containsKey(sessionKey)) {
 			throw new NoSuchElementException("Cannot log out session which does not exist");
 		}
@@ -70,12 +75,12 @@ public class SessionDAOInMemory implements SessionDAO {
 			sessions.remove(sessionKey); // may cause an Exception
 		} catch (Exception e) {
 			System.out.println(e);
-			throw new NoSuchElementException("Somebody already logged out from this session");
+			throw new IOException("Somebody already logged out from this session");
 		}
 	}
 
 	// might throw an error if the session does not exist
-	public int getUserIdFromSession(String sessionKey) throws NoSuchElementException {
+	public int getUserIdFromSession(String sessionKey) throws IOException, NoSuchElementException {
 		if (!sessions.containsKey(sessionKey)) {
 			throw new NoSuchElementException("Cannot get user associated with a session that does not exist");
 		}
@@ -84,15 +89,19 @@ public class SessionDAOInMemory implements SessionDAO {
 			return sessions.get(sessionKey).intValue();
 		} catch (Exception e) {
 			System.out.println(e);
-			throw new NoSuchElementException("Somebody already logged out from this session");
+			throw new IOException("Somebody already logged out from this session");
 		}
 	}
 
-	public String listSessions() {
+	public String listSessions() throws IOException {
 		String ret = "Current Sessions:";
 		// Using iterator to access elements of HashMap: https://www.tutorialspoint.com/traversing-contents-of-a-hash-map-in-java
-		for(Map.Entry el : this.sessions.entrySet()) {
-			ret = ret + "\n  Session Token " + el.getKey() + " corresponds to user id " + el.getValue();
+		try {
+			for(Map.Entry el : this.sessions.entrySet()) {
+				ret = ret + "\n  Session Token " + el.getKey() + " corresponds to user id " + el.getValue();
+			}
+		} catch (Exception e) {
+			throw new IOException(e.getMessage());
 		}
 		return ret;
 	}

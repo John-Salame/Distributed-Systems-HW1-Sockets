@@ -16,6 +16,9 @@ import java.io.IOException;
 public class SerializeString {
 	
 	public static byte[] serialize(String str) throws IOException {
+		if (str == null) {
+			throw new IOException("SerializeString attempted to serialize null string");
+		}
 		ByteArrayOutputStream buf = new ByteArrayOutputStream();
 		DataOutputStream writer = new DataOutputStream(buf);
 		writer.writeUTF(str);

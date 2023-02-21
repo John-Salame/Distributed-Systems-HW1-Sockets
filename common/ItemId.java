@@ -22,7 +22,7 @@ public class ItemId {
 	public ItemId() {
 		this.initializeDefaults();
 	}
-	public ItemId(int category, int serial) {
+	public ItemId(int category, int serial) throws IllegalArgumentException {
 		this.initializeDefaults();
 		this.setCategory(category);
 		this.setSerial(serial);
@@ -97,7 +97,7 @@ public class ItemId {
 		buf.close();
 		return ret;
 	}
-	public static ItemId deserialize(byte[] b) throws IOException {
+	public static ItemId deserialize(byte[] b) throws IOException, IllegalArgumentException {
 		ByteArrayInputStream buf = new ByteArrayInputStream(b);
 		DataInputStream reader = new DataInputStream(buf);
 		ItemId itemId = deserializeFromStream(reader);
@@ -105,10 +105,10 @@ public class ItemId {
 		buf.close();
 		return itemId;
 	}
-	public static ItemId deserializeFromStream(DataInputStream reader) throws IOException {
+	public static ItemId deserializeFromStream(DataInputStream reader) throws IOException, IllegalArgumentException {
 		int category = reader.readInt();
 		int serial = reader.readInt();
-		ItemId itemId = new ItemId(category, serial);
+		ItemId itemId = new ItemId(category, serial); // this might cause an issue with the partially filled ItemId of an item from the client side
 		return itemId;
 	}
 

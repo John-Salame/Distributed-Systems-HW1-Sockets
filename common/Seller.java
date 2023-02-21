@@ -118,7 +118,7 @@ public class Seller {
 		buf.close();
 		return ret;
 	}
-	public static Seller deserialize(byte[] b) throws IOException {
+	public static Seller deserialize(byte[] b) throws IOException, IllegalArgumentException {
 		ByteArrayInputStream buf = new ByteArrayInputStream(b);
 		DataInputStream reader = new DataInputStream(buf);
 		Seller seller = new Seller();
