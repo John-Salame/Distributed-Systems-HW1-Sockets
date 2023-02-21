@@ -71,7 +71,7 @@ public class BuyerInterfaceClientV1 implements BuyerInterface {
 	public Item[] searchItem(String sessionToken, int category, String[] keywords) {
 		Item[] results = new Item[0];
 		try {
-			results = searchItem(sessionToken, category, keywords);
+			results = transport.searchItem(sessionToken, category, keywords);
 		} catch (Exception e) {
 			System.out.println(e);
 		}

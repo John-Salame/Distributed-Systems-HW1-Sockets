@@ -97,6 +97,10 @@ public class BaseSocketServerThread implements Runnable {
 				// This could potentially cause the client and server to both hang if we experience an IOException while packaging a response
 				System.out.println(i);
 			}
+			catch (Exception e) {
+				// Prevent crashing the server thread
+				System.out.println("Socket server thread loop: " + e);
+			}
 		}
 		this.cleanup(); // if we fail to read a message correctly, then clean up (close the connection) and end the thread
 		System.out.println("Exiting thread");

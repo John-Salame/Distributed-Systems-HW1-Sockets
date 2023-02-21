@@ -10,7 +10,7 @@ I also ran out of time to do the timing study, as I spent the last of my time cr
 My code design also does not support one socket connection per buyer or seller (it allows everybody to use the same socket), so I do not have any mechanism in place to do the timing study yet.  
 Thus, I was unable to create a testing framework for the timing studies, and many of my databases, such as cart, item, and sale listing, have also not been created.  
 Since I did not have time to make my item database, I also was unable to test my search function.  
-Although I did not have time to complete many featuers, my codebase is around 3,000 lines of code total. In the coming days, I may be able to finish my sockets 
+Although I did not have time to complete many featuers, my codebase is over 3,000 lines of code total. In the coming days, I may be able to finish my sockets 
 and business logic and perform timing studies before I move onto true RPC-style for Programming Assignment 2.
 If for any reason something seems missing, check the GitHub repo I made for the project https://github.com/John-Salame/Distributed-Systems-HW1-Sockets
 

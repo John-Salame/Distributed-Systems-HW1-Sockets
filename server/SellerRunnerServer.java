@@ -15,19 +15,13 @@ import java.io.IOException;
 import java.net.SocketException;
 
 public class SellerRunnerServer {
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws SocketException {
 		String customerDBHost = "localhost";
 		int customerDBIp = 8300;
 		SellerDAO sellerDao = new DBCustomerSellerSocketClientV1(customerDBHost, customerDBIp);
 		SessionDAO sessionDao = new DBCustomerSessionSocketClientV1(customerDBHost, customerDBIp);
 		ItemDAO itemDao = null;
 		SellerInterface sellerInterface = new SellerInterfaceServerV1(sellerDao, sessionDao, itemDao);
-		// make a sample user
-		System.out.println("Remove this SellerDAO direct call later");
-		sellerDao.createUser("Mark", "hamSandwich");
-		Seller mark = sellerDao.getSellerById(1); // give Mark a positive review
-		mark.addThumbsUp();
-		sellerDao.commitSeller(mark);
 		SellerSocketServerListenerV1 server = new SellerSocketServerListenerV1(sellerInterface);
 		int port = 8200;
 		int maxConnections = 1;

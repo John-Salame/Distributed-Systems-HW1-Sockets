@@ -17,6 +17,7 @@ import common.ItemId;
 import common.SaleListing;
 import common.SaleListingId;
 import java.io.IOException;
+import java.util.Arrays;
 
  public class BuyerRunnerClient {
 	public static void main(String[] args) throws IOException {
@@ -26,18 +27,21 @@ import java.io.IOException;
 		BuyerInterface buyerInterfaceClient = new BuyerInterfaceClientV1(transport);
 
 		// Basic buyer API calls
-		try {
-			String buyer1Username = "Joe";
-			String buyer1Password = "password123";
-			int buyer1Id = buyerInterfaceClient.createUser(buyer1Username, buyer1Password);
-			System.out.println("Buyer 1 id: " + buyer1Id);
-			String buyer1SessionToken = buyerInterfaceClient.login(buyer1Username, buyer1Password);
-			System.out.println("Buyer 1 session token = " + buyer1SessionToken);
-			System.out.println("Buyer 1 logging out");
-			buyerInterfaceClient.logout(buyer1SessionToken);
-		} catch (Exception e) {
-			System.out.println(e);
-		}
+		String buyer1Username = "Joe";
+		String buyer1Password = "password123";
+		int buyer1Id = buyerInterfaceClient.createUser(buyer1Username, buyer1Password);
+		System.out.println("Buyer 1 id: " + buyer1Id);
+		String buyer1SessionToken = buyerInterfaceClient.login(buyer1Username, buyer1Password);
+		System.out.println("Searching for fruit");
+		Item[] searchResults;
+		searchResults = buyerInterfaceClient.searchItem(buyer1SessionToken, 0, new String[] {"fruit"}); // apple should top the list
+		System.out.println(Arrays.toString(searchResults));
+		System.out.println("\nSearching for sweet fruit");
+		searchResults = buyerInterfaceClient.searchItem(buyer1SessionToken, 0, new String[] {"fruit", "sweet"}); // apple should top the list
+		System.out.println(Arrays.toString(searchResults));
+		System.out.println("Buyer 1 session token = " + buyer1SessionToken);
+		System.out.println("Buyer 1 logging out");
+		buyerInterfaceClient.logout(buyer1SessionToken);
 
 		/*
 		// Basic seller API calls
