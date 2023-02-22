@@ -1,22 +1,24 @@
 /**
- * Class SellerRunnerClient
+ * Class SellerClientTimingStudySocket
  * Author: John Salame
  * CSCI 5673 Distributed Systems
  * Assignment 1 - Sockets
- * Description: The seller client which will make API calls and measure average response time
+ * Description: Creates SellerTimingInstances for X buyers and then uses TimingLog to aggregate the results.
  */
 
-package client;
+package client.v1.timing.socket;
 import client.v1.*;
+import client.v1.socket.*;
 import common.Seller;
 import common.SellerInterface;
 import common.Item;
 import common.ItemId;
 import common.SaleListing;
 import common.SaleListingId;
+import common.TimingLog;
 import java.io.IOException;
 
- public class SellerRunnerClient {
+ public class SellerClientTimingStudySocket {
 	public static void main(String[] args) throws IOException {
 		SellerInterface transport = new SellerSocketClientV1("localhost", 8200);
 		SellerInterface sellerInterface = new SellerInterfaceClientV1(transport);

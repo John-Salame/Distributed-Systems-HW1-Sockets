@@ -7,7 +7,7 @@
  * Description: Socket implementation of session server-database IPC on server side
  */
 
-package server.v1;
+package server.v1.socket;
 import dao.ItemDAO;
 import common.transport.serialize.*;
 import common.transport.socket.APIEnumV1;
@@ -23,7 +23,7 @@ public class DBProductItemSocketClientV1 extends BaseSocketClient implements Ite
 
 	// CONSTRUCTORS
 	// recommend serverIp = localhost
-	public DBProductItemSocketClientV1(String serverIp, int serverPort) throws SocketException {
+	public DBProductItemSocketClientV1(String serverIp, int serverPort) /*throws SocketException*/ {
 		super(serverIp, serverPort, (short) 1, APIEnumV1.DB_ITEM.ordinal());
 	}
 

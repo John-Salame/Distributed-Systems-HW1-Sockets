@@ -10,12 +10,18 @@ RM = rm
 	$(JC) $(JFLAGS) $*.java
 
 CLASSES = \
+	client/v1/socket/test/BuyerClientTestSocket.java \
+	client/v1/socket/test/SellerClientTestSocket.java \
+	client/v1/socket/BuyerSocketClientV1.java \
+	client/v1/socket/ClientSocketFactory.java \
+	client/v1/socket/SellerSocketClientV1.java \
+	client/v1/timing/socket/BuyerClientTimingStudySocket.java \
+	client/v1/timing/socket/SellerClientTimingStudySocket.java \
+	client/v1/timing/BuyerClientTimingInstance.java \
+	client/v1/timing/SellerClientTimingInstance.java \
 	client/v1/BuyerInterfaceClientV1.java \
-	client/v1/BuyerSocketClientV1.java \
+	client/v1/ClientInterfaceFactory.java \
 	client/v1/SellerInterfaceClientV1.java \
-	client/v1/SellerSocketClientV1.java \
-	client/BuyerRunnerClient.java \
-	client/SellerRunnerClient.java \
 	common/transport/serialize/SerializeInt.java \
 	common/transport/serialize/SerializeIntArray.java \
 	common/transport/serialize/SerializeLogin.java \
@@ -46,6 +52,9 @@ CLASSES = \
 	common/SaleListingId.java \
 	common/Seller.java \
 	common/SellerInterface.java \
+	common/TimingLog.java \
+	dao/factory/CustomerDAOFactory.java \
+	dao/factory/ProductDAOFactory.java \
 	dao/BuyerDAO.java \
 	dao/ItemDAO.java \
 	dao/SaleListingDAO.java \
@@ -55,6 +64,7 @@ CLASSES = \
 	db/customer/v1/DBCustomerSocketServerListenerV1.java \
 	db/customer/v1/DBCustomerSocketServerThreadV1.java \
 	db/customer/BuyerDAOInMemory.java \
+	db/customer/CustomerDAOFactoryInMemory.java \
 	db/customer/DBCustomerRunner.java \
 	db/customer/SellerDAOInMemory.java \
 	db/customer/SessionDAOInMemory.java \
@@ -62,19 +72,20 @@ CLASSES = \
 	db/product/v1/DBProductSocketServerThreadV1.java \
 	db/product/DBProductRunner.java \
 	db/product/ItemDAOInMemory.java \
+	server/v1/factory/DBCustomerDAOFactorySocketV1.java \
+	server/v1/factory/DBProductDAOFactorySocketV1.java \
+	server/v1/socket/BuyerServerTestSocket.java \
+	server/v1/socket/BuyerSocketServerListenerV1.java \
+	server/v1/socket/BuyerSocketServerThreadV1.java \
+	server/v1/socket/DBCustomerBuyerSocketClientV1.java \
+	server/v1/socket/SellerServerTestSocket.java \
+	server/v1/socket/DBCustomerSellerSocketClientV1.java \
+	server/v1/socket/DBCustomerSessionSocketClientV1.java \
+	server/v1/socket/DBProductItemSocketClientV1.java \
+	server/v1/socket/SellerSocketServerListenerV1.java \
+	server/v1/socket/SellerSocketServerThreadV1.java \
 	server/v1/BuyerInterfaceServerV1.java \
-	server/v1/BuyerSocketServerListenerV1.java \
-	server/v1/BuyerSocketServerThreadV1.java \
-	server/v1/DBCustomerBuyerSocketClientV1.java \
-	server/v1/DBCustomerSellerSocketClientV1.java \
-	server/v1/DBCustomerSessionSocketClientV1.java \
-	server/v1/DBProductItemSocketClientV1.java \
 	server/v1/SellerInterfaceServerV1.java \
-	server/v1/SellerSocketServerListenerV1.java \
-	server/v1/SellerSocketServerThreadV1.java \
-	server/ServerRunnerInMemory.java \
-	server/BuyerRunnerServer.java \
-	server/SellerRunnerServer.java \
 	util/EditDistance.java
 
 all: classes
@@ -84,21 +95,17 @@ classes: $(CLASSES:.java=.class)
 clean:
 	find . -name "*.class" -type f -delete
 
-# Run the server's test program using server-local in-memory "databases"
-run_server_in_memory:
-	$(JR) server/ServerRunnerInMemory
-
 run_buyer_client:
-	$(JR) client/BuyerRunnerClient.java
+	$(JR) client/v1/timing/socket/BuyerClientTimingStudySocket.java
 
 run_buyer_server:
-	$(JR) server/BuyerRunnerServer.java
+	$(JR) server/v1/socket/BuyerServerTestSocket.java
 
 run_seller_client:
-	$(JR) client/SellerRunnerClient.Java
+	$(JR) client/v1/timing/socket/SellerClientTimingStudySocket.java
 
 run_seller_server:
-	$(JR) server/SellerRunnerServer.java
+	$(JR) server/v1/socket/SellerServerTestSocket.java
 
 run_db_customer:
 	$(JR) db/customer/DBCustomerRunner.java

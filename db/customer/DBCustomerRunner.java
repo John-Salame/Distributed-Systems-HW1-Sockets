@@ -16,7 +16,7 @@ import java.net.SocketException;
 public class DBCustomerRunner {
 	public static void main(String[] args) throws SocketException {
 		int port = 8300;
-		int maxConnections = 1;
+		int maxConnections = 10;
 		SellerDAO sellerDaoV1 = new SellerDAOInMemory();
 		BuyerDAO buyerDaoV1 = new BuyerDAOInMemory();
 		SessionDAO sessionDaoV1 = new SessionDAOInMemory();

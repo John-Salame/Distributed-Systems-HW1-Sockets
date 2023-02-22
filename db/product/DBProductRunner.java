@@ -14,7 +14,7 @@ import java.net.SocketException;
 public class DBProductRunner {
 	public static void main(String[] args) throws SocketException {
 		int port = 8400;
-		int maxConnections = 1;
+		int maxConnections = 10;
 		ItemDAO itemDaoV1 = new ItemDAOInMemory();
 		DBProductSocketServerListenerV1 server = new DBProductSocketServerListenerV1(itemDaoV1);
 		server.startServer(port, maxConnections);

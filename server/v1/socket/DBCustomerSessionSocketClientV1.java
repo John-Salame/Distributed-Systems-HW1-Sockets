@@ -7,7 +7,7 @@
  * Description: Socket implementation of session server-database IPC on server side
  */
 
-package server.v1;
+package server.v1.socket;
 import dao.SessionDAO;
 import common.transport.serialize.*;
 import common.transport.socket.APIEnumV1;
@@ -21,7 +21,7 @@ public class DBCustomerSessionSocketClientV1 extends BaseSocketClient implements
 
 	// CONSTRUCTORS
 	// recommend serverIp = localhost
-	public DBCustomerSessionSocketClientV1(String serverIp, int serverPort) throws SocketException {
+	public DBCustomerSessionSocketClientV1(String serverIp, int serverPort) /*throws SocketException*/ {
 		super(serverIp, serverPort, (short) 1, APIEnumV1.DB_SESSION.ordinal());
 	}
 

@@ -90,7 +90,7 @@ public class BaseSocketServerThread implements Runnable {
 			}
 			// return immediately if the socket experiences a connection error such as "Connection reset"
 			catch (SocketException s) {
-				System.out.println(s);
+				System.out.println("Server socket thread loop readAndSplit() " + s);
 				this.stop = true;
 			}
 			catch (IOException i) {

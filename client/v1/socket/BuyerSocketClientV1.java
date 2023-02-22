@@ -8,7 +8,7 @@
  * Socket programming reference: https://www.geeksforgeeks.org/socket-programming-in-java/
  */
 
-package client.v1;
+package client.v1.socket;
 import common.BuyerInterface;
 import common.transport.serialize.*;
 import common.transport.socket.APIEnumV1;
@@ -34,6 +34,8 @@ public class BuyerSocketClientV1 extends BaseSocketClient implements BuyerInterf
 		byte[] msg = SerializeLogin.serialize(username, password);
 		byte[] buf = this.sendAndReceive(msg, funcId);
 		userId = SerializeInt.deserialize(buf);
+		// stop the Socket connection. Only do persistent connection while logged in. Should not be called while logged in, or the session token may not be deleted.
+		// this.cleanup();
 		return userId;
 	}
 	public String login(String username, String password) throws IOException, NoSuchElementException {

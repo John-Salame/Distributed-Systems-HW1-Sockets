@@ -4,10 +4,12 @@
  * CSCI 5673 Distributed Systems
  * Assignment 1 - Sockets
  * Description: Test the business logic using in-memory databases. Skip the client-server interaction.
+ * NOTE: This file no longer works after adding the factories; the DAOs no longer relate to the same object between buyer and seller interfaces
  */
 
 package server;
 import dao.*;
+import dao.factory.*;
 import server.v1.*;
 import common.Buyer;
 import common.BuyerInterface;
@@ -26,16 +28,23 @@ import java.util.NoSuchElementException;
 import java.io.IOException;
 
  public class ServerRunnerInMemory {
+	// NOTE: This file no longer works after adding the factories; the DAOs no longer relate to the same object between buyer and seller interfaces
 	// Note: The BuyerInterface and sellerInterface will never throw IOException, but some edge cases might, such as serialization.
 	public static void main(String[] args) throws IOException {
 		System.out.println("Starting program");
+		CustomerDAOFactory custDaoFact = new CustomerDAOFactoryInMemory();
+		CustomerDAOFactory buyerDaoFactory = custDaoFact;
+		CustomerDAOFactory sellerDaoFactory = custDaoFact;
+		CustomerDAOFactory sessionDaoFactory = custDaoFact;
+		ProductDAOFactory prodDaoFact = new ProductDAOFactoryInMemory();
+		ProductDAOFactory itemDaoFactory = prodDaoFact;
 		BuyerDAO buyerDao = new BuyerDAOInMemory();
 		SellerDAO sellerDao = new SellerDAOInMemory();
 		SessionDAO sessionDao = new SessionDAOInMemory();
 		ItemDAO itemDao = new ItemDAOInMemory();
 		System.out.println("Done creating DAOs");
-		BuyerInterface buyerInterface = new BuyerInterfaceServerV1(buyerDao, sellerDao, sessionDao, itemDao);
-		SellerInterface sellerInterface = new SellerInterfaceServerV1(sellerDao, sessionDao, itemDao);
+		BuyerInterface buyerInterface = new BuyerInterfaceServerV1(buyerDaoFactory, sellerDaoFactory, sessionDaoFactory, itemDaoFactory);
+		SellerInterface sellerInterface = new SellerInterfaceServerV1(sellerDaoFactory, sessionDaoFactory, itemDaoFactory);
 
 		// Basic buyer API calls
 		System.out.println("\n\nTesting Buyer edge cases");

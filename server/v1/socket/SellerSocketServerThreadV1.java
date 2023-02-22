@@ -8,7 +8,7 @@
  * Socket programming reference: https://www.geeksforgeeks.org/socket-programming-in-java/
  */
 
-package server.v1;
+package server.v1.socket;
 import common.SellerInterface;
 import common.transport.serialize.*;
 import common.transport.socket.APIEnumV1;
@@ -81,6 +81,8 @@ public class SellerSocketServerThreadV1 extends BaseSocketServerThread implement
 	private byte[] bytesCreateUser(byte[] msg) throws IOException, IllegalArgumentException {
 		SerializeLogin serLog = SerializeLogin.deserialize(msg);
 		int userId = this.createUser(serLog.getUsername(), serLog.getPassword());
+		System.out.println("End createUser()");
+		// this.stopServer(); // people can only log out if they've logged in, so we add this to let them close the socket before thay have an account to log in to
 		return SerializeInt.serialize(userId);
 	}
 

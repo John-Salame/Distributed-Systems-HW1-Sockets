@@ -9,12 +9,14 @@
 
 package server.v1;
 import dao.*;
+import dao.factory.*;
 import common.BuyerInterface;
 import common.Item;
 import common.ItemId;
 import util.EditDistance;
 import java.io.IOException;
 import java.util.NoSuchElementException;
+import java.lang.reflect.InvocationTargetException;
 
 public class BuyerInterfaceServerV1 implements BuyerInterface {
 
@@ -25,11 +27,16 @@ public class BuyerInterfaceServerV1 implements BuyerInterface {
 	
 	// CONSTRUCTORS
 	public BuyerInterfaceServerV1() {}
-	public BuyerInterfaceServerV1(BuyerDAO buyerDao, SellerDAO sellerDao, SessionDAO sessionDao, ItemDAO itemDao) {
-		this.buyerDao = buyerDao;
-		this.sellerDao = sellerDao;
-		this.sessionDao = sessionDao;
-		this.itemDao = itemDao;
+	public BuyerInterfaceServerV1(CustomerDAOFactory buyerDaoFactory, CustomerDAOFactory sellerDaoFactory, CustomerDAOFactory sessionDaoFactory, ProductDAOFactory itemDaoFactory) {
+		// not sure if I should tear it all down upon failing to build a DAO or if I should just print an error message
+		try {
+			this.buyerDao = buyerDaoFactory.createBuyerDao();
+			this.sellerDao = sellerDaoFactory.crateSellerDao();
+			this.sessionDao = sessionDaoFactory.createSessionDao();
+			this.itemDao = itemDaoFactory.createItemDao();
+		} catch (InvocationTargetException e) {
+			System.out.println(e);
+		}
 	}
 
 	public int createUser(String username, String password) throws IOException, IllegalArgumentException {

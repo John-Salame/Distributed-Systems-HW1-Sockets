@@ -36,12 +36,15 @@ public class BaseSocketClient {
 		this.api = APIEnumV1.ERROR.ordinal();
 		this.errorApi = APIEnumV1.ERROR.ordinal();
 	}
-	public BaseSocketClient(String serverIp, int serverPort, short apiVer, int api) throws SocketException {
+	public BaseSocketClient(String serverIp, int serverPort, short apiVer, int api) /*throws SocketException*/ {
 		this.apiVer = apiVer;
 		this.api = api;
 		this.errorApi = APIEnumV1.ERROR.ordinal();
 		this.packetPrefix = new PacketPrefix(this.apiVer, this.api);
-		this.setup(serverIp, serverPort);
+		this.serverIp = serverIp;
+		this.serverPort = serverPort;
+		// If I do not call setup() here, I can lazily start sockets upon the first send()
+		// this.setup(serverIp, serverPort); // start the socket connection
 	}
 	
 	protected void cleanup() {

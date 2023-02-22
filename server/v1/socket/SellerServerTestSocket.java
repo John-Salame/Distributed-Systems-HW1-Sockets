@@ -1,14 +1,16 @@
 /**
- * Class SellerRunnerServer
+ * Class SellerServerTestSocket
  * Author: John Salame
  * CSCI 5673 Distributed Systems
  * Assignment 1 - Sockets
  * Description: Test the seller interface by setting up the server-side transport layer (sockets)
  */
 
-package server;
+package server.v1.socket;
 import server.v1.*;
+import server.v1.factory.*;
 import dao.*;
+import dao.factory.*;
 import common.Seller;
 import common.SellerInterface;
 import common.Item;
@@ -16,10 +18,10 @@ import common.ItemId;
 import java.io.IOException;
 import java.net.SocketException;
 
-public class SellerRunnerServer {
+public class SellerServerTestSocket {
 	public static void main(String[] args) throws IOException {
 		int serverPort = 8200;
-		int maxConnections = 1;
+		int maxConnections = 100;
 		String customerDBHost = "localhost";
 		int customerDBIp = 8300;
 		String productDBHost = "localhost";
@@ -62,6 +64,14 @@ public class SellerRunnerServer {
 		} catch (Exception e) {
 			System.out.println(e);
 		}
+		/*
+		// prints an error message
+		try {
+			sellerInterface.changePriceOfItem("fakeSessionToken", appleItemId, (float) 0.20);
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+		*/
 
 		SellerSocketServerListenerV1 server = new SellerSocketServerListenerV1(sellerInterface);
 		server.startServer(serverPort, maxConnections);

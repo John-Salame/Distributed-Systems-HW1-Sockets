@@ -8,7 +8,7 @@
  * Socket programming reference: https://www.geeksforgeeks.org/socket-programming-in-java/
  */
 
-package server.v1;
+package server.v1.socket;
 import common.SellerInterface;
 import java.net.*;
 import java.io.IOException;
