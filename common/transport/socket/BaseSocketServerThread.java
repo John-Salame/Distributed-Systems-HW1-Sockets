@@ -74,7 +74,7 @@ public class BaseSocketServerThread implements Runnable {
 						this.sendException(ErrorEnum.NO_SUCH_ELEMENT_EXCEPTION.ordinal(), e.getMessage());
 					}
 					catch (UnsupportedOperationException e) {
-						this.sendException(ErrorEnum.NO_SUCH_ELEMENT_EXCEPTION.ordinal(), e.getMessage());
+						this.sendException(ErrorEnum.UNSUPPORTED_OPERATION_EXCEPTION.ordinal(), e.getMessage());
 					}
 					catch (Exception e) {
 						this.sendException(-1, e.getMessage()); // send a generic message

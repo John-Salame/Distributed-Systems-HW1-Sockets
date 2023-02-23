@@ -66,7 +66,10 @@ public class BuyerClientTimingInstance implements Runnable {
 			System.out.println("Created buyer " + this.userId);
 			System.out.println("Logging in");
 			this.sessionToken = this.buyerInterface.login(this.username, this.password);
-			System.out.println("Session token = " + sessionToken);
+			System.out.println("Buyer " + this.userId + " session token = " + sessionToken);
+			System.out.println("Displaying feedback for seller 1");
+			int[] feedback = this.buyerInterface.getSellerRating(1);
+			System.out.println(Arrays.toString(feedback));
 			System.out.println("Searching for fruit");
 			Item[] searchResults;
 			searchResults = this.buyerInterface.searchItem(this.sessionToken, 0, new String[] {"fruit"}); // apple should top the list

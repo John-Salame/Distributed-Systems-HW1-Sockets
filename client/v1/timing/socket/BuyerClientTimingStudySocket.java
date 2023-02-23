@@ -12,20 +12,12 @@ import client.v1.socket.*;
 import client.v1.timing.*;
 import common.interfaces.factory.UserInterfaceFactory;
 import common.interfaces.BuyerInterface;
-import common.interfaces.SellerInterface;
-import common.Buyer;
-import common.Item;
-import common.ItemId;
-import common.SaleListing;
-import common.SaleListingId;
-import common.Seller;
 import common.TimingLog;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
 
  public class BuyerClientTimingStudySocket {
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) {
 		// System.runFinalizersOnExit(true); // run destructors on threads
 		String serverHost = "localhost";
 		int serverPort = 8100;

@@ -41,6 +41,16 @@ public class ClientSocketFactory implements UserInterfaceFactory {
 		return socket;
 	}
 	public SellerInterface createSellerInterface() throws InvocationTargetException {
-		return null;
+		SellerInterface socket;
+		try {
+			socket = new SellerSocketClientV1(this.serverHost, this.serverPort);
+			if (wrapperBuyerInterface != null) {
+				// https://docs.oracle.com/javase/1.5.0/docs/api/java/lang/Class.html
+				return (SellerInterface) wrapperBuyerInterface.getConstructor(new Class[] {SellerInterface.class}).newInstance(socket);
+			}
+		} catch (Exception e) {
+			throw new InvocationTargetException(e);
+		}
+		return socket;
 	}
 }

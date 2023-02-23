@@ -3,75 +3,56 @@
  * Author: John Salame
  * CSCI 5673 Distributed Systems
  * Assignment 1 - Sockets
- * Description: Creates SellerTimingInstances for X buyers and then uses TimingLog to aggregate the results.
+ * Description: Creates SellerTimingInstances for X sellers and then uses TimingLog to aggregate the results.
  */
 
 package client.v1.timing.socket;
 import client.v1.*;
 import client.v1.socket.*;
-import common.Seller;
+import client.v1.timing.*;
+import common.interfaces.factory.UserInterfaceFactory;
 import common.interfaces.SellerInterface;
-import common.Item;
-import common.ItemId;
-import common.SaleListing;
-import common.SaleListingId;
+import common.Seller;
 import common.TimingLog;
-import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 
  public class SellerClientTimingStudySocket {
-	public static void main(String[] args) throws IOException {
-		SellerInterface transport = new SellerSocketClientV1("localhost", 8200);
-		SellerInterface sellerInterface = new SellerInterfaceClientV1(transport);
+	public static void main(String[] args) {
+		// System.runFinalizersOnExit(true); // run destructors on threads
+		String serverHost = "localhost";
+		int serverPort = 8200;
+		// SellerInterface transport = new SellerSocketClientV1(serverHost, serverPort);
+		// SellerInterface sellerInterface = new SellerInterfaceClientV1(transport);
+		UserInterfaceFactory sellerSocketFactory = new ClientSocketFactory(null, SellerInterfaceClientV1.class, serverHost, serverPort);
 
-		// Basic seller API calls
-		String seller1Username = "John";
-		String seller1Password = "password321";
-		int seller1Id = sellerInterface.createUser(seller1Username, seller1Password);
-		System.out.println("Seller 1 id: " + seller1Id);
-		String seller1SessionToken = sellerInterface.login(seller1Username, seller1Password);
-		System.out.println("Seller 1 session token = " + seller1SessionToken);
-		System.out.println("Seller 0 feedback:");
-		int[] feedback = sellerInterface.getSellerRating(1); // change this once I have the capacity to add feedback via the client-side API
-		System.out.println(Seller.displayFeedback(feedback));
-		System.out.println("Seller 1 logging out");
-		sellerInterface.logout(seller1SessionToken);
-
-		/*
-		// Create an item
-		String[] keywords = {"Food", "Fruit"};
-		ItemId itemId = new ItemId(0, 1);
-		Item apple = new Item("apple", itemId, keywords, "New", (float) 0.79, seller1Id);
-		System.out.println(apple);
-
-		// Sell the item
-		SaleListing sale = new SaleListing(new SaleListingId(itemId, 5));
-		System.out.println(sale);
-		System.out.println("Decreasing quantity by 2");
-		sale.decrementQuantity(2);
-		System.out.println("Removing sale listing");
-		sale.removeListing();
-		System.out.println(sale);
+		int numUsers = 2;
+		int numCalls = 10;
+		TimingLog timingLog = new TimingLog(numUsers);
+		String errorLogName = "errorLog.txt";
+		Thread[] threads = new Thread[numUsers];
+		// create users and start their threads
+		int userNumber;
+		Runnable seller;
+		// if a timing instance fails to be created, just move on
 		try {
-			sale.decrementQuantity(2);
-		} catch(IllegalStateException e) {
-			System.out.println("Correctly threw exception from trying to buy from removed listing");
+			userNumber = 1;
+			seller = new SellerClientTimingInstance("Joe", "password123", sellerSocketFactory, timingLog, userNumber, numCalls, errorLogName);
+			threads[0] = new Thread(seller);
+		} catch (InvocationTargetException e) {
+			System.out.println(e);
 		}
-		SaleListing sale2 = new SaleListing(itemId, 5);
-		System.out.println("\nBuying out all of sale2");
-		sale2.decrementQuantity(3);
-		int numSold = sale2.decrementQuantity(3);
-		assert numSold == 2;
-		System.out.println(sale2);
-
-		// Test logging out
-		System.out.println("Listing sessions");
-		System.out.println(sessionDao.listSessions());
-		System.out.println("Buyer 1 logging out");
-		buyerInterface.logout(buyer1SessionToken);
-		System.out.println(sessionDao.listSessions());
-		System.out.println("Seller 1 logging out");
-		sellerInterface.logout(seller1SessionToken);
-		System.out.println(sessionDao.listSessions());
-		*/
+		if (numUsers > 1) {
+			try {
+				userNumber = 2;
+				seller = new SellerClientTimingInstance("Harry", "potter321", sellerSocketFactory, timingLog, userNumber, numCalls, errorLogName);
+				threads[1] = new Thread(seller);
+			} catch (InvocationTargetException e) {
+				System.out.println(e);
+			}
+		}
+		// start the threads
+		for(int i = 0; i < numUsers; i++) {
+			threads[i].start();
+		}
 	}
  }
