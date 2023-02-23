@@ -19,4 +19,5 @@ public interface SessionDAO {
 	public abstract int getUserIdFromSession(String sessionKey) throws IOException, NoSuchElementException;
 	// just for debugging purposes
 	public abstract String listSessions() throws IOException;
+	public abstract void closeConnection() throws IOException;
 }

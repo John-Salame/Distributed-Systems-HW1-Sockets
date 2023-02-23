@@ -62,4 +62,7 @@ public class DBCustomerSellerSocketClientV1 extends BaseSocketClient implements 
 		byte[] buf = this.sendAndReceive(msg, funcId);
 		assert buf.length == 0;
 	}
+	public void closeConnection() throws IOException {
+		this.cleanup();
+	}
 }

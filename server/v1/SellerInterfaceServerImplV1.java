@@ -53,6 +53,10 @@ public class SellerInterfaceServerImplV1 implements SellerInterface {
 				System.out.println("SellerInterfaceServerImplV1 failed logout");
 			}
 		}
+		// close all database connections associated with this user
+		this.sellerDao.closeConnection();
+		this.sessionDao.closeConnection();
+		this.itemDao.closeConnection();
 	}
 	public int[] getSellerRating(int sellerId) throws IOException, NoSuchElementException {
 		return sellerDao.getSellerById(sellerId).getFeedback(); // not sure if this counts as stateless

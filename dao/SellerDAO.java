@@ -16,4 +16,5 @@ public interface SellerDAO {
 	public abstract int getUserId(String username, String password) throws IOException, NoSuchElementException;
 	public abstract Seller getSellerById(int sellerId) throws IOException, NoSuchElementException;
 	public abstract void commitSeller(Seller seller) throws IOException, IllegalArgumentException;
+	public abstract void closeConnection() throws IOException;
 }

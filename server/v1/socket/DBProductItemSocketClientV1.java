@@ -71,4 +71,7 @@ public class DBProductItemSocketClientV1 extends BaseSocketClient implements Ite
 		catItems = Item.deserializeArray(buf);
 		return catItems;
 	}
+	public void closeConnection() throws IOException {
+		this.cleanup();
+	}
 }

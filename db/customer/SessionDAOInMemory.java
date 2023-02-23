@@ -105,4 +105,8 @@ public class SessionDAOInMemory implements SessionDAO {
 		}
 		return ret;
 	}
+
+	public void closeConnection() {
+		// do nothing
+	}
 }

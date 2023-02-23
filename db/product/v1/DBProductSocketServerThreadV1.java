@@ -114,5 +114,9 @@ public class DBProductSocketServerThreadV1 extends BaseSocketServerThread implem
 		Item[] catItems = this.getItemsInCategory(category);
 		return Item.serializeArray(catItems);
 	}
-	
+
+
+	public void closeConnection() {
+		// do nothing
+	}
 }

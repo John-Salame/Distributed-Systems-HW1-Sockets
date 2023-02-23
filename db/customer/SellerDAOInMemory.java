@@ -117,4 +117,8 @@ public class SellerDAOInMemory implements SellerDAO {
 			throw new IOException("Error committing seller");
 		}
 	}
+
+	public void closeConnection() {
+		// do nothing
+	}
 }

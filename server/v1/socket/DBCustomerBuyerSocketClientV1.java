@@ -55,4 +55,7 @@ public class DBCustomerBuyerSocketClientV1 extends BaseSocketClient implements B
 		buyer = Buyer.deserialize(buf);
 		return buyer;
 	}
+	public void closeConnection() throws IOException {
+		this.cleanup();
+	}
 }

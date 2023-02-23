@@ -76,4 +76,7 @@ public class DBCustomerSessionSocketClientV1 extends BaseSocketClient implements
 		}
 		return sessions;
 	}
+	public void closeConnection() throws IOException {
+		this.cleanup();
+	}
 }

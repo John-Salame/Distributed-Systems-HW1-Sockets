@@ -217,4 +217,8 @@ public class DBCustomerSocketServerThreadV1 extends BaseSocketServerThread imple
 		assert msg.length == 0;
 		return SerializeString.serialize(this.listSessions());
 	}
+
+	public void closeConnection() {
+		// do nothing
+	}
 }

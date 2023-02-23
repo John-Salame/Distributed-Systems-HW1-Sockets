@@ -167,4 +167,8 @@ public class ItemDAOInMemory implements ItemDAO {
 		ret = catItems.toArray(ret);
 		return ret;
 	}
+
+	public void closeConnection() {
+		// do nothing
+	}
 }

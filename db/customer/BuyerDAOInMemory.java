@@ -82,4 +82,8 @@ public class BuyerDAOInMemory implements BuyerDAO {
 		}
 		throw new NoSuchElementException("No buyer exists with id " + buyerId);
 	}
+
+	public void closeConnection() {
+		// do nothing
+	}
 }

@@ -55,6 +55,11 @@ public class BuyerInterfaceServerImplV1 implements BuyerInterface {
 				System.out.println("BuyerInterfaceServerImplV1 failed logout");
 			}
 		}
+		// close all database connections associated with this user
+		this.buyerDao.closeConnection();
+		this.sellerDao.closeConnection();
+		this.sessionDao.closeConnection();
+		this.itemDao.closeConnection();
 	}
 	public int[] getSellerRating(int sellerId) throws IOException, NoSuchElementException {
 		return sellerDao.getSellerById(sellerId).getFeedback();
