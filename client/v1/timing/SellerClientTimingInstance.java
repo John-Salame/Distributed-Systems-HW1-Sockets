@@ -79,7 +79,7 @@ public class SellerClientTimingInstance implements Runnable {
 			// write the error to the log
 			try {
 				// if the lines end up jumbling together, use file locks https://www.baeldung.com/java-write-to-file
-				System.out.println(e);
+				System.out.println("Timing instance exception: " + e);
 				errorLog.write(e.toString());
 			} catch (IOException i) {
 				// do nothing
