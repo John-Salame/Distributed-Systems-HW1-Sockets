@@ -11,7 +11,7 @@ import client.v1.*;
 import common.Buyer;
 import common.Item;
 import common.Seller;
-import common.SellerInterface;
+import common.interfaces.SellerInterface;
 import common.TimingLog;
 import java.io.BufferedWriter;
 import java.io.FileWriter;

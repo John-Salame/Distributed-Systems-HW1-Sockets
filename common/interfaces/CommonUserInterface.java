@@ -6,7 +6,7 @@
  * Description: Interface containing methods common to buyers and sellers.
  */
 
-package common;
+package common.interfaces;
 import java.io.IOException;
 import java.util.NoSuchElementException;
 

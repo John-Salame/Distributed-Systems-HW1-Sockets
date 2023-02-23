@@ -27,7 +27,7 @@ public class DBCustomerDAOFactorySocketV1 implements CustomerDAOFactory {
 	public BuyerDAO createBuyerDao() throws InvocationTargetException {
 		return new DBCustomerBuyerSocketClientV1(this.dbHost, this.dbPort);
 	}
-	public SellerDAO crateSellerDao() throws InvocationTargetException {
+	public SellerDAO createSellerDao() throws InvocationTargetException {
 		return new DBCustomerSellerSocketClientV1(this.dbHost, this.dbPort);
 	}
 	public SessionDAO createSessionDao() throws InvocationTargetException {

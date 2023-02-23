@@ -20,8 +20,11 @@ CLASSES = \
 	client/v1/timing/BuyerClientTimingInstance.java \
 	client/v1/timing/SellerClientTimingInstance.java \
 	client/v1/BuyerInterfaceClientV1.java \
-	client/v1/ClientInterfaceFactory.java \
 	client/v1/SellerInterfaceClientV1.java \
+	common/interfaces/factory/UserInterfaceFactory.java \
+	common/interfaces/BuyerInterface.java \
+	common/interfaces/CommonUserInterface.java \
+	common/interfaces/SellerInterface.java \
 	common/transport/serialize/SerializeInt.java \
 	common/transport/serialize/SerializeIntArray.java \
 	common/transport/serialize/SerializeLogin.java \
@@ -43,15 +46,12 @@ CLASSES = \
 	common/transport/socket/SellerEnumV1.java \
 	common/transport/socket/SocketMessage.java \
 	common/Buyer.java \
-	common/BuyerInterface.java \
 	common/CartItem.java \
-	common/CommonUserInterface.java \
 	common/Item.java \
 	common/ItemId.java \
 	common/SaleListing.java \
 	common/SaleListingId.java \
 	common/Seller.java \
-	common/SellerInterface.java \
 	common/TimingLog.java \
 	dao/factory/CustomerDAOFactory.java \
 	dao/factory/ProductDAOFactory.java \
@@ -72,20 +72,22 @@ CLASSES = \
 	db/product/v1/DBProductSocketServerThreadV1.java \
 	db/product/DBProductRunner.java \
 	db/product/ItemDAOInMemory.java \
+	db/product/ProductDAOFactoryInMemory.java \
+	server/v1/factory/DBClientProgramFactorySocketV1.java \
 	server/v1/factory/DBCustomerDAOFactorySocketV1.java \
 	server/v1/factory/DBProductDAOFactorySocketV1.java \
-	server/v1/socket/BuyerServerTestSocket.java \
+	server/v1/socket/test/BuyerServerTestSocket.java \
+	server/v1/socket/test/SellerServerTestSocket.java \
 	server/v1/socket/BuyerSocketServerListenerV1.java \
 	server/v1/socket/BuyerSocketServerThreadV1.java \
 	server/v1/socket/DBCustomerBuyerSocketClientV1.java \
-	server/v1/socket/SellerServerTestSocket.java \
 	server/v1/socket/DBCustomerSellerSocketClientV1.java \
 	server/v1/socket/DBCustomerSessionSocketClientV1.java \
 	server/v1/socket/DBProductItemSocketClientV1.java \
 	server/v1/socket/SellerSocketServerListenerV1.java \
 	server/v1/socket/SellerSocketServerThreadV1.java \
-	server/v1/BuyerInterfaceServerV1.java \
-	server/v1/SellerInterfaceServerV1.java \
+	server/v1/BuyerInterfaceServerImplV1.java \
+	server/v1/SellerInterfaceServerImplV1.java \
 	util/EditDistance.java
 
 all: classes
@@ -99,13 +101,13 @@ run_buyer_client:
 	$(JR) client/v1/timing/socket/BuyerClientTimingStudySocket.java
 
 run_buyer_server:
-	$(JR) server/v1/socket/BuyerServerTestSocket.java
+	$(JR) server/v1/socket/test/BuyerServerTestSocket.java
 
 run_seller_client:
 	$(JR) client/v1/timing/socket/SellerClientTimingStudySocket.java
 
 run_seller_server:
-	$(JR) server/v1/socket/SellerServerTestSocket.java
+	$(JR) server/v1/socket/test/SellerServerTestSocket.java
 
 run_db_customer:
 	$(JR) db/customer/DBCustomerRunner.java

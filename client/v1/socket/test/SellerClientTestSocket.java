@@ -4,13 +4,14 @@
  * CSCI 5673 Distributed Systems
  * Assignment 1 - Sockets
  * Description: Tries various seller API functions, hardcoded, in order to test them out.
+ * This should work for testing a single client at a time.
  */
 
 package client.v1.socket.test;
 import client.v1.*;
 import client.v1.socket.SellerSocketClientV1;
 import common.Seller;
-import common.SellerInterface;
+import common.interfaces.SellerInterface;
 import common.Item;
 import common.ItemId;
 import common.SaleListing;

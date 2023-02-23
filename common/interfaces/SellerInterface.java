@@ -6,7 +6,10 @@
  * Description: Seller interface common to client and server
  */
 
-package common;
+package common.interfaces;
+import common.Item;
+import common.ItemId;
+import common.SaleListingId;
 import java.util.NoSuchElementException;
 import java.io.IOException;
 
@@ -17,7 +20,7 @@ public interface SellerInterface extends CommonUserInterface {
 	public abstract SaleListingId putOnSale(String sessionToken, Item item, int quantity) throws IOException, IllegalArgumentException;
 	public abstract void changePriceOfItem(String sessionToken, ItemId itemId, float newPrice) throws IOException, NoSuchElementException, IllegalArgumentException, UnsupportedOperationException;
 	/*
-	public abstract void removeItemFromSale(String sessionToken, ItemId itemId, int quantity);
+	public abstract void removeItemFromSale(String sessionToken, ItemId itemId, int quantity); // TO-DO: Figure out how to make this deterministic
 	public abstract String displayItemsOnSale(String sessionToken);
 	*/
 }

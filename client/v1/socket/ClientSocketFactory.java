@@ -9,12 +9,12 @@
  */
 
 package client.v1.socket;
-import client.v1.ClientInterfaceFactory;
-import common.BuyerInterface;
-import common.SellerInterface;
+import common.interfaces.factory.UserInterfaceFactory;
+import common.interfaces.BuyerInterface;
+import common.interfaces.SellerInterface;
 import java.lang.reflect.InvocationTargetException;
 
-public class ClientSocketFactory implements ClientInterfaceFactory {
+public class ClientSocketFactory implements UserInterfaceFactory {
 	private Class wrapperBuyerInterface; // these wrappers should be classes, such as BuyerInterfaceClientV1.class
 	private Class wrapperSellerInterface;
 	private String serverHost;

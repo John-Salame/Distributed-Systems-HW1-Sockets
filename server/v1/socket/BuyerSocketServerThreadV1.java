@@ -9,7 +9,8 @@
  */
 
 package server.v1.socket;
-import common.BuyerInterface;
+import common.interfaces.factory.UserInterfaceFactory;
+import common.interfaces.BuyerInterface;
 import common.transport.serialize.*;
 import common.transport.socket.APIEnumV1;
 import common.transport.socket.BaseSocketServerThread;
@@ -19,6 +20,7 @@ import java.net.*;
 import java.io.IOException;
 import java.io.EOFException; // happens when writing to a closed socket
 import java.util.NoSuchElementException;
+import java.lang.reflect.InvocationTargetException;
 
 public class BuyerSocketServerThreadV1 extends BaseSocketServerThread implements BuyerInterface {
 	private BuyerInterface buyerInterfaceV1;
@@ -28,9 +30,13 @@ public class BuyerSocketServerThreadV1 extends BaseSocketServerThread implements
 
 	// CONSTRUCTORS
 	// Use this Constructor for threads that have an active connection
-	public BuyerSocketServerThreadV1(BuyerInterface buyerInterfaceV1, Socket socket) {
+	public BuyerSocketServerThreadV1(UserInterfaceFactory buyerInterfaceFactoryV1, Socket socket) {
 		super(socket);
-		this.buyerInterfaceV1 = buyerInterfaceV1;
+		try {
+			this.buyerInterfaceV1 = buyerInterfaceFactoryV1.createBuyerInterface();
+		} catch (InvocationTargetException e) {
+			this.stopServer();
+		}
 		this.buyerEnumV1Values = BuyerEnumV1.values();
 		this.apiEnumV1Values = APIEnumV1.values();
 	}

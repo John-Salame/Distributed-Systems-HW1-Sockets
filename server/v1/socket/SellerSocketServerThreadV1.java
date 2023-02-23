@@ -9,7 +9,8 @@
  */
 
 package server.v1.socket;
-import common.SellerInterface;
+import common.interfaces.factory.UserInterfaceFactory;
+import common.interfaces.SellerInterface;
 import common.transport.serialize.*;
 import common.transport.socket.APIEnumV1;
 import common.transport.socket.BaseSocketServerThread;
@@ -20,6 +21,7 @@ import common.SaleListingId;
 import java.net.*;
 import java.io.IOException;
 import java.util.NoSuchElementException;
+import java.lang.reflect.InvocationTargetException;
 
 public class SellerSocketServerThreadV1 extends BaseSocketServerThread implements SellerInterface {
 	private SellerInterface sellerInterfaceV1;
@@ -28,9 +30,13 @@ public class SellerSocketServerThreadV1 extends BaseSocketServerThread implement
 
 	// CONSTRUCTORS
 	// Use this Constructor for threads that have an active connection
-	public SellerSocketServerThreadV1(SellerInterface sellerInterfaceV1, Socket socket) {
+	public SellerSocketServerThreadV1(UserInterfaceFactory sellerInterfaceFactoryV1, Socket socket) {
 		super(socket);
-		this.sellerInterfaceV1 = sellerInterfaceV1;
+		try {
+			this.sellerInterfaceV1 = sellerInterfaceFactoryV1.createSellerInterface();
+		} catch (InvocationTargetException e) {
+			this.stopServer();
+		}
 		this.sellerEnumV1Values = SellerEnumV1.values();
 		this.apiEnumV1Values = APIEnumV1.values();
 	}

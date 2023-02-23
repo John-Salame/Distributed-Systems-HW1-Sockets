@@ -11,7 +11,7 @@
  */
 
 package client.v1;
-import common.BuyerInterface;
+import common.interfaces.BuyerInterface;
 import common.Item;
 import java.io.IOException;
 

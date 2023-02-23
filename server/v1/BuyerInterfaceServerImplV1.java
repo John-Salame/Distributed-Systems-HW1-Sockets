@@ -1,5 +1,5 @@
 /**
- * Class BuyerInterfaceServerV1
+ * Class BuyerInterfaceServerImplV1
  * Author: John Salame
  * CSCI 5673 Distributed Systems
  * Assignment 1 - Sockets
@@ -8,17 +8,17 @@
  */
 
 package server.v1;
-import dao.*;
-import dao.factory.*;
-import common.BuyerInterface;
+import common.interfaces.BuyerInterface;
 import common.Item;
 import common.ItemId;
+import dao.*;
+import dao.factory.*;
 import util.EditDistance;
 import java.io.IOException;
 import java.util.NoSuchElementException;
 import java.lang.reflect.InvocationTargetException;
 
-public class BuyerInterfaceServerV1 implements BuyerInterface {
+public class BuyerInterfaceServerImplV1 implements BuyerInterface {
 
 	private BuyerDAO buyerDao;
 	private SellerDAO sellerDao;
@@ -26,17 +26,12 @@ public class BuyerInterfaceServerV1 implements BuyerInterface {
 	private ItemDAO itemDao;
 	
 	// CONSTRUCTORS
-	public BuyerInterfaceServerV1() {}
-	public BuyerInterfaceServerV1(CustomerDAOFactory buyerDaoFactory, CustomerDAOFactory sellerDaoFactory, CustomerDAOFactory sessionDaoFactory, ProductDAOFactory itemDaoFactory) {
-		// not sure if I should tear it all down upon failing to build a DAO or if I should just print an error message
-		try {
-			this.buyerDao = buyerDaoFactory.createBuyerDao();
-			this.sellerDao = sellerDaoFactory.crateSellerDao();
-			this.sessionDao = sessionDaoFactory.createSessionDao();
-			this.itemDao = itemDaoFactory.createItemDao();
-		} catch (InvocationTargetException e) {
-			System.out.println(e);
-		}
+	public BuyerInterfaceServerImplV1() {}
+	public BuyerInterfaceServerImplV1(CustomerDAOFactory buyerDaoFactory, CustomerDAOFactory sellerDaoFactory, CustomerDAOFactory sessionDaoFactory, ProductDAOFactory itemDaoFactory) throws InvocationTargetException {
+		this.buyerDao = buyerDaoFactory.createBuyerDao();
+		this.sellerDao = sellerDaoFactory.createSellerDao();
+		this.sessionDao = sessionDaoFactory.createSessionDao();
+		this.itemDao = itemDaoFactory.createItemDao();
 	}
 
 	public int createUser(String username, String password) throws IOException, IllegalArgumentException {
@@ -57,7 +52,7 @@ public class BuyerInterfaceServerV1 implements BuyerInterface {
 				sessionDao.expireSession(sessionToken);
 				logoutSuccess = true;
 			} catch (IOException e) {
-				System.out.println("SellerInterfaceServerV1 failed logout");
+				System.out.println("BuyerInterfaceServerImplV1 failed logout");
 			}
 		}
 	}
@@ -118,7 +113,7 @@ public class BuyerInterfaceServerV1 implements BuyerInterface {
 				// System.out.println("Levenshtein Distance for keyword " + keywordsTruncated[i] + " is " + editDist[i]);
 				sum += editDist[i];
 			}
-			System.out.println("Search score for item " + item.getName() + " is " + sum);
+			// System.out.println("Search score for item " + item.getName() + " is " + sum);
 			if (itemKeywords.length > 0) {
 				scores[scoreIndex] = sum;
 			}

@@ -9,9 +9,6 @@
  */
 
 package common.transport.socket;
-// import common.transport.socket.APIEnumV1;
-// import common.transport.socket.PacketPrefix;
-// import common.transport.socket.SocketMessage;
 import java.net.*;
 import java.io.ByteArrayInputStream;
 import java.io.DataOutputStream;

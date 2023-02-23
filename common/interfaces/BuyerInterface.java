@@ -6,7 +6,8 @@
  * Description: Buyer interface common to client and server
  */
 
-package common;
+package common.interfaces;
+import common.Item;
 import java.io.IOException;
 
 public interface BuyerInterface extends CommonUserInterface {

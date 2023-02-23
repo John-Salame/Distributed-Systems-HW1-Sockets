@@ -1,5 +1,5 @@
 /**
- * Class SellerInterfaceServerV1
+ * Class SellerInterfaceServerImplV1
  * Author: John Salame
  * CSCI 5673 Distributed Systems
  * Assignment 1 - Sockets
@@ -8,26 +8,28 @@
  */
 
 package server.v1;
-import dao.*;
-import common.SellerInterface;
+import common.interfaces.SellerInterface;
 import common.Item;
 import common.ItemId;
+import dao.*;
+import dao.factory.*;
 import common.SaleListingId;
 import util.EditDistance;
 import java.util.NoSuchElementException;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 
-public class SellerInterfaceServerV1 implements SellerInterface {
+public class SellerInterfaceServerImplV1 implements SellerInterface {
 	private SellerDAO sellerDao;
 	private SessionDAO sessionDao;
 	private ItemDAO itemDao;
 	
 	// CONSTRUCTORS
-	public SellerInterfaceServerV1() {}
-	public SellerInterfaceServerV1(SellerDAO sellerDao, SessionDAO sessionDao, ItemDAO itemDao) {
-		this.sellerDao = sellerDao;
-		this.sessionDao = sessionDao;
-		this.itemDao = itemDao;
+	public SellerInterfaceServerImplV1() {}
+	public SellerInterfaceServerImplV1(CustomerDAOFactory sellerDaoFactory, CustomerDAOFactory sessionDaoFactory, ProductDAOFactory itemDaoFactory) throws InvocationTargetException {
+		this.sellerDao = sellerDaoFactory.createSellerDao();
+		this.sessionDao = sessionDaoFactory.createSessionDao();
+		this.itemDao = itemDaoFactory.createItemDao();
 	}
 
 	public int createUser(String username, String password) throws IOException, IllegalArgumentException {
@@ -48,7 +50,7 @@ public class SellerInterfaceServerV1 implements SellerInterface {
 				sessionDao.expireSession(sessionToken);
 				logoutSuccess = true;
 			} catch (IOException e) {
-				System.out.println("SellerInterfaceServerV1 failed logout");
+				System.out.println("SellerInterfaceServerImplV1 failed logout");
 			}
 		}
 	}
@@ -56,7 +58,7 @@ public class SellerInterfaceServerV1 implements SellerInterface {
 		return sellerDao.getSellerById(sellerId).getFeedback(); // not sure if this counts as stateless
 	}
 	public SaleListingId putOnSale(String sessionToken, Item item, int quantity) throws IOException, IllegalArgumentException {
-		throw new RuntimeException("SellerInterfaceServerV1: putOnSale() Not implemented");
+		throw new RuntimeException("SellerInterfaceServerImplV1: putOnSale() Not implemented");
 	}
 	public void changePriceOfItem(String sessionToken, ItemId itemId, float newPrice) throws IOException, NoSuchElementException, IllegalArgumentException, UnsupportedOperationException {
 		int sellerId = sessionDao.getUserIdFromSession(sessionToken);

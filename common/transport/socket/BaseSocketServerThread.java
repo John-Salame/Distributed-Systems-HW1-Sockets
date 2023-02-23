@@ -9,8 +9,6 @@
  */
 
 package common.transport.socket;
-// import common.transport.socket.PacketPrefix;
-// import common.transport.socket.SocketMessage;
 import java.net.*;
 import common.transport.serialize.SerializeString;
 import java.io.DataOutputStream;

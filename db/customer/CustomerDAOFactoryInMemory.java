@@ -13,13 +13,24 @@ import dao.factory.CustomerDAOFactory;
 import java.lang.reflect.InvocationTargetException;
 
 public class CustomerDAOFactoryInMemory implements CustomerDAOFactory {
-	public BuyerDAO createBuyerDao() throws InvocationTargetException {
-		return new BuyerDAOInMemory();
+	private BuyerDAO buyerDao;
+	private SellerDAO sellerDao;
+	private SessionDAO sessionDao;
+
+	// CONSTRUCTORS
+	// All people who use this factory use the same DAO in memory.
+	public CustomerDAOFactoryInMemory() {
+		this.buyerDao = new BuyerDAOInMemory();
+		this.sellerDao = new SellerDAOInMemory();
+		this.sessionDao = new SessionDAOInMemory();
 	}
-	public SellerDAO crateSellerDao() throws InvocationTargetException {
-		return new SellerDAOInMemory();
+	public BuyerDAO createBuyerDao() throws InvocationTargetException {
+		return this.buyerDao;
+	}
+	public SellerDAO createSellerDao() throws InvocationTargetException {
+		return this.sellerDao;
 	}
 	public SessionDAO createSessionDao() throws InvocationTargetException {
-		return new SessionDAOInMemory();
+		return this.sessionDao;
 	}
 }

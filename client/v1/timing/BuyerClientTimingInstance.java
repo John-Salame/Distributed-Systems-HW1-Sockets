@@ -8,8 +8,9 @@
 
 package client.v1.timing;
 import client.v1.*;
+import common.interfaces.factory.UserInterfaceFactory;
+import common.interfaces.BuyerInterface;
 import common.Buyer;
-import common.BuyerInterface;
 import common.Item;
 import common.TimingLog;
 import java.io.BufferedWriter;
@@ -30,7 +31,7 @@ public class BuyerClientTimingInstance implements Runnable {
 	private int numCalls; // how many API calls to make
 	BufferedWriter errorLog;
 
-	public BuyerClientTimingInstance(String username, String password, ClientInterfaceFactory buyerInterfaceFactory, TimingLog timingLog, int buyerNumber, int numCalls, String errorLogName) throws InvocationTargetException {
+	public BuyerClientTimingInstance(String username, String password, UserInterfaceFactory buyerInterfaceFactory, TimingLog timingLog, int buyerNumber, int numCalls, String errorLogName) throws InvocationTargetException {
 		this.username = username;
 		this.password = password;
 		this.userId = 0; // invalid user ID

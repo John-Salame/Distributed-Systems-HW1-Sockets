@@ -39,6 +39,7 @@ public class DBProductSocketServerListenerV1 {
 		while(true) {
 			try {
 				Socket socket = server.accept();
+				System.out.println("Received connection from " + socket.getRemoteSocketAddress());
 				Thread t = new Thread((Runnable) new DBProductSocketServerThreadV1(this.itemDaoV1, socket));
 				t.start(); // run the run() function on a new thread
 				// TO-DO: Figure out how to join threads and maybe do something with the thread interrupts

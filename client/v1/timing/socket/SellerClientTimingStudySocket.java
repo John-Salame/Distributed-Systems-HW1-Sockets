@@ -10,7 +10,7 @@ package client.v1.timing.socket;
 import client.v1.*;
 import client.v1.socket.*;
 import common.Seller;
-import common.SellerInterface;
+import common.interfaces.SellerInterface;
 import common.Item;
 import common.ItemId;
 import common.SaleListing;

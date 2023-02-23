@@ -13,6 +13,6 @@ import java.lang.reflect.InvocationTargetException;
 
 public interface CustomerDAOFactory {
 	public abstract BuyerDAO createBuyerDao() throws InvocationTargetException;
-	public abstract SellerDAO crateSellerDao() throws InvocationTargetException;
+	public abstract SellerDAO createSellerDao() throws InvocationTargetException;
 	public abstract SessionDAO createSessionDao() throws InvocationTargetException;
 }

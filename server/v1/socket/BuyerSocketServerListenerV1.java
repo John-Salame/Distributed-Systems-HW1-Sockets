@@ -9,18 +9,20 @@
  */
 
 package server.v1.socket;
-import common.BuyerInterface;
+import common.interfaces.factory.UserInterfaceFactory;
+import common.interfaces.BuyerInterface;
 import java.net.*;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 
 public class BuyerSocketServerListenerV1 {
-	private BuyerInterface buyerInterfaceV1;
+	private UserInterfaceFactory buyerInterfaceFactoryV1;
 	private ServerSocket server = null;
 
 	// CONSTRUCTORS
 	// starting the server - use this constructor and then call startServer()
-	public BuyerSocketServerListenerV1(BuyerInterface buyerInterfaceV1) {
-		this.buyerInterfaceV1 = buyerInterfaceV1;
+	public BuyerSocketServerListenerV1(UserInterfaceFactory buyerInterfaceFactoryV1) {
+		this.buyerInterfaceFactoryV1 = buyerInterfaceFactoryV1;
 	}
 
 	// create the listener and enter the server loop
@@ -38,11 +40,13 @@ public class BuyerSocketServerListenerV1 {
 		// server loop
 		while(true) {
 			try {
-				Socket socket = server.accept();
-				Thread t = new Thread((Runnable) new BuyerSocketServerThreadV1(this.buyerInterfaceV1, socket)); // I would create a base class if I knew how to abstract this line away
+				Socket socket = server.accept(); // the socket which was created upon receiving a TCP connection request
+				System.out.println("Received connection from " + socket.getRemoteSocketAddress());
+				Thread t = new Thread((Runnable) new BuyerSocketServerThreadV1(this.buyerInterfaceFactoryV1, socket)); // I would create a base class if I knew how to abstract this line away
 				t.start(); // run the run() function on a new thread
 				// TO-DO: Figure out how to join threads and maybe do something with the thread interrupts
 				// I could potentially check the socket.getRemoteSocketAddress() for each thread to check if it's ready to join
+				//    No, this doesn't work. It doesn't change after the socket closes.
 			} catch (IOException i) {
 				System.out.println("Error server.accept(): " + i);
 			}

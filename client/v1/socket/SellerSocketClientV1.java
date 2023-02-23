@@ -9,7 +9,7 @@
  */
 
 package client.v1.socket;
-import common.SellerInterface;
+import common.interfaces.SellerInterface;
 import common.transport.serialize.*;
 import common.transport.socket.APIEnumV1;
 import common.transport.socket.BaseSocketClient;

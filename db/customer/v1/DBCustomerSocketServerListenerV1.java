@@ -9,7 +9,6 @@
  */
 
 package db.customer.v1;
-import common.SellerInterface;
 import dao.BuyerDAO;
 import dao.SellerDAO;
 import dao.SessionDAO;
@@ -46,6 +45,7 @@ public class DBCustomerSocketServerListenerV1 {
 		while(true) {
 			try {
 				Socket socket = server.accept();
+				System.out.println("Received connection from " + socket.getRemoteSocketAddress());
 				Thread t = new Thread((Runnable) new DBCustomerSocketServerThreadV1(this.buyerDaoV1, this.sellerDaoV1, this.sessionDaoV1, socket));
 				t.start(); // run the run() function on a new thread
 				// TO-DO: Figure out how to join threads and maybe do something with the thread interrupts

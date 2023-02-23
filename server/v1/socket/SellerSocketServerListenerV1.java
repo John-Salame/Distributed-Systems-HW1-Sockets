@@ -9,18 +9,19 @@
  */
 
 package server.v1.socket;
-import common.SellerInterface;
+import common.interfaces.factory.UserInterfaceFactory;
+import common.interfaces.SellerInterface;
 import java.net.*;
 import java.io.IOException;
 
 public class SellerSocketServerListenerV1 {
-	private SellerInterface sellerInterfaceV1;
+	private UserInterfaceFactory sellerInterfaceFactoryV1;
 	private ServerSocket server = null;
 
 	// CONSTRUCTORS
 	// starting the server - use this constructor and then call startServer()
-	public SellerSocketServerListenerV1(SellerInterface sellerInterfaceV1) {
-		this.sellerInterfaceV1 = sellerInterfaceV1;
+	public SellerSocketServerListenerV1(UserInterfaceFactory sellerInterfaceFactoryV1) {
+		this.sellerInterfaceFactoryV1 = sellerInterfaceFactoryV1;
 	}
 
 	// create the listener and enter the server loop
@@ -39,7 +40,8 @@ public class SellerSocketServerListenerV1 {
 		while(true) {
 			try {
 				Socket socket = server.accept();
-				Thread t = new Thread((Runnable) new SellerSocketServerThreadV1(this.sellerInterfaceV1, socket));
+				System.out.println("Received connection from " + socket.getRemoteSocketAddress());
+				Thread t = new Thread((Runnable) new SellerSocketServerThreadV1(this.sellerInterfaceFactoryV1, socket));
 				t.start(); // run the run() function on a new thread
 				// TO-DO: Figure out how to join threads and maybe do something with the thread interrupts
 				// I could potentially check the socket.getRemoteSocketAddress() for each thread to check if it's ready to join

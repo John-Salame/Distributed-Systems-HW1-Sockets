@@ -4,25 +4,26 @@
  * CSCI 5673 Distributed Systems
  * Assignment 1 - Sockets
  * Description: Test the business logic using in-memory databases. Skip the client-server interaction.
- * NOTE: This file no longer works after adding the factories; the DAOs no longer relate to the same object between buyer and seller interfaces
  */
 
 package server;
 import dao.*;
 import dao.factory.*;
 import server.v1.*;
+import common.interface.BuyerInterface;
+import common.interface.SellerInterface;
 import common.Buyer;
-import common.BuyerInterface;
 import common.Seller;
-import common.SellerInterface;
 import common.Item;
 import common.ItemId;
 import common.SaleListing;
 import common.SaleListingId;
 import db.customer.BuyerDAOInMemory;
+import db.customer.CustomerDAOFactoryInMemory;
 import db.customer.SellerDAOInMemory;
 import db.customer.SessionDAOInMemory;
 import db.product.ItemDAOInMemory;
+import db.product.ProductDAOFactoryInMemory;
 import java.util.Arrays;
 import java.util.NoSuchElementException;
 import java.io.IOException;
@@ -38,13 +39,13 @@ import java.io.IOException;
 		CustomerDAOFactory sessionDaoFactory = custDaoFact;
 		ProductDAOFactory prodDaoFact = new ProductDAOFactoryInMemory();
 		ProductDAOFactory itemDaoFactory = prodDaoFact;
-		BuyerDAO buyerDao = new BuyerDAOInMemory();
-		SellerDAO sellerDao = new SellerDAOInMemory();
-		SessionDAO sessionDao = new SessionDAOInMemory();
-		ItemDAO itemDao = new ItemDAOInMemory();
+		BuyerDAO buyerDao = buyerDaoFactory.createBuyerDao();
+		SellerDAO sellerDao = sellerDaoFactory.createSellerDao();
+		SessionDAO sessionDao = sessionDaoFactory.createSessionDao();
+		ItemDAO itemDao = itemDaoFactory.createItemDao();
 		System.out.println("Done creating DAOs");
-		BuyerInterface buyerInterface = new BuyerInterfaceServerV1(buyerDaoFactory, sellerDaoFactory, sessionDaoFactory, itemDaoFactory);
-		SellerInterface sellerInterface = new SellerInterfaceServerV1(sellerDaoFactory, sessionDaoFactory, itemDaoFactory);
+		BuyerInterface buyerInterface = new BuyerInterfaceServerImplV1(buyerDaoFactory, sellerDaoFactory, sessionDaoFactory, itemDaoFactory);
+		SellerInterface sellerInterface = new SellerInterfaceServerImplV1(sellerDaoFactory, sessionDaoFactory, itemDaoFactory);
 
 		// Basic buyer API calls
 		System.out.println("\n\nTesting Buyer edge cases");

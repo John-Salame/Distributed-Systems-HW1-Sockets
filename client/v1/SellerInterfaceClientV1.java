@@ -10,7 +10,7 @@
  */
 
 package client.v1;
-import common.SellerInterface;
+import common.interfaces.SellerInterface;
 import common.Item;
 import common.ItemId;
 import common.SaleListingId;

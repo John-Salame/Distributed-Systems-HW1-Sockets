@@ -4,15 +4,16 @@
  * CSCI 5673 Distributed Systems
  * Assignment 1 - Sockets
  * Description: Tries various buyer API functions, hardcoded, in order to test them out.
+ * This should work for testing a single client at a time.
  */
 
 package client.v1.socket.test;
 import client.v1.*;
 import client.v1.socket.BuyerSocketClientV1;
+import common.interfaces.BuyerInterface;
+import common.interfaces.SellerInterface;
 import common.Buyer;
-import common.BuyerInterface;
 import common.Seller;
-import common.SellerInterface;
 import common.Item;
 import common.ItemId;
 import common.SaleListing;
@@ -20,7 +21,7 @@ import common.SaleListingId;
 import java.io.IOException;
 import java.util.Arrays;
 
- public class BuyerClientTestSocket {
+public class BuyerClientTestSocket {
 	public static void main(String[] args) throws IOException {
 		String serverIp = "localhost";
 		int serverPort = 8100;
@@ -47,4 +48,4 @@ import java.util.Arrays;
 		System.out.println("Buyer 1 logging out");
 		buyerInterfaceClient.logout(buyer1SessionToken);
 	}
- }
+}
