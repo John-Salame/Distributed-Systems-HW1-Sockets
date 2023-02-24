@@ -1,0 +1,76 @@
+syntax = "proto3";
+
+option java_package="com.jsala.grpc.generated";
+
+service DBCustomerBuyer {
+	rpc createUser(LoginArgsGRPC) returns (BuyerIdGRPC);
+	rpc getUserId(LoginArgsGRPC) returns (BuyerIdGRPC);
+	rpc getBuyerById(BuyerIdGRPC) returns (BuyerGRPC);
+	rpc getSellerRating(SellerIdGRPC) returns (SellerRatingGRPC);
+	rpc closeConnection(Empty) returns (Empty);
+}
+
+service DBCustomerSeller {
+	rpc createUser(LoginArgsGRPC) returns (SellerIdGRPC);
+	rpc getUserId(LoginArgsGRPC) returns (SellerIdGRPC);
+	rpc getSellerById(SellerIdGRPC) returns (SellerGRPC);
+	rpc commitSeller(SellerGRPC) returns (Empty);
+	rpc closeConnection(Empty) returns (Empty);
+}
+
+// I've prepared for the eventuality that buyer id and seller id might diverge and the sessions database could split
+service DBCustomerSession {
+	rpc createBuyerSession(BuyerIdGRPC) returns (SessionTokenGRPC);
+	rpc createSellerSession(SellerIdGRPC) returns (SessionTokenGRPC);
+	rpc expireBuyerSession(SessionTokenGRPC) returns (Empty);
+	rpc expireSellerSession(SessionTokenGRPC) returns (Empty);
+	rpc getBuyerIdFromSession(SessionTokenGRPC) returns (BuyerIdGRPC);
+	rpc getSellerIdFromSession(SessionTokenGRPC) returns (SellerIdGRPC);
+	rpc listSessions(Empty) returns (SessionListGRPC);
+	rpc closeConnection(Empty) returns (Empty);
+}
+
+message LoginArgsGRPC {
+	string username = 1;
+	string password = 2;
+}
+
+message BuyerIdGRPC {
+	int32 buyerId = 1;
+}
+
+message BuyerGRPC {
+	string name = 1;
+	string password = 2;
+	BuyerIdGRPC buyerId = 3;
+	int32 numPurchases = 4;
+}
+
+message Empty {
+
+}
+
+message SellerIdGRPC {
+	int32 serllerId = 1;
+}
+
+message SellerRatingGRPC {
+	int32 positive = 1;
+	int32 negative = 2;
+}
+
+message SellerGRPC {
+	string name = 1;
+	string password = 2;
+	SellerIdGRPC serllerId = 3;
+	SellerRatingGRPC feedback = 4;
+	int32 numSold = 5;
+}
+
+message SessionTokenGRPC {
+	string sessionToken = 1;
+}
+
+message SessionListGRPC {
+	repeated SessionTokenGRPC sessions = 1;
+}

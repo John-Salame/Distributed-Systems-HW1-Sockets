@@ -3,16 +3,34 @@
 ## Group
 John Salame (solo)
 
+## GitHub Repo
+If for any reason something seems missing, check the GitHub repo I made for the project and check for branches associated with the programming assignment https://github.com/John-Salame/Distributed-Systems-HW1-Sockets
+
 ## Challenges Faced
 I attempted to set up the timing study after I got my sockets working well, but I ran into great difficulty once I tried to have two clients connecting at once.
 All of the server threads were using the same sockets to connect to the database, so data would be corrupted by multiple threads writing to the same socket.
 I eventually fixed this by creating one connection to the database per user.
-Thus, I was unable to create a testing framework for the timing studies, and I am missing many API functions.
+Thus, I was unable to create a testing framework for the timing studies, and I am missing many API functions.  
+After all that, I had a lot of trouble with building the program in Java. It was easy when there were no dependencies.
+However, I am not familiar with Maven and I had to spend a lot of time figuring it out, plus the protoc compiler for GRPC. I spent hours just figuring out how to compile my project.
+Then the dependencies caused my trouble since I had no classpath to them and I could not run my java files the same way I had done before.  
+My solution was to create one pom.xml for each program and set the main class (the entrypoint) for each.
+I have used both REST and GRPC before in CSCI 5253 Datacenter Scale Computing, but that was in Python and so I was learning everything along the way for this project.
 
 ## What I Completed
-I completed around half of the API for both buyers and sellers. I have sockets for client-server buyer, clinet-server seller, and server to Customer/Product databases.
-The customer database is complete with buyers, sellers, and sessions. My product database only has items, without any quantity or associated sale. No shopping cart, sale listing, purchase, or review exists yet.
-If for any reason something seems missing, check the GitHub repo I made for the project and check for branches associated with the programming assignment https://github.com/John-Salame/Distributed-Systems-HW1-Sockets
+I completed around half of the API for both buyers and sellers.
+The customer database is complete with buyers, sellers, and sessions. My product database only has items, without any quantity or associated sale.
+No shopping cart, sale listing, purchase, or review exists yet.
+### Sockets
+The program supports multithreading on both the client and the server. Each client has its own thread and spawns a server thread when the server accepts the connection.
+Each server thread has its own connection to the databases.
+### REST
+I did not have time to implement REST. For the REST client, I planned to use the built-in tools from java.net.http.
+For the REST server, I planned to use Spring.
+### GRPC
+I have GRPC working for the Buyer database on the Customer database machine. I did not have time to implement error handling from status codes.
+### SOAP
+I did not have time to research or attempt SOAP.
 
 ## Running
 On 6 terminals, run these commands:

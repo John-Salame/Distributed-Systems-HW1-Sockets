@@ -7,7 +7,7 @@
  * This adds decoupling and on-demand DAO creation.
  */
 
-package server.v1.factory;
+package com.jsala.server.v1.factory;
 import com.jsala.dao.*;
 import com.jsala.dao.factory.CustomerDAOFactory;
 import com.jsala.server.v1.socket.DBCustomerBuyerSocketClientV1;

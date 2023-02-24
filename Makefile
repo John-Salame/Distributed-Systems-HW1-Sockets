@@ -5,14 +5,14 @@
 # change this if your Maven downloads dependencies elsewhere
 MAVEN_LOCAL_REPO = "/c/Users/${USER}/.m2"
 # which directory to compile classes to
-CLASSDEST = -d target/classes
+CLASSDEST = target/classes
 # where to look for classes
-CLASSPATH = -cp "$(CLASSDEST);$(MAVEN_LOCAL_REPO)/repository"
+CLASSPATH = "$(CLASSDEST);$(MAVEN_LOCAL_REPO)"
 # where to look for java files during compilation
 SOURCEPATH = -sourcepath "${PWD}/src/main/java"
-JFLAGS = -g -Xlint:deprecation -Xlint:unchecked $(SOURCEPATH) $(CLASSPATH) $(CLASSDEST)
+JFLAGS = -g -Xlint:deprecation -Xlint:unchecked $(SOURCEPATH) -cp $(CLASSPATH) -d $(CLASSDEST)
 JC = "/c/Program Files/Common Files/Oracle/Java/javapath/javac"
-JR = "/c/Program Files/Common Files/Oracle/Java/javapath/java" $(CLASSPATH)
+JR = "/c/Program Files/Common Files/Oracle/Java/javapath/java" -cp $(CLASSPATH)
 RM = rm
 .SUFFIXES: .java .class
 .java.class:
@@ -34,12 +34,13 @@ CLASSES_DB_SOCKET = \
 CLASSES_CLIENT_REST = \
 	src/main/java/com/jsala/client/v1/rest/BuyerClientRESTV1.java
 
-all: classes
+all: mvn_build
 
 clean:
-	find . -name "*.class" -type f -delete
+	mvn clean
+	# find . -name "*.class" -type f -delete
 
-# maven build
+# use Maven to compile the code
 mvn_build:
 	mvn -e -Dmaven.repo.local=$(MAVEN_LOCAL_REPO) compile
 
@@ -51,19 +52,19 @@ db_rest:
 	$(CLASSES_DB_REST:.java=.class)
 
 run_buyer_client:
-	$(JR) src/client/v1/timing/socket/BuyerClientTimingStudySocket.java
+	$(JR) com/jsala/client/v1/timing/socket/BuyerClientTimingStudySocket.java
 
 run_buyer_server:
-	$(JR) src/server/v1/socket/test/BuyerServerTestSocket.java
+	$(JR) com/jsala/server/v1/socket/test/BuyerServerTestSocket.java
 
 run_seller_client:
-	$(JR) src/client/v1/timing/socket/SellerClientTimingStudySocket.java
+	$(JR) com/jsala/client/v1/timing/socket/SellerClientTimingStudySocket.java
 
 run_seller_server:
-	$(JR) src/server/v1/socket/test/SellerServerTestSocket.java
+	$(JR) com/jsala/server/v1/socket/test/SellerServerTestSocket.java
 
 run_db_customer:
-	$(JR) src/db/customer/DBCustomerRunner.java
+	$(JR) com/jsala/db/customer/DBCustomerRunner.java
 
 run_db_product:
-	$(JR) src/db/product/DBProductRunner.java
+	$(JR) com/jsala/db/product/DBProductRunner.java

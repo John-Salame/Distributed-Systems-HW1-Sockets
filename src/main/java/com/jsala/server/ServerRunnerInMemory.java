@@ -7,8 +7,8 @@
  */
 
 package com.jsala.server;
-import com.jsala.common.interface.BuyerInterface;
-import com.jsala.common.interface.SellerInterface;
+import com.jsala.common.interfaces.BuyerInterface;
+import com.jsala.common.interfaces.SellerInterface;
 import com.jsala.common.Buyer;
 import com.jsala.common.Item;
 import com.jsala.common.ItemId;

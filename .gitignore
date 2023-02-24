@@ -12,6 +12,7 @@ errorLog.txt
 # Java classes
 *.class
 class/
+target/
 
 # User-specific files
 *.rsuser

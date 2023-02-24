@@ -7,17 +7,37 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.source>8</maven.compiler.source>
+    <maven.compiler.target>8</maven.compiler.target>
     <grpc.version>1.53.0</grpc.version>
     <gson.version>2.10.1</gson.version>
-    <plugin.protoc.version>3.6.0.1</plugin.protoc.version>
   </properties>
 
   <dependencies>
-    
+
+    <!-- https://github.com/grpc/grpc-java/blob/master/README.md -->
     <dependency>
       <groupId>io.grpc</groupId>
-      <artifactId>grpc-all</artifactId>
-      <version>${grpc.version}</version>
+      <artifactId>grpc-netty-shaded</artifactId>
+      <version>1.52.1</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.grpc</groupId>
+      <artifactId>grpc-protobuf</artifactId>
+      <version>1.52.1</version>
+    </dependency>
+    <dependency>
+      <groupId>io.grpc</groupId>
+      <artifactId>grpc-stub</artifactId>
+      <version>1.52.1</version>
+    </dependency>
+    <dependency>
+      <!-- necessary for Java 9+ -->
+      <groupId>org.apache.tomcat</groupId>
+      <artifactId>annotations-api</artifactId>
+      <version>6.0.53</version>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
@@ -28,53 +48,46 @@
 
   </dependencies>
 
+  <!-- https://github.com/grpc/grpc-java/blob/master/README.md -->
   <build>
-    <defaultGoal>clean generate-sources compile install</defaultGoal>
-
+    <extensions>
+      <extension>
+        <groupId>kr.motd.maven</groupId>
+        <artifactId>os-maven-plugin</artifactId>
+        <version>1.7.1</version>
+      </extension>
+    </extensions>
     <plugins>
-      <!-- compile proto file into java files. -->
-      <plugin>
-        <groupId>com.github.os72</groupId>
-        <artifactId>protoc-jar-maven-plugin</artifactId>
-        <version>${plugin.protoc.version}</version>
-        <executions>
-          <execution>
-            <phase>generate-sources</phase>
-            <goals>
-              <goal>run</goal>
-            </goals>
-            <configuration>
-              <includeMavenTypes>direct</includeMavenTypes>
-
-              <inputDirectories>
-                <include>src/main/resources/protobuf</include>
-              </inputDirectories>
-
-              <outputTargets>
-                <outputTarget>
-                  <type>java</type>
-                  <outputDirectory>src/main/java</outputDirectory>
-                </outputTarget>
-                <outputTarget>
-                  <type>grpc-java</type>
-                  <pluginArtifact>io.grpc:protoc-gen-grpc-java:1.15.0</pluginArtifact>
-                  <outputDirectory>src/main/java</outputDirectory>
-                </outputTarget>
-              </outputTargets>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
-
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.8.0</version>
         <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
+          <excludes>
+            <source>1.8</source>
+            <target>1.8</target>
+            <exclude>com/jsala/dao/PurchaseDAOInMemory.java</exclude>
+            <exclude>com/jsala/server/ServerRunnerInMemory.java</exclude>
+          </excludes>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.xolstice.maven.plugins</groupId>
+        <artifactId>protobuf-maven-plugin</artifactId>
+        <version>0.6.1</version>
+        <configuration>
+          <protocArtifact>com.google.protobuf:protoc:3.21.7:exe:${os.detected.classifier}</protocArtifact>
+          <pluginId>grpc-java</pluginId>
+          <pluginArtifact>io.grpc:protoc-gen-grpc-java:1.52.1:exe:${os.detected.classifier}</pluginArtifact>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>compile</goal>
+              <goal>compile-custom</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

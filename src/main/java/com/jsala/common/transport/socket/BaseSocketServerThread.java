@@ -10,7 +10,7 @@
 
 package com.jsala.common.transport.socket;
 import com.jsala.common.transport.serialize.SerializeString;
-java.net.*;
+import java.net.*;
 import java.io.DataOutputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
