@@ -47,7 +47,8 @@ clean:
 	mvn clean
 	# find . -name "*.class" -type f -delete
 
-# use Maven to compile the code
+
+# use Maven to compile the code and place the jars in MAVEN_LOCAL_REPO
 mvn_install:
 	mvn $(MAVEN_ARGS) install
 

@@ -12,6 +12,10 @@
   <artifactId>distributed-systems-rpc-buyer-server</artifactId>
   <version>1.0-SNAPSHOT</version>
 
+  <properties>
+    <main.class>com.jsala.server.v1.grpc.BuyerServerGRPCRunner</main.class>
+  </properties>
+
   <!-- Runnable jar files https://kuniganotas.wordpress.com/2011/10/09/maven-specify-entry-point-main-class-in-a-jar-package/ -->
   <build>
     <plugins>

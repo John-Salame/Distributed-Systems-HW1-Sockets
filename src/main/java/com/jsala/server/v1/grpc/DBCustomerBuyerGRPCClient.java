@@ -9,9 +9,13 @@
  */
 
 package com.jsala.server.v1.grpc;
+import com.jsala.common.transport.grpc.GRPCAdaptor;
+import com.jsala.common.transport.grpc.GRPCErrorCodes;
 import com.jsala.common.Buyer;
 import com.jsala.dao.BuyerDAO;
 import com.jsala.grpc.generated.CustomerGRPC;
+import com.jsala.grpc.generated.CustomerGRPC.BuyerGRPC;
+import com.jsala.grpc.generated.CustomerGRPC.BuyerGRPC.Builder;
 import com.jsala.grpc.generated.CustomerGRPC.BuyerIdGRPC;
 import com.jsala.grpc.generated.CustomerGRPC.LoginArgsGRPC;
 import com.jsala.grpc.generated.DBCustomerBuyerGrpc;
@@ -24,21 +28,25 @@ import java.util.NoSuchElementException;
 public class DBCustomerBuyerGRPCClient implements BuyerDAO {
 	private String hostname; // remote host
 	private int port; // remote port
+	private ManagedChannel channel;
 	private DBCustomerBuyerBlockingStub stub;
 
-	public DBCustomerBuyerGRPCClient(ManagedChannelBuilder channelBuilder) {
-		ManagedChannel channel = ManagedChannelBuilder.forAddress(this.hostname, this.port).usePlaintext().build();
+	public DBCustomerBuyerGRPCClient(ManagedChannel channel) {
+		this.channel = channel;
 		this.stub = DBCustomerBuyerGrpc.newBlockingStub(channel);
 	}
 
+	// BuyerDAO methods
+
 	// return the user id
+	@Override
 	public int createUser(String username, String password) throws IOException, IllegalArgumentException {
 		try {
 			CustomerGRPC.LoginArgsGRPC loginArgs = CustomerGRPC.LoginArgsGRPC.newBuilder()
 				.setUsername(username)
 				.setPassword(password)
 				.build();
-			CustomerGRPC.BuyerIdGRPC response = this.stub.createUser(loginArgs);
+			CustomerGRPC.BuyerIdGRPC response = this.stub.createBuyer(loginArgs);
 			return response.getBuyerId();
 		} catch (Exception e) {
 			throw new IOException(e.getMessage()); // I will abandon all other types of errors for now
@@ -46,18 +54,32 @@ public class DBCustomerBuyerGRPCClient implements BuyerDAO {
 		// once I figure out how, get the status code and run it through the method that might throw an error
 		//   com.jsala.common.transport.grpc.GRPCErrorCodes.generateExceptionFromStatus
 	}
+	@Override
 	public int getUserId(String username, String password) throws IOException, NoSuchElementException {
-		CustomerGRPC.LoginArgsGRPC loginArgs = CustomerGRPC.LoginArgsGRPC.newBuilder()
-			.setUsername(username)
-			.setPassword(password)
-			.build();
-		CustomerGRPC.BuyerIdGRPC response = this.stub.getUserId(loginArgs);
-		return response.getBuyerId();
+		try {
+			CustomerGRPC.LoginArgsGRPC loginArgs = CustomerGRPC.LoginArgsGRPC.newBuilder()
+				.setUsername(username)
+				.setPassword(password)
+				.build();
+			CustomerGRPC.BuyerIdGRPC response = this.stub.getBuyerId(loginArgs);
+			return response.getBuyerId();
+		} catch (Exception e) {
+			throw new IOException(e.getMessage()); // I will abandon all other types of errors for now
+		}
 	}
+	@Override
 	public Buyer getBuyerById(int buyerId) throws IOException, NoSuchElementException {
-		return null;
+		try {
+			BuyerIdGRPC buyerIdGrpc = BuyerIdGRPC.newBuilder().setBuyerId(buyerId).build();
+			BuyerGRPC response = this.stub.getBuyerById(buyerIdGrpc);
+			return GRPCAdaptor.toBuyer(response);
+		} catch (Exception e) {
+			throw new IOException(e.getMessage()); // I will abandon all other types of errors for now
+		}
 	}
+	// do not call an RPC, just close this end.
+	@Override
 	public void closeConnection() throws IOException {
-
+		this.channel.shutdown();
 	}
 }

@@ -69,7 +69,7 @@ Then we normalize the edit distance a bit so it's more or less based on the perc
 * Due to lack of synchronization code, the database has plenty of unprotected critical sections, such as user account creation. During one run, I had an instance where two buyers received buyer ID 1.
 *  * I have checks preventing somebody from receiving a userID if that ID already exists for a user with a different username and password. This proves that it is an issue of synchronization.
 *
-* The seller program stops if the wrong user tries to change the price of an item. It should continue until a logout, but it does not.
+* 
 
 ## Socket Solution
 I essentially implemented at most once RPCs with sockets. If there is a connection failure during a client API call, 

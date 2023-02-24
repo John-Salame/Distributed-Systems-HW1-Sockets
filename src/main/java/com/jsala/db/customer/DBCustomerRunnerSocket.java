@@ -1,5 +1,5 @@
 /**
- * Class DBCustomerRunner
+ * Class DBCustomerRunnerSocket
  * Author: John Salame
  * CSCI 5673 Distributed Systems
  * Assignment 1 - Sockets
@@ -13,7 +13,7 @@ import com.jsala.dao.SellerDAO;
 import com.jsala.dao.SessionDAO;
 import java.net.SocketException;
 
-public class DBCustomerRunner {
+public class DBCustomerRunnerSocket {
 	public static void main(String[] args) throws SocketException {
 		int port = 8300;
 		int maxConnections = 10;
