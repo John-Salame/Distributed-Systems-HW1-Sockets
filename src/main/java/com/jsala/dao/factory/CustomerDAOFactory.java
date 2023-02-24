@@ -1,0 +1,18 @@
+/**
+ * Interface CustomerDAOFactory
+ * Author: John Salame
+ * CSCI 5673 Distributed Systems
+ * Assignment 1 - Sockets
+ * Description: Creates concrete DAOs associated with the Customer database.
+ * This adds decoupling and on-demand DAO creation.
+ */
+
+package com.jsala.dao.factory;
+import com.jsala.dao.*;
+import java.lang.reflect.InvocationTargetException;
+
+public interface CustomerDAOFactory {
+	public abstract BuyerDAO createBuyerDao() throws InvocationTargetException;
+	public abstract SellerDAO createSellerDao() throws InvocationTargetException;
+	public abstract SessionDAO createSessionDao() throws InvocationTargetException;
+}

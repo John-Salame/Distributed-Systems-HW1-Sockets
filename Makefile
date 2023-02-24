@@ -1,88 +1,85 @@
 # Modified from https://www.cs.swarthmore.edu/~newhall/unixhelp/javamakefiles.html
 # use current directory as class path
-CLASSPATH = -cp "${PWD}"
-JFLAGS = -g -Xlint:deprecation $(CLASSPATH)
+# Help with classpath: https://www3.ntu.edu.sg/home/ehchua/programming/java/J9c_PackageClasspath.html
+
+# change this if your Maven downloads dependencies elsewhere
+MAVEN_LOCAL_REPO = "/c/Users/${USER}/.m2"
+MAVEN_ARGS = -e -Dmaven.repo.local=$(MAVEN_LOCAL_REPO)
+# which directory to compile classes to
+CLASSDEST = target/classes
+# where to look for classes
+CLASSPATH = "$(CLASSDEST);$(MAVEN_LOCAL_REPO)"
+# where to look for java files during compilation
+SOURCEPATH = -sourcepath "${PWD}/src/main/java"
+JFLAGS = -g -Xlint:deprecation -Xlint:unchecked $(SOURCEPATH) -cp $(CLASSPATH) -d $(CLASSDEST)
 JC = "/c/Program Files/Common Files/Oracle/Java/javapath/javac"
-JR = "/c/Program Files/Common Files/Oracle/Java/javapath/java" $(CLASSPATH)
+JR = "/c/Program Files/Common Files/Oracle/Java/javapath/java" -cp $(CLASSPATH)
 RM = rm
 .SUFFIXES: .java .class
 .java.class:
 	$(JC) $(JFLAGS) $*.java
 
 CLASSES = \
-	client/v1/BuyerInterfaceClientV1.java \
-	client/v1/BuyerSocketClientV1.java \
-	client/v1/SellerInterfaceClientV1.java \
-	client/v1/SellerSocketClientV1.java \
-	client/BuyerRunnerClient.java \
-	client/SellerRunnerClient.java \
-	common/transport/serialize/SerializeInt.java \
-	common/transport/serialize/SerializeIntArray.java \
-	common/transport/serialize/SerializeLogin.java \
-	common/transport/serialize/SerializeString.java \
-	common/transport/socket/APIEnumV1.java \
-	common/transport/socket/BaseSocketClient.java \
-	common/transport/socket/BaseSocketServerThread.java \
-	common/transport/socket/BuyerEnumV1.java \
-	common/transport/socket/DBSellerEnumV1.java \
-	common/transport/socket/PacketPrefix.java \
-	common/transport/socket/SellerEnumV1.java \
-	common/transport/socket/SocketMessage.java \
-	common/Buyer.java \
-	common/BuyerInterface.java \
-	common/CartItem.java \
-	common/CommonUserInterface.java \
-	common/Item.java \
-	common/ItemId.java \
-	common/SaleListing.java \
-	common/SaleListingId.java \
-	common/Seller.java \
-	common/SellerInterface.java \
-	dao/BuyerDAO.java \
-	dao/BuyerDAOInMemory.java \
-	dao/ItemDAO.java \
-	dao/SaleListingDAO.java \
-	dao/SellerDAO.java \
-	dao/SessionDAO.java \
-	dao/SessionDAOInMemory.java \
-	dao/ShoppingCartDAO.java \
-	db/customer/v1/DBCustomerSocketServerListenerV1.java \
-	db/customer/v1/DBCustomerSocketServerThreadV1.java \
-	db/customer/SellerDAOInMemory.java \
-	server/v1/BuyerInterfaceServerV1.java \
-	server/v1/BuyerSocketServerListenerV1.java \
-	server/v1/BuyerSocketServerThreadV1.java \
-	server/v1/DBCustomerSocketClientV1.java \
-	server/v1/SellerInterfaceServerV1.java \
-	server/v1/SellerSocketServerListenerV1.java \
-	server/v1/SellerSocketServerThreadV1.java \
-	server/ServerRunnerInMemory.java \
-	server/BuyerRunnerServer.java \
-	server/SellerRunnerServer.java \
-	util/EditDistance.java
+	src/main/java/com/jsala/client/v1/rest/BuyerClientRESTV1.java \
+	src/main/java/com/jsala/client/v1/timing/socket/BuyerClientTimingStudySocket.java \
+	src/main/java/com/jsala/client/v1/timing/socket/SellerClientTimingStudySocket.java \
+	src/main/java/com/jsala/server/v1/socket/test/BuyerServerTestSocket.java \
+	src/main/java/com/jsala/server/v1/socket/test/SellerServerTestSocket.java \
+	src/main/java/com/jsala/db/customer/DBCustomerRunner.java \
+	src/main/java/com/jsala/db/product/DBProductRunner.java
 
-all: classes
+CLASSES_DB_SOCKET = \
+	src/main/java/com/jsala/db/customer/DBCustomerRunner.java \
+	src/main/java/com/jsala/db/product/DBProductRunner.java
+
+CLASSES_CLIENT_REST = \
+	src/main/java/com/jsala/client/v1/rest/BuyerClientRESTV1.java
+
+all: mvn_install \
+	mvn_install_buyer_client \
+	mvn_install_buyer_server \
+	mvn_install_seller_client \
+	mvn_install_seller_server \
+	mvn_install_db_customer \
+	mvn_install_db_product
+
+clean:
+	mvn clean
+	# find . -name "*.class" -type f -delete
+
+
+# use Maven to compile the code and place the jars in MAVEN_LOCAL_REPO
+mvn_install:
+	mvn $(MAVEN_ARGS) install
 
 classes: $(CLASSES:.java=.class)
 
-clean:
-	$(RM) **/*.class
+db_socket: $(CLASSES_DB_SOCKET:.java=.class)
 
-# Run the server's test program using server-local in-memory "databases"
-run_server_in_memory:
-	$(JR) server/ServerRunnerInMemory
+db_rest:
+	$(CLASSES_DB_REST:.java=.class)
 
+mvn_install_buyer_client:
+	mvn $(MAVEN_ARGS) -f pom_buyer_client.xml install
 run_buyer_client:
-	$(JR) client/BuyerRunnerClient.java
-
+	java -jar $(MAVEN_LOCAL_REPO)/com/jsala/distributed-systems-rpc-buyer-client/1.0-SNAPSHOT/distributed-systems-rpc-buyer-client-1.0-SNAPSHOT.jar
+mvn_install_buyer_server:
+	mvn $(MAVEN_ARGS) -f pom_buyer_server.xml install
 run_buyer_server:
-	$(JR) server/BuyerRunnerServer.java
-
+	java -jar $(MAVEN_LOCAL_REPO)/com/jsala/distributed-systems-rpc-buyer-server/1.0-SNAPSHOT/distributed-systems-rpc-buyer-server-1.0-SNAPSHOT.jar
+mvn_install_seller_client:
+	mvn $(MAVEN_ARGS) -f pom_seller_client.xml install
 run_seller_client:
-	$(JR) client/SellerRunnerClient.Java
-
+	java -jar $(MAVEN_LOCAL_REPO)/com/jsala/distributed-systems-rpc-seller-client/1.0-SNAPSHOT/distributed-systems-rpc-seller-client-1.0-SNAPSHOT.jar
+mvn_install_seller_server:
+	mvn $(MAVEN_ARGS) -f pom_seller_server.xml install
 run_seller_server:
-	$(JR) server/SellerRunnerServer.java
-
+	java -jar $(MAVEN_LOCAL_REPO)/com/jsala/distributed-systems-rpc-seller-server/1.0-SNAPSHOT/distributed-systems-rpc-seller-server-1.0-SNAPSHOT.jar
+mvn_install_db_customer:
+	mvn $(MAVEN_ARGS) -f pom_db_customer.xml install
 run_db_customer:
-	$(JR) db/customer/CustomerRunner.java
+	java -jar $(MAVEN_LOCAL_REPO)/com/jsala/distributed-systems-rpc-db-customer/1.0-SNAPSHOT/distributed-systems-rpc-db-customer-1.0-SNAPSHOT.jar
+mvn_install_db_product:
+	mvn $(MAVEN_ARGS) -f pom_db_product.xml install
+run_db_product:
+	java -jar $(MAVEN_LOCAL_REPO)/com/jsala/distributed-systems-rpc-db-product/1.0-SNAPSHOT/distributed-systems-rpc-db-product-1.0-SNAPSHOT.jar

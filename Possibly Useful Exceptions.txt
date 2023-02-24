@@ -1,0 +1,6 @@
+ConcurrentModificationException
+Illegal­State­Exception
+UnsupportedOperationException
+
+TO-DO: Maybe return a byte[] based on the exception caught inside demux or one of its derivatives.
+On the client side, parse networked exceptions inside sendAndReceive() and then throw the appropriate exception.

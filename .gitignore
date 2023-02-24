@@ -3,8 +3,16 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+# configuration
+setup_maven.sh
+
+# logs
+errorLog.txt
+
 # Java classes
 *.class
+class/
+target/
 
 # User-specific files
 *.rsuser
