@@ -41,7 +41,9 @@ Each server thread has its own connection to the databases.
 I did not have time to implement REST. For the REST client, I planned to use the built-in tools from java.net.http.
 For the REST server, I planned to use Spring.
 ### GRPC
-I have GRPC working for the Buyer database on the Customer database machine. I did not have time to implement error handling from status codes.
+I almost got GRPC working for the Buyer database on the Customer database machine. I did not have time to implement error handling from status codes.  
+After working on it for 11 hours straight, I don't have much to show for it.
+I got an error "java.lang.NoClassDefFoundError: io/grpc/BindableService" at 6:00 AM and decided that was enough.
 ### SOAP
 I did not have time to research or attempt SOAP.
 
@@ -69,7 +71,7 @@ Then we normalize the edit distance a bit so it's more or less based on the perc
 * Due to lack of synchronization code, the database has plenty of unprotected critical sections, such as user account creation. During one run, I had an instance where two buyers received buyer ID 1.
 *  * I have checks preventing somebody from receiving a userID if that ID already exists for a user with a different username and password. This proves that it is an issue of synchronization.
 *
-* 
+* The GRPC server can't start up. It is 6:00 AM past the agreed due date and I don't want to troubleshoot more. I think I will put this assignment to rest.
 
 ## Socket Solution
 I essentially implemented at most once RPCs with sockets. If there is a connection failure during a client API call, 
