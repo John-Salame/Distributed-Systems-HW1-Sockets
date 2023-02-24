@@ -4,6 +4,7 @@
 
 # change this if your Maven downloads dependencies elsewhere
 MAVEN_LOCAL_REPO = "/c/Users/${USER}/.m2"
+MAVEN_ARGS = -e -Dmaven.repo.local=$(MAVEN_LOCAL_REPO)
 # which directory to compile classes to
 CLASSDEST = target/classes
 # where to look for classes
@@ -34,15 +35,21 @@ CLASSES_DB_SOCKET = \
 CLASSES_CLIENT_REST = \
 	src/main/java/com/jsala/client/v1/rest/BuyerClientRESTV1.java
 
-all: mvn_build buyer_client
+all: mvn_install \
+	mvn_install_buyer_client \
+	mvn_install_buyer_server \
+	mvn_install_seller_client \
+	mvn_install_seller_server \
+	mvn_install_db_customer \
+	mvn_install_db_product
 
 clean:
 	mvn clean
 	# find . -name "*.class" -type f -delete
 
 # use Maven to compile the code
-mvn_build:
-	mvn -e -Dmaven.repo.local=$(MAVEN_LOCAL_REPO) install
+mvn_install:
+	mvn $(MAVEN_ARGS) install
 
 classes: $(CLASSES:.java=.class)
 
@@ -51,20 +58,27 @@ db_socket: $(CLASSES_DB_SOCKET:.java=.class)
 db_rest:
 	$(CLASSES_DB_REST:.java=.class)
 
-buyer_client:
-	mvn -f pom_buyer_client.xml install exec:java
-
+mvn_install_buyer_client:
+	mvn $(MAVEN_ARGS) -f pom_buyer_client.xml install
+run_buyer_client:
+	java -jar $(MAVEN_LOCAL_REPO)/com/jsala/distributed-systems-rpc-buyer-client/1.0-SNAPSHOT/distributed-systems-rpc-buyer-client-1.0-SNAPSHOT.jar
+mvn_install_buyer_server:
+	mvn $(MAVEN_ARGS) -f pom_buyer_server.xml install
 run_buyer_server:
-	$(JR) com/jsala/server/v1/socket/test/BuyerServerTestSocket.java
-
+	java -jar $(MAVEN_LOCAL_REPO)/com/jsala/distributed-systems-rpc-buyer-server/1.0-SNAPSHOT/distributed-systems-rpc-buyer-server-1.0-SNAPSHOT.jar
+mvn_install_seller_client:
+	mvn $(MAVEN_ARGS) -f pom_seller_client.xml install
 run_seller_client:
-	$(JR) com/jsala/client/v1/timing/socket/SellerClientTimingStudySocket.java
-
+	java -jar $(MAVEN_LOCAL_REPO)/com/jsala/distributed-systems-rpc-seller-client/1.0-SNAPSHOT/distributed-systems-rpc-seller-client-1.0-SNAPSHOT.jar
+mvn_install_seller_server:
+	mvn $(MAVEN_ARGS) -f pom_seller_server.xml install
 run_seller_server:
-	$(JR) com/jsala/server/v1/socket/test/SellerServerTestSocket.java
-
+	java -jar $(MAVEN_LOCAL_REPO)/com/jsala/distributed-systems-rpc-seller-server/1.0-SNAPSHOT/distributed-systems-rpc-seller-server-1.0-SNAPSHOT.jar
+mvn_install_db_customer:
+	mvn $(MAVEN_ARGS) -f pom_db_customer.xml install
 run_db_customer:
-	$(JR) com/jsala/db/customer/DBCustomerRunner.java
-
+	java -jar $(MAVEN_LOCAL_REPO)/com/jsala/distributed-systems-rpc-db-customer/1.0-SNAPSHOT/distributed-systems-rpc-db-customer-1.0-SNAPSHOT.jar
+mvn_install_db_product:
+	mvn $(MAVEN_ARGS) -f pom_db_product.xml install
 run_db_product:
-	$(JR) com/jsala/db/product/DBProductRunner.java
+	java -jar $(MAVEN_LOCAL_REPO)/com/jsala/distributed-systems-rpc-db-product/1.0-SNAPSHOT/distributed-systems-rpc-db-product-1.0-SNAPSHOT.jar

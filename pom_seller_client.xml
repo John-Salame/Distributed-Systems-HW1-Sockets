@@ -9,7 +9,7 @@
 
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.jsala</groupId>
-  <artifactId>distributed-systems-rpc-buyer-client</artifactId>
+  <artifactId>distributed-systems-rpc-seller-client</artifactId>
   <version>1.0-SNAPSHOT</version>
 
   <!-- Runnable jar files https://kuniganotas.wordpress.com/2011/10/09/maven-specify-entry-point-main-class-in-a-jar-package/ -->
@@ -22,7 +22,7 @@
           <archive>
             <manifest>
               <addClasspath>true</addClasspath>
-              <mainClass>com.jsala.client.v1.timing.socket.BuyerClientTimingStudySocket</mainClass>
+              <mainClass>com.jsala.client.v1.timing.socket.SellerClientTimingStudySocket</mainClass>
             </manifest>
           </archive>
         </configuration>

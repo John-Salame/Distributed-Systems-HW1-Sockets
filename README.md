@@ -6,6 +6,19 @@ John Salame (solo)
 ## GitHub Repo
 If for any reason something seems missing, check the GitHub repo I made for the project and check for branches associated with the programming assignment https://github.com/John-Salame/Distributed-Systems-HW1-Sockets
 
+## Building
+Run "make build"
+## Running
+On 6 terminals, make sure your environment variables from setup_maven_template.sh are set up for your system.
+Also modify the MAVEN_LOCAL_REPO environment variable in the makefile to where you want the jar files installed.
+Then, run each of these commands:
+* make run_db_customer
+* make run_db_product
+* make run_buyer_server
+* make run_seller_server
+* make run_buyer_client
+* make run_seller_client
+
 ## Challenges Faced
 I attempted to set up the timing study after I got my sockets working well, but I ran into great difficulty once I tried to have two clients connecting at once.
 All of the server threads were using the same sockets to connect to the database, so data would be corrupted by multiple threads writing to the same socket.
@@ -32,14 +45,6 @@ I have GRPC working for the Buyer database on the Customer database machine. I d
 ### SOAP
 I did not have time to research or attempt SOAP.
 
-## Running
-On 6 terminals, run these commands:
-* make run_db_customer
-* make run_db_product
-* make run_buyer_server
-* make run_seller_server
-* make run_buyer_client
-* make run_seller_client
 
 ## Search Function
 My search used the Levenshtein distance against the keywords in each item.  
