@@ -1,0 +1,38 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <parent>
+    <groupId>com.jsala</groupId>
+    <artifactId>distributed-systems-rpc</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <relativePath>./pom.xml</relativePath>
+  </parent>
+
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.jsala</groupId>
+  <artifactId>distributed-systems-rpc-buyer-client</artifactId>
+  <version>1.0-SNAPSHOT</version>
+
+  <!-- Runnable jar files http://www.mastertheboss.com/jboss-frameworks/jboss-maven/run-a-java-class-from-maven-made-simple/ -->
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>3.0.0</version>
+        <executions>
+          <execution>
+            <id>my-execution</id>
+            <phase>package</phase>
+            <goals>
+              <goal>java</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <mainClass>com.jsala.client.v1.timing.socket.BuyerClientTimingStudySocket</mainClass>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

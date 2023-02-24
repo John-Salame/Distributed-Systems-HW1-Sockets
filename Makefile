@@ -34,7 +34,7 @@ CLASSES_DB_SOCKET = \
 CLASSES_CLIENT_REST = \
 	src/main/java/com/jsala/client/v1/rest/BuyerClientRESTV1.java
 
-all: mvn_build
+all: mvn_build buyer_client
 
 clean:
 	mvn clean
@@ -42,7 +42,7 @@ clean:
 
 # use Maven to compile the code
 mvn_build:
-	mvn -e -Dmaven.repo.local=$(MAVEN_LOCAL_REPO) compile
+	mvn -e -Dmaven.repo.local=$(MAVEN_LOCAL_REPO) install
 
 classes: $(CLASSES:.java=.class)
 
@@ -51,8 +51,8 @@ db_socket: $(CLASSES_DB_SOCKET:.java=.class)
 db_rest:
 	$(CLASSES_DB_REST:.java=.class)
 
-run_buyer_client:
-	$(JR) com/jsala/client/v1/timing/socket/BuyerClientTimingStudySocket.java
+buyer_client:
+	mvn -f pom_buyer_client.xml install exec:java
 
 run_buyer_server:
 	$(JR) com/jsala/server/v1/socket/test/BuyerServerTestSocket.java
