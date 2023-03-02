@@ -3,22 +3,16 @@
  * Author: John Salame
  * CSCI 5673 Distributed Systems
  * Assignment 2 - RPC
- * Description: Creates the buyer server
- * This adds decoupling and on-demand DAO creation.
+ * Description: Creates the buyer server using sockets to client and GRPC to connect to the database
  */
 
-package com.jsala.server.v1.grpc;
+package com.jsala.server.v1.starter.buyer;
 import com.jsala.common.interfaces.factory.UserInterfaceFactory;
-import com.jsala.common.interfaces.BuyerInterface;
-import com.jsala.dao.*;
-import com.jsala.dao.factory.*;
 import com.jsala.server.v1.factory.*;
 import com.jsala.server.v1.socket.*;
-import com.jsala.server.v1.*;
-import java.net.SocketException;
 
 
-public class BuyerServerGRPCRunner {
+public class BuyerServerSocketGRPCRunner {
 	public static void main(String args) {
 		// use sockets to listen to the client for now
 		int serverPort = 8100;

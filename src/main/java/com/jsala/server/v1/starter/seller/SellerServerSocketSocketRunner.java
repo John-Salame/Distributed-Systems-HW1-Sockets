@@ -3,11 +3,11 @@
  * Author: John Salame
  * CSCI 5673 Distributed Systems
  * Assignment 1 - Sockets
- * Description: Test the seller interface by setting up the server-side transport layer (sockets)
+ * Description: Test the seller interface by setting up the server-side transport layer (sockets to clients and to databases)
  * This should work for testing a single client at a time.
  */
 
-package com.jsala.server.v1.socket.test;
+package com.jsala.server.v1.starter.seller;
 import com.jsala.common.interfaces.factory.UserInterfaceFactory;
 import com.jsala.common.interfaces.SellerInterface;
 import com.jsala.common.Seller;
@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.net.SocketException;
 import java.lang.reflect.InvocationTargetException;
 
-public class SellerServerTestSocket {
+public class SellerServerSocketSocketRunner {
 	public static void main(String[] args) throws IOException {
 		int serverPort = 8200;
 		int maxConnections = 100;

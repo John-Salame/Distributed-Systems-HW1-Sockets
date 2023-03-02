@@ -22,7 +22,7 @@
           <archive>
             <manifest>
               <addClasspath>true</addClasspath>
-              <mainClass>com.jsala.server.v1.socket.test.SellerServerTestSocket</mainClass>
+              <mainClass>com.jsala.server.v1.starter.seller.SellerServerSocketSocketRunner</mainClass>
             </manifest>
           </archive>
         </configuration>

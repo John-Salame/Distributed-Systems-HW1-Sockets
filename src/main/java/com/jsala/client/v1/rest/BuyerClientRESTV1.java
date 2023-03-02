@@ -38,7 +38,7 @@ public class BuyerClientRESTV1 implements BuyerInterface {
 			this.port = port;
 		}
 		this.hostname = hostname;
-		this.context = "buyer";
+		this.context = "buyer/v1";
 	}
 
 	// helper function

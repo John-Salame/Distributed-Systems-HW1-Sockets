@@ -23,8 +23,8 @@ CLASSES = \
 	src/main/java/com/jsala/client/v1/rest/BuyerClientRESTV1.java \
 	src/main/java/com/jsala/client/v1/timing/socket/BuyerClientTimingStudySocket.java \
 	src/main/java/com/jsala/client/v1/timing/socket/SellerClientTimingStudySocket.java \
-	src/main/java/com/jsala/server/v1/socket/test/BuyerServerTestSocket.java \
-	src/main/java/com/jsala/server/v1/socket/test/SellerServerTestSocket.java \
+	src/main/java/com/jsala/server/v1/starter/buyer/BuyerServerSocketSocketRunner.java \
+	src/main/java/com/jsala/server/v1/starter/seller/SellerServerSocketSocketRunner.java \
 	src/main/java/com/jsala/db/customer/DBCustomerRunner.java \
 	src/main/java/com/jsala/db/product/DBProductRunner.java
 
