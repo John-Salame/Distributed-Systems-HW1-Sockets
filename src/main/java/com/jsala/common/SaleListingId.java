@@ -8,6 +8,8 @@
 
 package com.jsala.common;
 
+import java.io.*;
+
 public class SaleListingId {
 	private ItemId itemId; // acts as a foreign key
 	private int quantity; // how many the seller put up for sale
@@ -44,6 +46,34 @@ public class SaleListingId {
 	}
 	public int getQuantity() {
 		return this.quantity;
+	}
+
+	public static byte[] serialize(SaleListingId saleListingId) throws IOException {
+		// ItemId, quantity
+		ByteArrayOutputStream buf = new ByteArrayOutputStream(2*Integer.BYTES);
+		DataOutputStream writer = new DataOutputStream(buf);
+		ItemId itemId = saleListingId.getItemId();
+		byte[] itemIdSer = ItemId.serialize(itemId);
+		writer.write(itemIdSer);
+		writer.writeInt(saleListingId.getQuantity());
+		byte ret[] = buf.toByteArray();
+		writer.close();
+		buf.close();
+		return ret;
+	}
+	public static SaleListingId deserialize(byte[] b) throws IOException, IllegalArgumentException {
+		ByteArrayInputStream buf = new ByteArrayInputStream(b);
+		DataInputStream reader = new DataInputStream(buf);
+		SaleListingId saleListingId = deserializeFromStream(reader);
+		reader.close();
+		buf.close();
+		return saleListingId;
+	}
+	public static SaleListingId deserializeFromStream(DataInputStream reader) throws IOException, IllegalArgumentException {
+		ItemId itemId = ItemId.deserializeFromStream(reader);
+		int quantity = reader.readInt();
+		SaleListingId saleListingId = new SaleListingId(itemId, quantity);
+		return saleListingId;
 	}
 
 	@Override

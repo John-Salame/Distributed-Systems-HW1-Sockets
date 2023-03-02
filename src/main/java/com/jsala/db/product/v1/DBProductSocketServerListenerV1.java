@@ -10,17 +10,21 @@
 
 package com.jsala.db.product.v1;
 import com.jsala.dao.ItemDAO;
+import com.jsala.dao.SaleListingDAO;
+
 import java.net.*;
 import java.io.IOException;
 
 public class DBProductSocketServerListenerV1 {
 	private ItemDAO itemDaoV1;
+	private SaleListingDAO saleListingDaoV1;
 	private ServerSocket server = null;
 
 	// CONSTRUCTORS
 	// starting the server - use this constructor and then call startServer()
-	public DBProductSocketServerListenerV1(ItemDAO itemDaoV1) {
+	public DBProductSocketServerListenerV1(ItemDAO itemDaoV1, SaleListingDAO saleListingDaoV1) {
 		this.itemDaoV1 = itemDaoV1;
+		this.saleListingDaoV1 = saleListingDaoV1;
 	}
 
 	// create the listener and enter the server loop
@@ -40,7 +44,7 @@ public class DBProductSocketServerListenerV1 {
 			try {
 				Socket socket = server.accept();
 				System.out.println("Received connection from " + socket.getRemoteSocketAddress());
-				Thread t = new Thread((Runnable) new DBProductSocketServerThreadV1(this.itemDaoV1, socket));
+				Thread t = new Thread((Runnable) new DBProductSocketServerThreadV1(this.itemDaoV1, this.saleListingDaoV1, socket));
 				t.start(); // run the run() function on a new thread
 				// TO-DO: Figure out how to join threads and maybe do something with the thread interrupts
 				// I could potentially check the socket.getRemoteSocketAddress() for each thread to check if it's ready to join

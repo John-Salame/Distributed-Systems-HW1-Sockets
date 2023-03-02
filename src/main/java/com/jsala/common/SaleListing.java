@@ -17,28 +17,63 @@
 
 package com.jsala.common;
 
+import com.jsala.common.transport.serialize.SerializeStringArray;
+
+import java.io.*;
+
 public class SaleListing {
+	private int dbId; // the primary key in the database, used for determinism
 	private SaleListingId id;
 	private int quantityRemaining; // how many have not yet sold
 	boolean isRemoved;
 
 	// CONSTRUCTORS
 	public SaleListing() {
+		this.dbId = -1;
 		this.id = new SaleListingId();
 		this.isRemoved = false;
 	}
 	public SaleListing(ItemId itemId, int quantity) {
+		this.dbId = -1;
 		this.id = new SaleListingId(itemId, quantity);
 		this.initializeQuantity(quantity);
 		this.isRemoved = false;
 	}
 	public SaleListing(SaleListingId id) {
+		this.dbId = -1;
 		this.id = id;
 		this.initializeQuantity(id.getQuantity());
 		this.isRemoved = false;
 	}
 
+	// VALIDATION
+	public static void validateDbId(int dbId) throws IllegalArgumentException {
+		if(dbId < 1) {
+			throw new IllegalArgumentException("Sale Listing database id must be positive");
+		}
+	}
+	public static void validateQuantityRemaining(int quantityRemaining) {
+		if(quantityRemaining < 0) {
+			throw new IllegalArgumentException("Sale Listing quantity remaining must be non-negative");
+		}
+	}
+
 	// SETTERS
+	/**
+	 * Method setDbId
+	 * Precondition: The database id has not been initialized.
+	 * The database id number is the primary key and thus is immutable once it has been initialized.
+	 */
+	public void setDbId(int dbId) throws IllegalArgumentException, IllegalStateException {
+		if(this.dbId != -1) {
+			throw new IllegalStateException("Error: Sale Listing database id cannot be changed after the sale listing has been created.");
+		}
+		// allow the database id to be -1 (helps with creating an item and passing it over the network before you know its database id)
+		if (dbId != -1) {
+			validateDbId(dbId);
+		}
+		this.dbId = dbId;
+	}
 	public void setItemId(ItemId itemId) {
 		this.id.setItemId(itemId);
 	}
@@ -52,7 +87,7 @@ public class SaleListing {
 	}
 	// used this function when selling the item; you can only sell up to <quantityRemaining> items
 	// return the number of items sold
-	public int decrementQuantity(int q) {
+	public int decrementQuantity(int q) throws IllegalStateException {
 		if(isRemoved) {
 			throw new IllegalStateException("Error: Cannot buy an item which has been removed from sale.");
 		}
@@ -66,6 +101,10 @@ public class SaleListing {
 	}
 
 	// GETTERS
+	public int getDbId() { return this.dbId; }
+	public SaleListingId getId() {
+		return this.id;
+	}
 	public ItemId getItemId() {
 		return this.id.getItemId();
 	}
@@ -84,10 +123,77 @@ public class SaleListing {
 	public boolean isRemoved() {
 		return this.isRemoved;
 	}
+	public boolean isAvailable() {
+		return !this.isRemoved() && !this.isSoldOut();
+	}
+
+	public static byte[] serialize(SaleListing saleListing) throws IOException {
+		// dbId, saleListingId, quantityRemaining, isRemoved
+		ByteArrayOutputStream buf = new ByteArrayOutputStream(); // grow dynamically
+		DataOutputStream writer = new DataOutputStream(buf);
+		writer.writeInt(saleListing.getDbId());
+		byte[] saleListingIdSer = SaleListingId.serialize(saleListing.getId());
+		writer.write(saleListingIdSer);
+		writer.writeInt(saleListing.getQuantityRemaining());
+		writer.writeBoolean((saleListing.isRemoved()));
+		byte ret[] = buf.toByteArray();
+		writer.close();
+		buf.close();
+		return ret;
+	}
+	public static SaleListing deserialize(byte[] b) throws IOException, IllegalArgumentException {
+		ByteArrayInputStream buf = new ByteArrayInputStream(b);
+		DataInputStream reader = new DataInputStream(buf);
+		SaleListing saleListing = deserializeFromStream(reader);
+		reader.close();
+		buf.close();
+		return saleListing;
+	}
+	public static SaleListing deserializeFromStream(DataInputStream reader) throws IOException, IllegalArgumentException {
+		int dbId = reader.readInt();
+		SaleListingId saleListingId = SaleListingId.deserializeFromStream(reader);
+		int quantityRemaining = reader.readInt();
+		boolean isRemoved = reader.readBoolean();
+		SaleListing saleListing = new SaleListing(saleListingId);
+		int originalQuantity = saleListing.getOriginalQuantity();
+		saleListing.decrementQuantity(originalQuantity - quantityRemaining);
+		if (isRemoved) {
+			saleListing.removeListing();
+		}
+		return saleListing;
+	}
+
+	public static byte[] serializeArray(SaleListing[] saleListings) throws IOException {
+		ByteArrayOutputStream buf = new ByteArrayOutputStream(); // grow dynamically
+		DataOutputStream writer = new DataOutputStream(buf);
+		short numElements = (short) saleListings.length;
+		writer.writeShort(numElements);
+		for(short i = 0; i < numElements; i++) {
+			byte[] saleListingSer = SaleListing.serialize(saleListings[i]);
+			writer.write(saleListingSer);
+		}
+		byte ret[] = buf.toByteArray();
+		writer.close();
+		buf.close();
+		return ret;
+	}
+
+	public static SaleListing[] deserializeArray(byte[] b) throws IOException, IllegalArgumentException {
+		ByteArrayInputStream buf = new ByteArrayInputStream(b);
+		DataInputStream reader = new DataInputStream(buf);
+		short numElements = reader.readShort();
+		SaleListing[] saleListings = new SaleListing[numElements];
+		for(short i = 0; i < numElements; i++) {
+			saleListings[i] = SaleListing.deserializeFromStream(reader);
+		}
+		reader.close();
+		buf.close();
+		return saleListings;
+	}
 	
 	@Override
 	public String toString() {
-		String ret = "Sales Listing for item " + this.getItemId().toString() + "\n";
+		String ret = "Sales Listing for item (DB ID " + this.getDbId() + ") " + this.getItemId().toString() + "\n";
 		ret = ret + this.getQuantityRemaining() + "/" + this.getOriginalQuantity() + " Remaining";
 		if(this.isSoldOut()) {
 			ret += " (Sold out)";

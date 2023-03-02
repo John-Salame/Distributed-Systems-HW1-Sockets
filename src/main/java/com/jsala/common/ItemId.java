@@ -47,7 +47,7 @@ public class ItemId {
 		}
 	}
 	// validate the ItemId as a whole
-	public static void validateId(ItemId id) {
+	public static void validateId(ItemId id) throws IllegalArgumentException {
 		validateCategory(id.getCategory());
 		validateSerial(id.getSerial());
 	}

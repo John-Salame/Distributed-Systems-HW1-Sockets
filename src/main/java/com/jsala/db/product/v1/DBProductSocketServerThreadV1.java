@@ -9,28 +9,37 @@
  */
 
 package com.jsala.db.product.v1;
+import com.jsala.common.SaleListing;
+import com.jsala.common.SaleListingId;
 import com.jsala.common.transport.serialize.*;
 import com.jsala.common.transport.socket.APIEnumV1;
 import com.jsala.common.transport.socket.BaseSocketServerThread;
 import com.jsala.common.transport.socket.DBItemEnumV1;
 import com.jsala.common.Item;
 import com.jsala.common.ItemId;
+import com.jsala.common.transport.socket.DBSaleListingEnumV1;
 import com.jsala.dao.ItemDAO;
+import com.jsala.dao.SaleListingDAO;
+
+import java.io.*;
 import java.net.*;
-import java.io.IOException;
 import java.util.NoSuchElementException;
 
-public class DBProductSocketServerThreadV1 extends BaseSocketServerThread implements ItemDAO {
+public class DBProductSocketServerThreadV1 extends BaseSocketServerThread implements ItemDAO, SaleListingDAO {
 	private ItemDAO itemDaoV1;
+	private SaleListingDAO saleListingDaoV1;
 	private DBItemEnumV1[] dbItemEnumV1Values; // for translating function ID to enum value
+	private DBSaleListingEnumV1[] dbSaleListingEnumV1Values;
 	private APIEnumV1[] apiEnumV1Values;
 
 	// CONSTRUCTORS
 	// Use this Constructor for threads that have an active connection
-	public DBProductSocketServerThreadV1(ItemDAO itemDaoV1, Socket socket) {
+	public DBProductSocketServerThreadV1(ItemDAO itemDaoV1, SaleListingDAO saleListingDaoV1, Socket socket) {
 		super(socket);
 		this.itemDaoV1 = itemDaoV1;
+		this.saleListingDaoV1 = saleListingDaoV1;
 		this.dbItemEnumV1Values = DBItemEnumV1.values();
+		this.dbSaleListingEnumV1Values = DBSaleListingEnumV1.values();
 		this.apiEnumV1Values = APIEnumV1.values();
 	}
 
@@ -48,6 +57,8 @@ public class DBProductSocketServerThreadV1 extends BaseSocketServerThread implem
 		switch (apiName) {
 			case DB_ITEM:
 				return this.demuxV1DBItem(funcId, msg);
+			case DB_SALE_LISTING:
+				return this.demuxV1DBSaleListing(funcId, msg);
 			default:
 				throw new RuntimeException("Err SellerSocketServerThreadV1: Received message with invalid API identifier.");
 		}
@@ -66,13 +77,27 @@ public class DBProductSocketServerThreadV1 extends BaseSocketServerThread implem
 			case GET_ITEMS_IN_CATEGORY:
 				return this.bytesGetItemsInCategory(msg);
 			default:
-				throw new RuntimeException("Err SellerSocketServerThreadV1: Unsupported method triggered by enum.");
+				throw new RuntimeException("Err SellerSocketServerThreadV1: Unsupported method triggered by DBItemV1 enum.");
+		}
+	}
+	private byte[] demuxV1DBSaleListing(int funcId, byte[] msg) throws IOException {
+		DBSaleListingEnumV1 functionName = this.dbSaleListingEnumV1Values[funcId];
+		switch (functionName) {
+			case PUT_ITEM_ON_SALE:
+				return this.bytesPutItemOnSale(msg);
+			case REMOVE_ITEM_FROM_SALE:
+				return this.bytesRemoveItemFromSale(msg);
+			case GET_SALE_LISTINGS_BY_SELLER:
+				return this.bytesGetSaleListingsBySeller(msg);
+			default:
+				throw new RuntimeException("Err SellerSocketServerThreadV1: Unsupported method triggered by DBSaleListingV1 enum.");
 		}
 	}
 	
 
 	// ITEM METHODS
 	// take in an item with an incomplete item id and update the id.
+	@Override
 	public ItemId createItem(Item item) throws IOException, IllegalArgumentException {
 		return itemDaoV1.createItem(item);
 	}
@@ -81,6 +106,7 @@ public class DBProductSocketServerThreadV1 extends BaseSocketServerThread implem
 		ItemId itemId = this.createItem(item);
 		return ItemId.serialize(itemId);
 	}
+	@Override
 	public Item getItemById(ItemId itemId) throws IOException, NoSuchElementException {
 		return itemDaoV1.getItemById(itemId);
 	}
@@ -90,6 +116,7 @@ public class DBProductSocketServerThreadV1 extends BaseSocketServerThread implem
 		return Item.serialize(item);
 	}
 	// use sellerId to verify that you are the correct seller to change the price
+	@Override
 	public void changePrice(ItemId itemId, int sellerId, float newPrice) throws IOException, NoSuchElementException, IllegalArgumentException, UnsupportedOperationException {
 		itemDaoV1.changePrice(itemId, sellerId, newPrice);
 	}
@@ -98,6 +125,7 @@ public class DBProductSocketServerThreadV1 extends BaseSocketServerThread implem
 		this.changePrice(priceArg.getItemId(), priceArg.getSellerId(), priceArg.getPrice());
 		return new byte[0];
 	}
+	@Override
 	public Item[] getItemsBySeller(int sellerId) throws IOException {
 		return itemDaoV1.getItemsBySeller(sellerId);
 	}
@@ -106,6 +134,7 @@ public class DBProductSocketServerThreadV1 extends BaseSocketServerThread implem
 		Item[] sellerItems = this.getItemsBySeller(sellerId);
 		return Item.serializeArray(sellerItems);
 	}
+	@Override
 	public Item[] getItemsInCategory(int category) throws IOException {
 		return itemDaoV1.getItemsInCategory(category);
 	}
@@ -115,8 +144,40 @@ public class DBProductSocketServerThreadV1 extends BaseSocketServerThread implem
 		return Item.serializeArray(catItems);
 	}
 
+	// SALE LISTING METHODS
 
-	public void closeConnection() {
-		// do nothing
+
+	@Override
+	public SaleListingId putItemOnSale(int sellerId, ItemId itemId, int quantity) throws IOException, NoSuchElementException, IllegalArgumentException, UnsupportedOperationException {
+		return saleListingDaoV1.putItemOnSale(sellerId, itemId, quantity);
+	}
+	private byte[] bytesPutItemOnSale(byte[] msg) throws IOException, NoSuchElementException, IllegalArgumentException, UnsupportedOperationException {
+		SerializeSaleListingArg saleListingArg = SerializeSaleListingArg.deserialize(msg);
+		SaleListingId ret = this.putItemOnSale(saleListingArg.getSellerId(), saleListingArg.getItemId(), saleListingArg.getQuantity());
+		return SaleListingId.serialize(ret);
+	}
+	@Override
+	public void removeItemFromSale(int sellerId, ItemId itemId, int quantity) throws IOException, NoSuchElementException, UnsupportedOperationException {
+		saleListingDaoV1.removeItemFromSale(sellerId, itemId, quantity);
+	}
+	private byte[] bytesRemoveItemFromSale(byte[] msg) throws IOException, NoSuchElementException, UnsupportedOperationException {
+		SerializeSaleListingArg saleListingArg = SerializeSaleListingArg.deserialize(msg);
+		this.removeItemFromSale(saleListingArg.getSellerId(), saleListingArg.getItemId(), saleListingArg.getQuantity());
+		return new byte[0];
+	}
+	@Override
+	public SaleListing[] getSaleListingsBySeller(int sellerId) throws IOException {
+		return saleListingDaoV1.getSaleListingsBySeller(sellerId);
+	}
+	private byte[] bytesGetSaleListingsBySeller(byte[] msg) throws IOException {
+		int sellerId = SerializeInt.deserialize(msg);
+		SaleListing[] saleListings = this.getSaleListingsBySeller(sellerId);
+		return SaleListing.serializeArray(saleListings);
+	}
+
+	@Override
+	public void closeConnection() throws IOException {
+		itemDaoV1.closeConnection();
+		saleListingDaoV1.closeConnection();
 	}
 }

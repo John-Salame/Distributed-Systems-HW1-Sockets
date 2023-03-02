@@ -7,6 +7,7 @@
  */
 
 package com.jsala.db.product;
+import com.jsala.dao.SaleListingDAO;
 import com.jsala.db.product.v1.*;
 import com.jsala.dao.ItemDAO;
 import java.net.SocketException;
@@ -16,7 +17,8 @@ public class DBProductRunner {
 		int port = 8400;
 		int maxConnections = 10;
 		ItemDAO itemDaoV1 = new ItemDAOInMemory();
-		DBProductSocketServerListenerV1 server = new DBProductSocketServerListenerV1(itemDaoV1);
+		SaleListingDAO saleListingDAOV1 = new SaleListingDAOInMemory(itemDaoV1);
+		DBProductSocketServerListenerV1 server = new DBProductSocketServerListenerV1(itemDaoV1, saleListingDAOV1);
 		server.startServer(port, maxConnections);
 	}
 }
