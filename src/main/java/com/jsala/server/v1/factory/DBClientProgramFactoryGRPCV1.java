@@ -19,24 +19,42 @@ import io.grpc.ManagedChannelBuilder;
 import java.lang.reflect.InvocationTargetException;
 
 public class DBClientProgramFactoryGRPCV1 implements UserInterfaceFactory {
-	private CustomerDAOFactory customerDaoFactory;
-	private ProductDAOFactory productDaoFactory;
+	private String customerDBHost;
+	private int customerDBIp;
+	private String productDBHost;
+	private int productDBIp;
 
 	public DBClientProgramFactoryGRPCV1(String customerDBHost, int customerDBIp, String productDBHost, int productDBIp) {
-		this.customerDaoFactory = new DBCustomerDAOFactoryGRPCV1(customerDBHost, customerDBIp);
-		// this.productDaoFactory = new DBProductDAOFactorySocketV1(productDBHost, productDBIp);
+		this.customerDBHost = customerDBHost;
+		this.customerDBIp = customerDBIp;
+		this.productDBHost = productDBHost;
+		this.productDBIp = productDBIp;
 	}
 	public BuyerInterface createBuyerInterface() throws InvocationTargetException {
-		CustomerDAOFactory buyerDAOFactory = customerDaoFactory;
-		CustomerDAOFactory sellerDAOFactory = customerDaoFactory;
-		CustomerDAOFactory sessionDAOFactory = customerDaoFactory;
-		ProductDAOFactory itemDAOFactory = productDaoFactory;
-		return new BuyerInterfaceServerImplV1(buyerDAOFactory, sellerDAOFactory, sessionDAOFactory, itemDAOFactory);
+		// I think it may be a bug to have the customerDaoFactory created in the constructor instead of here.
+		// Up in the constructor, it creates only one channel in the BuyerServerGRPCRunner instead of upon receiving a login.
+		try {
+			CustomerDAOFactory customerDaoFactory = new DBCustomerDAOFactoryGRPCV1(customerDBHost, customerDBIp);
+			ProductDAOFactory productDaoFactory = null;
+			CustomerDAOFactory buyerDAOFactory = customerDaoFactory;
+			CustomerDAOFactory sellerDAOFactory = customerDaoFactory;
+			CustomerDAOFactory sessionDAOFactory = customerDaoFactory;
+			ProductDAOFactory itemDAOFactory = productDaoFactory;
+			return new BuyerInterfaceServerImplV1(buyerDAOFactory, sellerDAOFactory, sessionDAOFactory, itemDAOFactory);
+		} catch (Exception e) {
+			throw new InvocationTargetException(e);
+		}
 	}
 	public SellerInterface createSellerInterface() throws InvocationTargetException {
-		CustomerDAOFactory sellerDAOFactory = customerDaoFactory;
-		CustomerDAOFactory sessionDAOFactory = customerDaoFactory;
-		ProductDAOFactory itemDAOFactory = productDaoFactory;
-		return new SellerInterfaceServerImplV1(sellerDAOFactory, sessionDAOFactory, itemDAOFactory);
+		try {
+			CustomerDAOFactory customerDaoFactory = new DBCustomerDAOFactoryGRPCV1(customerDBHost, customerDBIp);
+			ProductDAOFactory productDaoFactory = null;
+			CustomerDAOFactory sellerDAOFactory = customerDaoFactory;
+			CustomerDAOFactory sessionDAOFactory = customerDaoFactory;
+			ProductDAOFactory itemDAOFactory = productDaoFactory;
+			return new SellerInterfaceServerImplV1(sellerDAOFactory, sessionDAOFactory, itemDAOFactory);
+		} catch (Exception e) {
+			throw new InvocationTargetException(e);
+		}
 	}
 }

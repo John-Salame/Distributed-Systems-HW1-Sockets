@@ -20,6 +20,7 @@ import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
+import java.util.Arrays;
 
 public class BuyerClientRESTV1 implements BuyerInterface {
 	private String hostname;
@@ -81,15 +82,19 @@ public class BuyerClientRESTV1 implements BuyerInterface {
 	}
 	// DELETE
 	public void logout(String sessionToken) {
+		String resource = "logout";
 		throw new UnsupportedOperationException("REST buyer logout() unimplemented");
 	}
 	// GET
 	public int[] getSellerRating(int sellerId) {
+		String resource = "getsellerid?id=" + sellerId;
 		throw new UnsupportedOperationException("REST buyer getSellerRating() unimplemented");
 	}
 	// GET
 	// I will use comma-separated words for keywords as mentioned as an option here: https://www.atatus.com/blog/rest-api-best-practices-for-parameter-and-query-string-usage/
 	public Item[] searchItem(String sessionToken, int category, String[] keywords) {
+		String resource = "searchitem?category=" + category + "&keywords=" + Arrays.toString(keywords);
+		// add sessionToken to cookies header
 		throw new UnsupportedOperationException("REST buyer searchItem() unimplemented");
 	}
 }
