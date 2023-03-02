@@ -61,6 +61,7 @@ public class SellerInterfaceServerImplV1 implements SellerInterface {
 		return sellerDao.getSellerById(sellerId).getFeedback(); // not sure if this counts as stateless
 	}
 	public SaleListingId putOnSale(String sessionToken, Item item, int quantity) throws IOException, IllegalArgumentException {
+		int sellerId = sessionDao.getUserIdFromSession(sessionToken);
 		throw new RuntimeException("SellerInterfaceServerImplV1: putOnSale() Not implemented");
 	}
 	public void changePriceOfItem(String sessionToken, ItemId itemId, float newPrice) throws IOException, NoSuchElementException, IllegalArgumentException, UnsupportedOperationException {
