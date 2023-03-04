@@ -8,12 +8,10 @@
 
 package com.jsala.client.v1.timing;
 import com.jsala.client.v1.*;
+import com.jsala.common.*;
 import com.jsala.common.interfaces.factory.UserInterfaceFactory;
 import com.jsala.common.interfaces.SellerInterface;
-import com.jsala.common.Item;
-import com.jsala.common.ItemId;
-import com.jsala.common.Seller;
-import com.jsala.common.TimingLog;
+
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -70,9 +68,22 @@ public class SellerClientTimingInstance implements Runnable {
 			System.out.println("Displaying feedback for seller " + this.userId);
 			int[] feedback = this.sellerInterface.getSellerRating(1);
 			System.out.println(Arrays.toString(feedback));
-			System.out.println("Changing price of category 0, item 1");
-			this.sellerInterface.changePriceOfItem(this.sessionToken, new ItemId(0,1), (float) 5.00);
-			System.out.println("Seler " + this.userId + " session token = " + this.sessionToken);
+			// Create items
+			int quantity = this.userId;
+			Item apple = new Item("apple", 0, new String[] {"Food", "Fruit", "Crunchy"}, "New", (float) 0.79);
+			SaleListingId appleId = sellerInterface.putOnSale(this.sessionToken, apple, quantity);
+			Item pear = new Item("pear", 0, new String[] {"Food", "Fruit", "Soft", "Sour", "Sweet"}, "New", (float) 1.23);
+			SaleListingId pearId = sellerInterface.putOnSale(this.sessionToken, pear, quantity);
+			Item chair = new Item("chair", 1, new String[] {"Household", "Furniture"}, "Used", (float) 5.29);
+			SaleListingId chairId = sellerInterface.putOnSale(this.sessionToken, chair, quantity);
+			System.out.println("Changing price of apple");
+			this.sellerInterface.changePriceOfItem(this.sessionToken, appleId.getItemId(), (float) 5.00);
+			// remove the apple from sale
+			sellerInterface.removeItemFromSale(this.sessionToken, appleId.getItemId(), quantity);
+			// list all items this seller is selling
+			String itemsOnSale = sellerInterface.displayItemsOnSale(this.sessionToken);
+			System.out.println("Seller " + this.userId + " is selling:\n" + itemsOnSale);
+			System.out.println("Seller " + this.userId + " session token = " + this.sessionToken);
 			System.out.println("Seller " + this.userId + " logging out");
 			this.sellerInterface.logout(this.sessionToken);
 		} catch (Exception e) {
@@ -81,6 +92,7 @@ public class SellerClientTimingInstance implements Runnable {
 				// if the lines end up jumbling together, use file locks https://www.baeldung.com/java-write-to-file
 				System.out.println("Timing instance exception: " + e);
 				errorLog.write(e.toString());
+				this.sellerInterface.logout(this.sessionToken);
 			} catch (IOException i) {
 				// do nothing
 			}

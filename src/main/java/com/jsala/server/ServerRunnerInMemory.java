@@ -24,6 +24,8 @@ import com.jsala.db.customer.SessionDAOInMemory;
 import com.jsala.db.product.ItemDAOInMemory;
 import com.jsala.db.product.ProductDAOFactoryInMemory;
 import com.jsala.server.v1.*;
+
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.NoSuchElementException;
 import java.io.IOException;
@@ -39,13 +41,26 @@ import java.io.IOException;
 		CustomerDAOFactory sessionDaoFactory = custDaoFact;
 		ProductDAOFactory prodDaoFact = new ProductDAOFactoryInMemory();
 		ProductDAOFactory itemDaoFactory = prodDaoFact;
-		BuyerDAO buyerDao = buyerDaoFactory.createBuyerDao();
-		SellerDAO sellerDao = sellerDaoFactory.createSellerDao();
-		SessionDAO sessionDao = sessionDaoFactory.createSessionDao();
-		ItemDAO itemDao = itemDaoFactory.createItemDao();
-		System.out.println("Done creating DAOs");
-		BuyerInterface buyerInterface = new BuyerInterfaceServerImplV1(buyerDaoFactory, sellerDaoFactory, sessionDaoFactory, itemDaoFactory);
-		SellerInterface sellerInterface = new SellerInterfaceServerImplV1(sellerDaoFactory, sessionDaoFactory, itemDaoFactory);
+		ProductDAOFactory saleListingDaoFactory = prodDaoFact;
+		BuyerDAO buyerDao;
+		SellerDAO sellerDao;
+		SessionDAO sessionDao;
+		ItemDAO itemDao;
+		SaleListingDAO saleListingDAO;
+		BuyerInterface buyerInterface;
+		SellerInterface sellerInterface;
+		try {
+			buyerDao = buyerDaoFactory.createBuyerDao();
+			sellerDao = sellerDaoFactory.createSellerDao();
+			sessionDao = sessionDaoFactory.createSessionDao();
+			itemDao = itemDaoFactory.createItemDao();
+			saleListingDAO = saleListingDaoFactory.createSaleListingDao();
+			System.out.println("Done creating DAOs");
+			buyerInterface = new BuyerInterfaceServerImplV1(buyerDaoFactory, sellerDaoFactory, sessionDaoFactory, itemDaoFactory);
+			sellerInterface = new SellerInterfaceServerImplV1(sellerDaoFactory, sessionDaoFactory, itemDaoFactory, saleListingDaoFactory);
+		} catch (InvocationTargetException e) {
+			return; // stop the program if we can't create the DAOs or interfaces
+		}
 
 		// Basic buyer API calls
 		System.out.println("\n\nTesting Buyer edge cases");

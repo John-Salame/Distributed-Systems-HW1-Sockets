@@ -14,12 +14,19 @@ import java.lang.reflect.InvocationTargetException;
 
 public class ProductDAOFactoryInMemory implements ProductDAOFactory {
 	private ItemDAO itemDao;
+	private SaleListingDAO saleListingDao;
 
 	public ProductDAOFactoryInMemory() {
 		this.itemDao = new ItemDAOInMemory();
+		this.saleListingDao = new SaleListingDAOInMemory(this.itemDao);
 	}
 
+	@Override
 	public ItemDAO createItemDao() throws InvocationTargetException {
 		return this.itemDao;
+	}
+	@Override
+	public SaleListingDAO createSaleListingDao() throws InvocationTargetException {
+		return this.saleListingDao;
 	}
 }

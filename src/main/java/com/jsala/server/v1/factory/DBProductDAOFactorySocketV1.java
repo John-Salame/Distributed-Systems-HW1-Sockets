@@ -11,6 +11,8 @@ package com.jsala.server.v1.factory;
 import com.jsala.dao.*;
 import com.jsala.dao.factory.ProductDAOFactory;
 import com.jsala.server.v1.socket.DBProductItemSocketClientV1;
+import com.jsala.server.v1.socket.DBProductSaleListingSocketClientV1;
+
 import java.lang.reflect.InvocationTargetException;
 
 public class DBProductDAOFactorySocketV1 implements ProductDAOFactory {
@@ -22,7 +24,12 @@ public class DBProductDAOFactorySocketV1 implements ProductDAOFactory {
 		this.dbPort = port;
 	}
 
+	@Override
 	public ItemDAO createItemDao() throws InvocationTargetException {
 		return new DBProductItemSocketClientV1(this.dbHost, this.dbPort);
+	}
+	@Override
+	public SaleListingDAO createSaleListingDao() throws InvocationTargetException {
+		return new DBProductSaleListingSocketClientV1(this.dbHost, this.dbPort);
 	}
 }

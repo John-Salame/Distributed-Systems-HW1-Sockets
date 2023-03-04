@@ -13,10 +13,9 @@ import com.jsala.common.ItemId;
 import com.jsala.common.SaleListing;
 import com.jsala.common.SaleListingId;
 import com.jsala.common.transport.serialize.SerializeInt;
-import com.jsala.common.transport.serialize.SerializeSaleListingArg;
+import com.jsala.common.transport.serialize.SerializeSaleListingArgDB;
 import com.jsala.common.transport.socket.APIEnumV1;
 import com.jsala.common.transport.socket.BaseSocketClient;
-import com.jsala.common.transport.socket.DBItemEnumV1;
 import com.jsala.common.transport.socket.DBSaleListingEnumV1;
 import com.jsala.dao.SaleListingDAO;
 
@@ -34,7 +33,7 @@ public class DBProductSaleListingSocketClientV1 extends BaseSocketClient impleme
     @Override
     public SaleListingId putItemOnSale(int sellerId, ItemId itemId, int quantity) throws IOException, NoSuchElementException, IllegalArgumentException, UnsupportedOperationException {
         int funcId = DBSaleListingEnumV1.PUT_ITEM_ON_SALE.ordinal();
-        byte[] msg = SerializeSaleListingArg.serialize(sellerId, itemId, quantity);
+        byte[] msg = SerializeSaleListingArgDB.serialize(sellerId, itemId, quantity);
         byte[] buf = this.sendAndReceive(msg, funcId);
         return SaleListingId.deserialize(buf);
     }
@@ -42,7 +41,7 @@ public class DBProductSaleListingSocketClientV1 extends BaseSocketClient impleme
     @Override
     public void removeItemFromSale(int sellerId, ItemId itemId, int quantity) throws IOException, NoSuchElementException, UnsupportedOperationException {
         int funcId = DBSaleListingEnumV1.REMOVE_ITEM_FROM_SALE.ordinal();
-        byte[] msg = SerializeSaleListingArg.serialize(sellerId, itemId, quantity);
+        byte[] msg = SerializeSaleListingArgDB.serialize(sellerId, itemId, quantity);
         byte[] buf = this.sendAndReceive(msg, funcId);
         assert buf.length == 0;
     }

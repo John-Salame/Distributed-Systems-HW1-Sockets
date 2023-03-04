@@ -13,4 +13,5 @@ import java.lang.reflect.InvocationTargetException;
 
 public interface ProductDAOFactory {
 	public abstract ItemDAO createItemDao() throws InvocationTargetException;
+    public abstract SaleListingDAO createSaleListingDao() throws InvocationTargetException;
 }

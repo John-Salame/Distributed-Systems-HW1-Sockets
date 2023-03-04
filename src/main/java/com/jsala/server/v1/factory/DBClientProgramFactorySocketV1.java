@@ -12,6 +12,7 @@ package com.jsala.server.v1.factory;
 import com.jsala.common.interfaces.factory.UserInterfaceFactory;
 import com.jsala.common.interfaces.BuyerInterface;
 import com.jsala.common.interfaces.SellerInterface;
+import com.jsala.dao.SaleListingDAO;
 import com.jsala.dao.factory.CustomerDAOFactory;
 import com.jsala.dao.factory.ProductDAOFactory;
 import com.jsala.server.v1.BuyerInterfaceServerImplV1;
@@ -36,6 +37,7 @@ public class DBClientProgramFactorySocketV1 implements UserInterfaceFactory {
 		CustomerDAOFactory sellerDAOFactory = customerDaoFactory;
 		CustomerDAOFactory sessionDAOFactory = customerDaoFactory;
 		ProductDAOFactory itemDAOFactory = productDaoFactory;
-		return new SellerInterfaceServerImplV1(sellerDAOFactory, sessionDAOFactory, itemDAOFactory);
+		ProductDAOFactory saleListingDAOFactory = productDaoFactory;
+		return new SellerInterfaceServerImplV1(sellerDAOFactory, sessionDAOFactory, itemDAOFactory, saleListingDAOFactory);
 	}
 }

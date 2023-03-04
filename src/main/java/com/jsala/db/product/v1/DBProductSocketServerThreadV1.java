@@ -152,7 +152,7 @@ public class DBProductSocketServerThreadV1 extends BaseSocketServerThread implem
 		return saleListingDaoV1.putItemOnSale(sellerId, itemId, quantity);
 	}
 	private byte[] bytesPutItemOnSale(byte[] msg) throws IOException, NoSuchElementException, IllegalArgumentException, UnsupportedOperationException {
-		SerializeSaleListingArg saleListingArg = SerializeSaleListingArg.deserialize(msg);
+		SerializeSaleListingArgDB saleListingArg = SerializeSaleListingArgDB.deserialize(msg);
 		SaleListingId ret = this.putItemOnSale(saleListingArg.getSellerId(), saleListingArg.getItemId(), saleListingArg.getQuantity());
 		return SaleListingId.serialize(ret);
 	}
@@ -161,7 +161,7 @@ public class DBProductSocketServerThreadV1 extends BaseSocketServerThread implem
 		saleListingDaoV1.removeItemFromSale(sellerId, itemId, quantity);
 	}
 	private byte[] bytesRemoveItemFromSale(byte[] msg) throws IOException, NoSuchElementException, UnsupportedOperationException {
-		SerializeSaleListingArg saleListingArg = SerializeSaleListingArg.deserialize(msg);
+		SerializeSaleListingArgDB saleListingArg = SerializeSaleListingArgDB.deserialize(msg);
 		this.removeItemFromSale(saleListingArg.getSellerId(), saleListingArg.getItemId(), saleListingArg.getQuantity());
 		return new byte[0];
 	}

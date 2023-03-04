@@ -14,7 +14,6 @@ import com.jsala.common.interfaces.SellerInterface;
 import com.jsala.common.Item;
 import com.jsala.common.ItemId;
 import com.jsala.common.SaleListingId;
-import java.util.NoSuchElementException;
 
 public class SellerInterfaceClientImplV1 implements SellerInterface {
 
@@ -26,6 +25,7 @@ public class SellerInterfaceClientImplV1 implements SellerInterface {
 		this.transport = transport;
 	}
 
+	@Override
 	public int createUser(String username, String password) {
 		int userId = 0;
 		try {
@@ -35,6 +35,7 @@ public class SellerInterfaceClientImplV1 implements SellerInterface {
 		}
 		return userId;
 	}
+	@Override
 	public String login(String username, String password) {
 		String sessionToken = "";
 		try {
@@ -44,6 +45,7 @@ public class SellerInterfaceClientImplV1 implements SellerInterface {
 		}
 		return sessionToken;
 	}
+	@Override
 	public void logout(String sessionToken) {
 		try {
 			transport.logout(sessionToken);
@@ -51,6 +53,7 @@ public class SellerInterfaceClientImplV1 implements SellerInterface {
 			System.out.println(e);
 		}
 	}
+	@Override
 	public int[] getSellerRating(int sellerId) {
 		int[] sellerRating = new int[] {0, 0};
 		try {
@@ -60,6 +63,7 @@ public class SellerInterfaceClientImplV1 implements SellerInterface {
 		}
 		return sellerRating;
 	}
+	@Override
 	public SaleListingId putOnSale(String sessionToken, Item item, int quantity) {
 		SaleListingId saleId = null;
 		try {
@@ -69,6 +73,7 @@ public class SellerInterfaceClientImplV1 implements SellerInterface {
 		}
 		return saleId;
 	}
+	@Override
 	public void changePriceOfItem(String sessionToken, ItemId itemId, float newPrice) {
 		try {
 			transport.changePriceOfItem(sessionToken, itemId, newPrice);
@@ -76,8 +81,22 @@ public class SellerInterfaceClientImplV1 implements SellerInterface {
 			System.out.println(e);
 		}
 	}
-	/*
-	public void removeItemFromSale(String sessionToken, ItemId itemId, int quantity);
-	public String displayItemsOnSale(String sessionToken);
-	*/
+	@Override
+	public void removeItemFromSale(String sessionToken, ItemId itemId, int quantity) {
+		try {
+			transport.removeItemFromSale(sessionToken, itemId, quantity);
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+	}
+	@Override
+	public String displayItemsOnSale(String sessionToken) {
+		String ret = "";
+		try {
+			ret = transport.displayItemsOnSale(sessionToken);
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+		return ret;
+	}
 }

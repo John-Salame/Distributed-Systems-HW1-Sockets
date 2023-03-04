@@ -131,7 +131,7 @@ public class BaseSocketClient {
 				this.setup(this.serverIp, this.serverPort);
 			}
 			byte[] msg = packetPrefix.prependPrefix(b, funcId); // prepare the message
-			System.out.println("Sending " + new PacketPrefix((short) b.length, this.apiVer, this.api, funcId));
+			// System.out.println("Sending " + new PacketPrefix((short) b.length, this.apiVer, this.api, funcId));
 			this.out.write(msg); // send the message over the socket
 		} catch (SocketException se) {
 			// catch what is hopefully a "Connection reset""

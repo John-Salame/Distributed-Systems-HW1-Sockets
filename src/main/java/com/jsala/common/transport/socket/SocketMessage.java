@@ -28,7 +28,7 @@ public class SocketMessage {
 		try {
 			// read the message from the socket and parse out the metadata
 			prefix = PacketPrefix.getPrefixFromMessage(in);
-			System.out.println("Received " + prefix);
+			// System.out.println("Received " + prefix);
 		} catch (IOException i) {
 			System.out.println("SocketMessage readAndSplit() getPrefixFromMessage(): " + i);
 			throw i;

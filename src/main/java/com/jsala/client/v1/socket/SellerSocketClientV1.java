@@ -30,6 +30,7 @@ public class SellerSocketClientV1 extends BaseSocketClient implements SellerInte
 	}
 
 	// Inherited Methods
+	@Override
 	public int createUser(String username, String password) throws IOException, IllegalArgumentException {
 		int funcId = SellerEnumV1.CREATE_USER.ordinal();
 		int userId = 0;
@@ -40,6 +41,7 @@ public class SellerSocketClientV1 extends BaseSocketClient implements SellerInte
 		// this.cleanup();
 		return userId;
 	}
+	@Override
 	public String login(String username, String password) throws IOException, NoSuchElementException {
 		int funcId = SellerEnumV1.LOGIN.ordinal();
 		String sessionToken = null;
@@ -48,10 +50,12 @@ public class SellerSocketClientV1 extends BaseSocketClient implements SellerInte
 		sessionToken = SerializeString.deserialize(buf);
 		return sessionToken;
 	}
+	@Override
 	// clean up (close buffers and close the connection) when finished
 	// not sure if I should clean up if I get an IOException from the database logout operation
 	public void logout(String sessionToken) throws IOException, NoSuchElementException {
 		int funcId = SellerEnumV1.LOGOUT.ordinal();
+		// continue past an exception so we can cleanup the connection.
 		try {
 			byte[] msg = SerializeString.serialize(sessionToken);
 			byte[] buf = this.sendAndReceive(msg, funcId);
@@ -61,6 +65,7 @@ public class SellerSocketClientV1 extends BaseSocketClient implements SellerInte
 		}
 		this.cleanup();
 	}
+	@Override
 	public int[] getSellerRating(int sellerId) throws IOException, NoSuchElementException {
 		int funcId = SellerEnumV1.GET_SELLER_RATING.ordinal();
 		int[] rating = null;
@@ -69,17 +74,34 @@ public class SellerSocketClientV1 extends BaseSocketClient implements SellerInte
 		rating = SerializeIntArray.deserialize(buf);
 		return rating;
 	}
+	@Override
 	public SaleListingId putOnSale(String sessionToken, Item item, int quantity) throws IOException, IllegalArgumentException {
-		throw new RuntimeException("SellerSocketClientV1: putOnSale() Not implemented");
+		int funcId = SellerEnumV1.PUT_ON_SALE.ordinal();
+		SaleListingId saleListingId = null;
+		byte[] msg = SerializeCreateSaleListingArg.serialize(sessionToken, item, quantity);
+		byte[] buf = this.sendAndReceive(msg, funcId);
+		saleListingId = SaleListingId.deserialize(buf);
+		return saleListingId;
 	}
+	@Override
 	public void changePriceOfItem(String sessionToken, ItemId itemId, float newPrice) throws IOException, NoSuchElementException, IllegalArgumentException, UnsupportedOperationException {
 		int funcId = SellerEnumV1.CHANGE_PRICE_OF_ITEM.ordinal();
 		byte[] msg = SerializePriceArgClientServer.serialize(sessionToken, itemId, newPrice);
 		byte[] buf = this.sendAndReceive(msg, funcId);
 		assert buf.length == 0;
 	}
-	/*
-	public void removeItemFromSale(String sessionToken, ItemId itemId, int quantity);
-	public String displayItemsOnSale(String sessionToken);
-	*/
+	@Override
+	public void removeItemFromSale(String sessionToken, ItemId itemId, int quantity) throws IOException, NoSuchElementException, UnsupportedOperationException {
+		int funcId = SellerEnumV1.REMOVE_ITEM_FROM_SALE.ordinal();
+		byte[] msg = SerializeRemoveItemArg.serialize(sessionToken, itemId, quantity);
+		byte[] buf = this.sendAndReceive(msg, funcId);
+		assert buf.length == 0;
+	}
+	@Override
+	public String displayItemsOnSale(String sessionToken) throws IOException {
+		int funcId = SellerEnumV1.DISPLAY_ITEMS_ON_SALE.ordinal();
+		byte[] msg = SerializeString.serialize(sessionToken);
+		byte[] buf = this.sendAndReceive(msg, funcId);
+		return SerializeString.deserialize(buf);
+	}
 }

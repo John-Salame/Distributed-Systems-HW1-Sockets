@@ -52,7 +52,8 @@ public class DBClientProgramFactoryGRPCV1 implements UserInterfaceFactory {
 			CustomerDAOFactory sellerDAOFactory = customerDaoFactory;
 			CustomerDAOFactory sessionDAOFactory = customerDaoFactory;
 			ProductDAOFactory itemDAOFactory = productDaoFactory;
-			return new SellerInterfaceServerImplV1(sellerDAOFactory, sessionDAOFactory, itemDAOFactory);
+			ProductDAOFactory saleListingDaoFactory = productDaoFactory;
+			return new SellerInterfaceServerImplV1(sellerDAOFactory, sessionDAOFactory, itemDAOFactory, saleListingDaoFactory);
 		} catch (Exception e) {
 			throw new InvocationTargetException(e);
 		}

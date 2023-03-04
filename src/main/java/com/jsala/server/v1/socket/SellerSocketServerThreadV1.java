@@ -75,12 +75,17 @@ public class SellerSocketServerThreadV1 extends BaseSocketServerThread implement
 				return this.bytesPutOnSale(msg);
 			case CHANGE_PRICE_OF_ITEM:
 				return this.bytesChangePriceOfItem(msg);
+			case REMOVE_ITEM_FROM_SALE:
+				return this.bytesRemoveItemFromSale(msg);
+			case DISPLAY_ITEMS_ON_SALE:
+				return this.bytesDisplayItemsOnSale(msg);
 			default:
 				throw new RuntimeException("Err SellerSocketServerThreadV1: Unsupported method triggered by enum.");
 		}
 	}
 
 	// Seller interface methods and their new counterparts
+	@Override
 	public int createUser(String username, String password) throws IOException, IllegalArgumentException {
 		return this.sellerInterfaceV1.createUser(username, password);
 	}
@@ -91,7 +96,7 @@ public class SellerSocketServerThreadV1 extends BaseSocketServerThread implement
 		// this.stopServer(); // people can only log out if they've logged in, so we add this to let them close the socket before thay have an account to log in to
 		return SerializeInt.serialize(userId);
 	}
-
+	@Override
 	public String login(String username, String password) throws IOException, NoSuchElementException {
 		return this.sellerInterfaceV1.login(username, password);
 	}
@@ -100,6 +105,7 @@ public class SellerSocketServerThreadV1 extends BaseSocketServerThread implement
 		String sessionToken = this.login(serLog.getUsername(), serLog.getPassword());
 		return SerializeString.serialize(sessionToken);
 	}
+	@Override
 	public void logout(String sessionToken) throws IOException, NoSuchElementException {
 		this.sellerInterfaceV1.logout(sessionToken);
 		this.stopServer();
@@ -111,6 +117,7 @@ public class SellerSocketServerThreadV1 extends BaseSocketServerThread implement
 		byte[] output = new byte[0];
 		return output;
 	}
+	@Override
 	public int[] getSellerRating(int sellerId) throws IOException, NoSuchElementException {
 		return this.sellerInterfaceV1.getSellerRating(sellerId);
 	}
@@ -119,12 +126,16 @@ public class SellerSocketServerThreadV1 extends BaseSocketServerThread implement
 		int[] rating = this.getSellerRating(sellerId);
 		return SerializeIntArray.serialize(rating);
 	}
-	public SaleListingId putOnSale(String sessionToken, Item item, int quantity) throws IOException, IllegalArgumentException {
+	@Override
+	public SaleListingId putOnSale(String sessionToken, Item item, int quantity)  throws IOException, NoSuchElementException, IllegalArgumentException, UnsupportedOperationException {
 		return this.sellerInterfaceV1.putOnSale(sessionToken, item, quantity);
 	}
-	private byte[] bytesPutOnSale(byte[] msg) throws IOException, IllegalArgumentException {
-		throw new RuntimeException("SellerSocketServerThreadV1: putOnSale() Not implemented");
+	private byte[] bytesPutOnSale(byte[] msg)  throws IOException, NoSuchElementException, IllegalArgumentException, UnsupportedOperationException {
+		SerializeCreateSaleListingArg saleListingArg = SerializeCreateSaleListingArg.deserialize(msg);
+		SaleListingId saleListingId = this.putOnSale(saleListingArg.getSessionToken(), saleListingArg.getItem(), saleListingArg.getQuantity());
+		return SaleListingId.serialize(saleListingId);
 	}
+	@Override
 	public void changePriceOfItem(String sessionToken, ItemId itemId, float newPrice) throws IOException, NoSuchElementException, IllegalArgumentException, UnsupportedOperationException {
 		this.sellerInterfaceV1.changePriceOfItem(sessionToken, itemId, newPrice);
 	}
@@ -133,8 +144,22 @@ public class SellerSocketServerThreadV1 extends BaseSocketServerThread implement
 		this.changePriceOfItem(priceArg.getSessionToken(), priceArg.getItemId(), priceArg.getPrice());
 		return new byte[0];
 	}
-	/*
-	public void removeItemFromSale(String sessionToken, ItemId itemId, int quantity);
-	public String displayItemsOnSale(String sessionToken);
-	*/
+	@Override
+	public void removeItemFromSale(String sessionToken, ItemId itemId, int quantity) throws IOException, NoSuchElementException, UnsupportedOperationException {
+		this.sellerInterfaceV1.removeItemFromSale(sessionToken, itemId, quantity);
+	}
+	private byte[] bytesRemoveItemFromSale(byte[] msg) throws IOException, NoSuchElementException, UnsupportedOperationException {
+		SerializeRemoveItemArg removeItemArg = SerializeRemoveItemArg.deserialize(msg);
+		this.removeItemFromSale(removeItemArg.getSessionToken(), removeItemArg.getItemId(), removeItemArg.getQuantity());
+		return new byte[0];
+	}
+	@Override
+	public String displayItemsOnSale(String sessionToken) throws IOException {
+		return this.sellerInterfaceV1.displayItemsOnSale(sessionToken);
+	}
+	private byte[] bytesDisplayItemsOnSale(byte[] msg) throws IOException {
+		String sessionToken = SerializeString.deserialize(msg);
+		String ret = this.displayItemsOnSale(sessionToken);
+		return SerializeString.serialize(ret);
+	}
 }

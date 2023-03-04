@@ -83,12 +83,12 @@ public class BaseSocketServerThread implements Runnable {
 				}
 			}
 			catch (EOFException e) {
-				System.out.println("SellerSocketServerThreadV1 receive loop: " + e);
+				System.out.println("Error SellerSocketServerThreadV1 receive loop: " + e);
 				this.stop = true;
 			}
 			// return immediately if the socket experiences a connection error such as "Connection reset"
 			catch (SocketException s) {
-				System.out.println("Server socket thread loop readAndSplit() " + s);
+				System.out.println("Error SellerSocketServerThreadV1 receive loop: " + s);
 				this.stop = true;
 			}
 			catch (IOException i) {
@@ -97,7 +97,7 @@ public class BaseSocketServerThread implements Runnable {
 			}
 			catch (Exception e) {
 				// Prevent crashing the server thread
-				System.out.println("Socket server thread loop: " + e);
+				System.out.println("Error in Socket server thread loop: " + e);
 			}
 		}
 		this.cleanup(); // if we fail to read a message correctly, then clean up (close the connection) and end the thread
@@ -123,7 +123,7 @@ public class BaseSocketServerThread implements Runnable {
 			this.out.write(msg); // send the message over the socket
 		} catch (EOFException e) {
 			// I wonder if I should close the socket since this may imply that I can't send a proper message
-			System.out.println("SellerSocketServerThreadV1 sendResponse(): " + e);
+			System.out.println("Error SellerSocketServerThreadV1 sendResponse(): " + e);
 		} catch (IOException i) {
 			// I wonder if I should close the socket since this may imply that I can't send a proper message
 			System.out.println(i);
@@ -139,7 +139,7 @@ public class BaseSocketServerThread implements Runnable {
 			this.socket.close();
 			this.socket = null;
 		} catch (IOException i) {
-			System.out.println("SellerSocketServerThreadV1 cleanup(): " + i);
+			System.out.println("Error SellerSocketServerThreadV1 cleanup(): " + i);
 		}
 	}
 

@@ -155,6 +155,7 @@ public class SaleListing {
 		int quantityRemaining = reader.readInt();
 		boolean isRemoved = reader.readBoolean();
 		SaleListing saleListing = new SaleListing(saleListingId);
+		saleListing.setDbId(dbId);
 		int originalQuantity = saleListing.getOriginalQuantity();
 		saleListing.decrementQuantity(originalQuantity - quantityRemaining);
 		if (isRemoved) {
