@@ -9,14 +9,11 @@
  */
 
 package com.jsala.db.product.v1;
-import com.jsala.common.SaleListing;
-import com.jsala.common.SaleListingId;
+import com.jsala.common.*;
 import com.jsala.common.transport.serialize.*;
 import com.jsala.common.transport.socket.APIEnumV1;
 import com.jsala.common.transport.socket.BaseSocketServerThread;
 import com.jsala.common.transport.socket.DBItemEnumV1;
-import com.jsala.common.Item;
-import com.jsala.common.ItemId;
 import com.jsala.common.transport.socket.DBSaleListingEnumV1;
 import com.jsala.dao.ItemDAO;
 import com.jsala.dao.SaleListingDAO;
@@ -89,6 +86,8 @@ public class DBProductSocketServerThreadV1 extends BaseSocketServerThread implem
 				return this.bytesRemoveItemFromSale(msg);
 			case GET_SALE_LISTINGS_BY_SELLER:
 				return this.bytesGetSaleListingsBySeller(msg);
+			case GET_DETAILED_SALE_LISTINGS_BY_SELLER:
+				return this.bytesGetDetailedSaleListingsBySeller(msg);
 			default:
 				throw new RuntimeException("Err SellerSocketServerThreadV1: Unsupported method triggered by DBSaleListingV1 enum.");
 		}
@@ -146,7 +145,6 @@ public class DBProductSocketServerThreadV1 extends BaseSocketServerThread implem
 
 	// SALE LISTING METHODS
 
-
 	@Override
 	public SaleListingId putItemOnSale(int sellerId, ItemId itemId, int quantity) throws IOException, NoSuchElementException, IllegalArgumentException, UnsupportedOperationException {
 		return saleListingDaoV1.putItemOnSale(sellerId, itemId, quantity);
@@ -173,6 +171,15 @@ public class DBProductSocketServerThreadV1 extends BaseSocketServerThread implem
 		int sellerId = SerializeInt.deserialize(msg);
 		SaleListing[] saleListings = this.getSaleListingsBySeller(sellerId);
 		return SaleListing.serializeArray(saleListings);
+	}
+	@Override
+	public DetailedSaleListing[] getDetailedSaleListingsBySeller(int sellerId) throws IOException {
+		return saleListingDaoV1.getDetailedSaleListingsBySeller(sellerId);
+	}
+	private byte[] bytesGetDetailedSaleListingsBySeller(byte[] msg) throws IOException {
+		int sellerId = SerializeInt.deserialize(msg);
+		DetailedSaleListing[] detailedSaleListings = this.getDetailedSaleListingsBySeller(sellerId);
+		return DetailedSaleListing.serializeArray(detailedSaleListings);
 	}
 
 	@Override

@@ -8,11 +8,8 @@
  */
 
 package com.jsala.server.v1;
-import com.jsala.common.SaleListing;
+import com.jsala.common.*;
 import com.jsala.common.interfaces.SellerInterface;
-import com.jsala.common.Item;
-import com.jsala.common.ItemId;
-import com.jsala.common.SaleListingId;
 import com.jsala.dao.*;
 import com.jsala.dao.factory.*;
 
@@ -87,13 +84,13 @@ public class SellerInterfaceServerImplV1 implements SellerInterface {
 	}
 	public String displayItemsOnSale(String sessionToken) throws IOException {
 		int sellerId = 0;
-		SaleListing[] saleListings = new SaleListing[0];
+		DetailedSaleListing[] detailedSaleListings = new DetailedSaleListing[0];
 		try {
 			sellerId = sessionDao.getUserIdFromSession(sessionToken);
-			saleListings = saleListingDao.getSaleListingsBySeller(sellerId);
+			detailedSaleListings = saleListingDao.getDetailedSaleListingsBySeller(sellerId);
 		} catch (Exception e) {
 			System.out.println("SellerInterfaceServerImplV1 failed to display items on sale: " + e);
 		}
-		return Arrays.toString(saleListings);
+		return Arrays.toString(detailedSaleListings);
 	}
 }

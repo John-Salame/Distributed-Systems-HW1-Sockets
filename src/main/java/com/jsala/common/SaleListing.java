@@ -8,10 +8,6 @@
  * you can put the same kind of item on sale again after it has sold out.
  * However, once the actual sale is recorded, it will be recorded in another class and table which also permanently records the sale price in case it changes later.
  *
- * I'm not sure what my candidate key would be. The assignment implies that it is a combination of item ID and quantity, but what if I have multiple listings with the same quantity?
- * Perhaps I can't do partial sales and I can only sell the full quantity. Only then will the removal of a listing make sense.
- * Otherwise, we have an arbitrary numeric primary key and we query for all listings matching (item id, quantity) and arbitrarily sell one of them.
- *
  * In the future, I may denormalize some things such as sellerId and seller name so that I can get a nice toString() method.
  */
 

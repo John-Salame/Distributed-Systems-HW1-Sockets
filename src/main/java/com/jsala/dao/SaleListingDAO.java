@@ -7,6 +7,7 @@
  */
 
 package com.jsala.dao;
+import com.jsala.common.DetailedSaleListing;
 import com.jsala.common.ItemId;
 import com.jsala.common.SaleListing;
 import com.jsala.common.SaleListingId;
@@ -21,5 +22,6 @@ public interface SaleListingDAO {
 	public abstract void removeItemFromSale(int sellerId, ItemId itemId, int quantity) throws IOException, NoSuchElementException, UnsupportedOperationException;
 	// can return an empty array
 	public abstract SaleListing[] getSaleListingsBySeller(int sellerId) throws IOException;
+	public abstract DetailedSaleListing[] getDetailedSaleListingsBySeller(int sellerId) throws IOException;
 	public abstract void closeConnection() throws IOException;
 }

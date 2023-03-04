@@ -9,6 +9,7 @@
 
 package com.jsala.server.v1.socket;
 
+import com.jsala.common.DetailedSaleListing;
 import com.jsala.common.ItemId;
 import com.jsala.common.SaleListing;
 import com.jsala.common.SaleListingId;
@@ -52,6 +53,14 @@ public class DBProductSaleListingSocketClientV1 extends BaseSocketClient impleme
         byte[] msg = SerializeInt.serialize(sellerId);
         byte[] buf = this.sendAndReceive(msg, funcId);
         return SaleListing.deserializeArray(buf);
+    }
+
+    @Override
+    public DetailedSaleListing[] getDetailedSaleListingsBySeller(int sellerId) throws IOException {
+        int funcId = DBSaleListingEnumV1.GET_DETAILED_SALE_LISTINGS_BY_SELLER.ordinal();
+        byte[] msg = SerializeInt.serialize(sellerId);
+        byte[] buf = this.sendAndReceive(msg, funcId);
+        return DetailedSaleListing.deserializeArray(buf);
     }
 
     @Override

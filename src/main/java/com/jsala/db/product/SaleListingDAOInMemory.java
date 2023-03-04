@@ -8,10 +8,7 @@
 
 package com.jsala.db.product;
 
-import com.jsala.common.Item;
-import com.jsala.common.ItemId;
-import com.jsala.common.SaleListing;
-import com.jsala.common.SaleListingId;
+import com.jsala.common.*;
 import com.jsala.dao.ItemDAO;
 import com.jsala.dao.SaleListingDAO;
 import java.io.IOException;
@@ -106,6 +103,30 @@ public class SaleListingDAOInMemory implements SaleListingDAO {
         }
         SaleListing[] ret = new SaleListing[0];
         ret = salesList.toArray(ret);
+        return ret;
+    }
+
+    @Override
+    public DetailedSaleListing[] getDetailedSaleListingsBySeller(int sellerId) throws IOException {
+        SaleListing[] saleListings = this.getSaleListingsBySeller(sellerId);
+        int numListings = saleListings.length;
+        DetailedSaleListing[] dsl = new DetailedSaleListing[numListings];
+        int numElements = 0;
+        DetailedSaleListing[] ret = dsl;
+        try {
+            // I could optimize later on by using batch retrievals
+            for (int i = 0; i < numListings; ++i) {
+                SaleListing saleListing = saleListings[i];
+                dsl[i] = new DetailedSaleListing(saleListing, this.itemDAO.getItemById(saleListing.getItemId()));
+                ++numElements;
+            }
+        } catch (Exception e) {
+            // copy only the detailed sale listings which did not throw an Exception during creation
+            ret = new DetailedSaleListing[numElements];
+            for(int i = 0; i < numElements; ++i) {
+                ret[i] = dsl[i];
+            }
+        }
         return ret;
     }
 
